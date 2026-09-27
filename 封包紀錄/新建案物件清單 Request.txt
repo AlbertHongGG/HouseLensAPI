@@ -1,0 +1,13 @@
+curl -X GET 'https://bff-newhouse.591.com.tw/v1/list-search?searchtype=1&regionid=1&sectionid=&subway_line=&subway_id=&shop_id=&unitprice=&unitminprice=&unitmaxprice=&price=&minprice=&maxprice=&buildstatus=1%2C2&shape=&room=&purpose=&tag=&open_sell_time=&keywords=&o=&p=1&limit=20&mobile_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&deviceid=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&device_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&version=8.13.0.975&device=android&cm91dGU=L25ld2hvdXNlL2hvdXNpbmdsaXN0' ^
+-H 'user-agent: com.addcn.android.house591/8.13.0.975/1080x2274/Android/10/SM-A315G/675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'deviceid: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'cm91dgu: L25ld2hvdXNlL2hvdXNpbmdsaXN0' ^
+-H 'accept-encoding: gzip' ^
+-H 'mobile_id: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'loginvalid: 0' ^
+-H 'accept: application/json, text/plain, */*' ^
+-H 'version: 8.13.0.975' ^
+-H 'cookie: PHPSESSID=bvt2ps5jae2u9tmq9famriosln; urlJumpIp=1; T591_TOKEN=1c69104972d31c10b6305593462d5ba5; webp=1; _gcl_au=1.1.1138929088.1790519833; _ga=GA1.1.671267394.1790519833; __loc__=MTAxLjEyLjIwNi4xMDg=; __one_id__=01M3HK0GKD9C0JSM61GXJ4TBE6; _ga_HDSPSZ773Q=GS2.1.s1790527243$o2$g1$t1790527246$j57$l0$h0' ^
+-H 'device: android' ^
+-H 'host: bff-newhouse.591.com.tw' ^
+-H 'sentry-trace: 4c901e2ef4f2458f8e3156096dfc8474-029a5590248b4466'

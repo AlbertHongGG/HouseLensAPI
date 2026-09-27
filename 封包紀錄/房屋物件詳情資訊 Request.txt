@@ -1,0 +1,14 @@
+curl -X GET 'https://bff-house.591.com.tw/v1/app/gateway/sale/detail?id=20604856&regionid=1&is_ai_video=0&mobile_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&deviceid=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&device_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&version=8.13.0.975&device=android&cm91dGU=L3NhbGVob3VzZS9kZXRhaWw%3D' ^
+-H 'user-agent: com.addcn.android.house591/8.13.0.975/1080x2274/Android/10/SM-A315G/675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'deviceid: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'cm91dgu: L3NhbGVob3VzZS9kZXRhaWw=' ^
+-H 'accept-encoding: gzip' ^
+-H 'mobile_id: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'loginvalid: 0' ^
+-H 'accept: application/json, text/plain, */*' ^
+-H 'version: 8.13.0.975' ^
+-H 'cookie: PHPSESSID=bvt2ps5jae2u9tmq9famriosln; urlJumpIp=1; T591_TOKEN=1c69104972d31c10b6305593462d5ba5; webp=1; __one_id__=01M3HK0GKD9C0JSM61GXJ4TBE6; _gcl_au=1.1.1138929088.1790519833; _ga=GA1.1.671267394.1790519833; __loc__=MTAxLjEyLjIwNi4xMDg=; _ga_HDSPSZ773Q=GS2.1.s1790519833$o1$g1$t1790519838$j55$l0$h0' ^
+-H 'device: android' ^
+-H 'host: bff-house.591.com.tw' ^
+-H 'sentry-trace: 569bea5b518a4c29b1ef89a1e43d68e8-cfae109ffb464578-0' ^
+-H 'baggage: sentry-trace_id=569bea5b518a4c29b1ef89a1e43d68e8,sentry-public_key=fc75192838a84f9abc8026ba7784e7ae,sentry-release=com.addcn.android.house591%408.13.0%2B975,sentry-environment=release,sentry-transaction=%2Fsalehouse%2Fdetail,sentry-sample_rate=0.005,sentry-sample_rand=0.8705410365427048,sentry-sampled=false'

@@ -1,0 +1,14 @@
+curl -X GET 'https://oneid.addcn.com/v1/app/gateway/community/info?id=5855864&from_source=S20604856&mobile_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&deviceid=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&device_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&version=8.13.0.975&device=android&cm91dGU=L2NvbW11bml0eS9kZXRhaWw%3D' ^
+-H 'user-agent: com.addcn.android.house591/8.13.0.975/1080x2274/Android/10/SM-A315G/675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'deviceid: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'cm91dgu: L2NvbW11bml0eS9kZXRhaWw=' ^
+-H 'accept-encoding: gzip' ^
+-H 'mobile_id: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'loginvalid: 0' ^
+-H 'accept: application/json, text/plain, */*' ^
+-H 'version: 8.13.0.975' ^
+-H 'cookie: PHPSESSID=bvt2ps5jae2u9tmq9famriosln; urlJumpIp=1; T591_TOKEN=1c69104972d31c10b6305593462d5ba5; webp=1; _gcl_au=1.1.1138929088.1790519833; _ga=GA1.1.671267394.1790519833; __loc__=MTAxLjEyLjIwNi4xMDg=; _ga_HDSPSZ773Q=GS2.1.s1790519833$o1$g1$t1790521289$j60$l0$h0; __one_id__=01M3HP5D3NCZC8707CPG6VH7F2' ^
+-H 'device: android' ^
+-H 'host: bff-market.591.com.tw' ^
+-H 'sentry-trace: c8a0060cc30b4e42a9c2a069e5c015c0-cde6b2cec916417f-0' ^
+-H 'baggage: sentry-trace_id=c8a0060cc30b4e42a9c2a069e5c015c0,sentry-public_key=fc75192838a84f9abc8026ba7784e7ae,sentry-release=com.addcn.android.house591%408.13.0%2B975,sentry-environment=release,sentry-transaction=%2Fcommunity%2Fdetail,sentry-sample_rate=0.005,sentry-sample_rand=0.0917759102706036,sentry-sampled=false'

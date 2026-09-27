@@ -1,0 +1,13 @@
+curl -X GET 'https://bff.591.com.tw/v1/search/list?regionid=1&page=2&is_sale=0&post_type=8%2C2&mobile_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&deviceid=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&device_id=675ad1fc-ebc4-4310-8df7-7e8dd5b0c051&version=8.13.0.975&device=android&cm91dGU=L2NvbW11bml0eS9ob21l' ^
+-H 'user-agent: com.addcn.android.house591/8.13.0.975/1080x2274/Android/10/SM-A315G/675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'deviceid: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'cm91dgu: L2NvbW11bml0eS9ob21l' ^
+-H 'accept-encoding: gzip' ^
+-H 'mobile_id: 675ad1fc-ebc4-4310-8df7-7e8dd5b0c051' ^
+-H 'loginvalid: 0' ^
+-H 'accept: application/json, text/plain, */*' ^
+-H 'version: 8.13.0.975' ^
+-H 'cookie: PHPSESSID=bvt2ps5jae2u9tmq9famriosln; urlJumpIp=1; T591_TOKEN=1c69104972d31c10b6305593462d5ba5; webp=1; _gcl_au=1.1.1138929088.1790519833; _ga=GA1.1.671267394.1790519833; __loc__=MTAxLjEyLjIwNi4xMDg=; _ga_HDSPSZ773Q=GS2.1.s1790519833$o1$g1$t1790521289$j60$l0$h0; __one_id__=01M3HP5D3NCZC8707CPG6VH7F2' ^
+-H 'device: android' ^
+-H 'host: bff-market.591.com.tw' ^
+-H 'sentry-trace: 4f1bcf03713b4ca0b79a3540f82b7401-d943a8974661417b'

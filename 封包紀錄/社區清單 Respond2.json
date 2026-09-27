@@ -1,0 +1,2510 @@
+HTTP/1.1 200 OK
+Server: openresty
+Date: Sun,
+27 Sep 2026 15: 59: 50 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Vary: Accept-Encoding
+Vary: Accept-Encoding
+X-Server-Monitor: /v1/search/list 200 489 => /oauth/user/data 200 3 | /v2/search/list 200 486
+Content-Encoding: gzip
+
+{
+    "status": 1,
+    "msg": "ok",
+    "data": {
+        "items": [
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 6222,
+                "name": "奧斯卡談美",
+                "section": "內湖區",
+                "lat": "25.0623210",
+                "lng": "121.5851000",
+                "sale_num": 11,
+                "build_purpose_simple": "住宅",
+                "house_holds": 25,
+                "simple_address": "行善路333巷6號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "9,078",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "仁愛敦南加盟店",
+                    "shop_id": 47483,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "895962",
+                    "is_super": 0,
+                    "agent_id": 355658,
+                    "name": "王冠雅",
+                    "avatar": "https://img2.591.com.tw/user/2026/03/25/177436880628916.png!300x360.png",
+                    "user_id": 1848141,
+                    "im_uid": 1848141,
+                    "im_name": "王女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交6筆",
+                        "在售物件26筆·在租物件1筆",
+                        "熟悉社區·從業年限2年"
+                    ],
+                    "line": "https://line.me/ti/p/x_hDK--Vg8"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "https://img1.591.com.tw/3dmap/2026/04/28/69gzwCmro8np-WxE9m-Zr_1777363635896.gif!x.gif",
+                "map_3d_enable": 1,
+                "housing_type_str": "14年社區",
+                "station_name": "首都客運內湖站",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "11筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "75.4",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 13,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "第五期重劃區",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/12/164192135499209004.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 2,
+                        "content": "5筆降價,最高降3.3%"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 6189,
+                "name": "昇陽明大廈",
+                "section": "北投區",
+                "lat": "25.1359670",
+                "lng": "121.5033230",
+                "sale_num": 15,
+                "build_purpose_simple": "住宅",
+                "house_holds": 39,
+                "simple_address": "光明路185號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "15,294",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "住商不動產",
+                    "sub_company": "永和雙和加盟店",
+                    "shop_id": 23615,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "431277",
+                    "is_super": 0,
+                    "agent_id": 165951,
+                    "name": "陳獻銘",
+                    "avatar": "https://img1.591.com.tw/user/2024/09/28/172745363683690103.png!300x360.png",
+                    "user_id": 190987,
+                    "im_uid": 190987,
+                    "im_name": "陳先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "本社區已成交1筆",
+                        "在售物件2筆",
+                        "熟悉社區·行業深耕25年"
+                    ],
+                    "line": "https://line.me/ti/p/bGKzuWFEI_"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "15年社區",
+                "station_name": "新北投",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "15筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "71.3",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 29,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "新北投",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/12/164192118055087906.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我深耕本社區多年，更了解物件底價",
+                    "icon": "幫我議價"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "新上架2筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 5207,
+                "name": "萬美",
+                "section": "萬華區",
+                "lat": "25.0248250",
+                "lng": "121.5008980",
+                "sale_num": 16,
+                "build_purpose_simple": "華廈",
+                "house_holds": 32,
+                "simple_address": "萬大路277巷14弄16號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "6,257",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 1,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "西門加盟店",
+                    "shop_id": 43689,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "967700",
+                    "is_super": 0,
+                    "agent_id": 355199,
+                    "name": "饒明明",
+                    "avatar": "https://img1.591.com.tw/user/2024/05/30/171699925455616605.png!300x360.png",
+                    "user_id": 3962628,
+                    "im_uid": 3962628,
+                    "im_name": "饒女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交13筆",
+                        "在售物件70筆·在租物件2筆",
+                        "熟悉社區·行業深耕3年"
+                    ],
+                    "line": "https://line.me/ti/p/oG4_xoUcrb"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "17年社區",
+                "station_name": "青年路派出所",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "16筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "56.5",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 7,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "青年公園",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164191638077970108.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我熟悉市場動態，可以幫您了解行情準確估價",
+                    "icon": "幫我估價"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "新上架1筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 124969,
+                "id": 104221,
+                "name": "溫州院",
+                "section": "大安區",
+                "lat": "25.0244300",
+                "lng": "121.5340400",
+                "sale_num": 10,
+                "build_purpose_simple": "住宅",
+                "house_holds": 93,
+                "simple_address": "溫州街29號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "16,898",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 1,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "仁愛敦南加盟店",
+                    "shop_id": 31214,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "39463",
+                    "is_super": 0,
+                    "agent_id": 37633,
+                    "name": "黃頎順",
+                    "avatar": "https://img1.591.com.tw/user/2024/01/19/170559454023332908.png!300x360.png",
+                    "user_id": 2242729,
+                    "im_uid": 2242729,
+                    "im_name": "黃先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交10筆",
+                        "在售物件10筆",
+                        "熟悉社區·行業深耕15年"
+                    ],
+                    "line": "https://line.me/ti/p/O3jNnPHrVJ"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "新成屋",
+                "station_name": "台電大樓",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 3,
+                        "tag_str": "已完銷"
+                    }
+                ],
+                "price": {
+                    "price": "184.2",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 63,
+                "housing_ad_union": {
+                    "hid": 124969,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "師大",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [
+                    "近一週超 651 人看過",
+                    "熱門指數68%"
+                ],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2026/05/22/phgtoqqYbRZO2Q0yJmLP8.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我深耕本社區多年，更了解物件底價",
+                    "icon": "幫我議價"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "15天內上架8筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 115511,
+                "id": 7530,
+                "name": "昇陽鵬城",
+                "section": "萬華區",
+                "lat": "25.0460800",
+                "lng": "121.5050600",
+                "sale_num": 19,
+                "build_purpose_simple": "商辦",
+                "house_holds": "",
+                "simple_address": "漢口街二段99號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "12,521",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "住商不動産",
+                    "sub_company": "西門捷運加盟店",
+                    "shop_id": 25838,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "180971",
+                    "is_super": 0,
+                    "agent_id": 149498,
+                    "name": "張宗立",
+                    "avatar": "https://img2.591.com.tw/user/2024/07/11/172062798507457801.png!300x360.png",
+                    "user_id": 73399,
+                    "im_uid": 73399,
+                    "im_name": "張先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "本社區已成交4筆",
+                        "在售物件8筆·在租物件7筆",
+                        "熟悉社區·行業深耕17年"
+                    ],
+                    "line": "https://line.me/ti/p/Ew0iGtyIY9"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "8年社區",
+                "station_name": "西門",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "19筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "62.2",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 68,
+                "housing_ad_union": {
+                    "hid": 115511,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "西門",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/house/2018/04/18/152404480307289009.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區已成交4筆，更熟悉社區資訊",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "新上架3筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 138553,
+                "id": 5974875,
+                "name": "昇陽麗鉑",
+                "section": "北投區",
+                "lat": "25.1240300",
+                "lng": "121.5256700",
+                "sale_num": 40,
+                "build_purpose_simple": "住宅",
+                "house_holds": 47,
+                "simple_address": "石牌路二段363號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "5,322",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 0,
+                    "company": "",
+                    "sub_company": "",
+                    "shop_id": 0,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "900452",
+                    "is_super": 0,
+                    "agent_id": 354782,
+                    "name": "林耀鋐",
+                    "avatar": "https://img2.591.com.tw/user/2026/04/20/177661525226778.png!300x360.png",
+                    "user_id": 3489446,
+                    "im_uid": 3489446,
+                    "im_name": "林先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交10筆",
+                        "在售物件10筆",
+                        "專業服務·態度積極·認真負責"
+                    ],
+                    "line": "https://line.me/ti/p/LY-blYdpX4"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "新成屋",
+                "station_name": "振興醫院",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    },
+                    {
+                        "tag_type": 4,
+                        "tag_str": "開箱文"
+                    }
+                ],
+                "price": {
+                    "price": "100.7",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 22,
+                "housing_ad_union": {
+                    "hid": 138553,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "磺溪",
+                "dynamic": {
+                    "date": "2026-07-31",
+                    "content": "建案可售為3房38坪產品，銷售倒數1戶，2房產品已售罄，現場備有實品屋可供參觀，成交即可交屋。",
+                    "text": "有最新一條動態",
+                    "hid": 138553
+                },
+                "article": {
+                    "id": 10744,
+                    "score": "0.00",
+                    "advantage": "\n環境：「昇陽麗鉑」位於台北市北投區磺溪生活圈，鄰近石牌商圈、天母商圈，生活機能佳。\n",
+                    "is_light": 1
+                },
+                "hot_tag": [
+                    "近一週超 356 人看過",
+                    "熱門指數67%"
+                ],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/house/2025/03/14/174192001876106004.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 2,
+                        "content": "1筆降價,最高降6.3%"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 4277,
+                "name": "學園大廈",
+                "section": "大安區",
+                "lat": "25.0191430",
+                "lng": "121.5301410",
+                "sale_num": 15,
+                "build_purpose_simple": "住宅",
+                "house_holds": 44,
+                "simple_address": "羅斯福路三段259號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "1,852",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "住商不動產",
+                    "sub_company": "仁愛光復加盟店",
+                    "shop_id": 46031,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "274002",
+                    "is_super": 0,
+                    "agent_id": 355560,
+                    "name": "林建揚",
+                    "avatar": "https://img1.591.com.tw/user/2026/07/02/178292239914986.png!300x360.png",
+                    "user_id": 1499690,
+                    "im_uid": 1499690,
+                    "im_name": "林先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交91筆",
+                        "在售物件34筆·在租物件2筆",
+                        "熟悉社區·行業深耕11年"
+                    ],
+                    "line": "https://line.me/ti/p/iRItmbeKej"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "40年社區",
+                "station_name": "台電大樓",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "15筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "83.6",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 10,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "公館",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2021/11/13/163678766997462709.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超11年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 2,
+                        "content": "6筆降價,最高降2.4%"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 4055,
+                "name": "帝寶",
+                "section": "大安區",
+                "lat": "25.0388200",
+                "lng": "121.5361450",
+                "sale_num": 7,
+                "build_purpose_simple": "住宅",
+                "house_holds": 188,
+                "simple_address": "建國南路一段222號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "72,198",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 7,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "大師房屋",
+                    "sub_company": "仁愛營業處",
+                    "shop_id": 15228,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "706399",
+                    "is_super": 0,
+                    "agent_id": 348320,
+                    "name": "闕宏倫",
+                    "avatar": "https://img1.591.com.tw/user/2025/11/19/176348239571857006.png!300x360.png",
+                    "user_id": 89295,
+                    "im_uid": 89295,
+                    "im_name": "闕先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交22筆",
+                        "熟悉社區·行業深耕22年",
+                        "專業服務·態度積極·認真負責"
+                    ],
+                    "line": ""
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "20年社區",
+                "station_name": "忠孝新生",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "7筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "247.7",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 17,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "東區商圈",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [
+                    "近一週超 1,122 人看過",
+                    "熱門指數67%"
+                ],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/11/164191070588653806.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超22年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 3,
+                        "content": "15天內559人瀏覽"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 124851,
+                "id": 104143,
+                "name": "Forest Park 吉美富徠",
+                "section": "大安區",
+                "lat": "25.0260700",
+                "lng": "121.5395700",
+                "sale_num": 23,
+                "build_purpose_simple": "住宅",
+                "house_holds": 50,
+                "simple_address": "瑞安街149巷6號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "14,072",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "仁愛敦南加盟店",
+                    "shop_id": 31214,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "82243",
+                    "is_super": 0,
+                    "agent_id": 72376,
+                    "name": "黃頎順",
+                    "avatar": "https://img2.591.com.tw/user/2024/01/19/170559454023332908.png!300x360.png",
+                    "user_id": 2242729,
+                    "im_uid": 2242729,
+                    "im_name": "黃先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交10筆",
+                        "在售物件10筆",
+                        "熟悉社區·行業深耕15年"
+                    ],
+                    "line": "https://line.me/ti/p/O3jNnPHrVJ"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "新成屋",
+                "station_name": "科技大樓",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    },
+                    {
+                        "tag_type": 4,
+                        "tag_str": "開箱文"
+                    }
+                ],
+                "price": {
+                    "price": "170.9",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 39,
+                "housing_ad_union": {
+                    "hid": 124851,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "科技大樓",
+                "dynamic": {},
+                "article": {
+                    "id": 9978,
+                    "score": "0.00",
+                    "advantage": "\n環境：基地旁為瑞安公園、距大安森林公園不遠，周邊質感、機能佳。\n社區規劃：標準層雙併設計，相對單純。\n",
+                    "is_light": 1
+                },
+                "hot_tag": [
+                    "近一週超 355 人看過",
+                    "熱門指數66%"
+                ],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/house/2024/09/06/172561459512060004.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超15年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "15天內上架6筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 3557,
+                "name": "潤泰翡翠",
+                "section": "萬華區",
+                "lat": "25.0409590",
+                "lng": "121.5075220",
+                "sale_num": 11,
+                "build_purpose_simple": "住宅",
+                "house_holds": 52,
+                "simple_address": "中華路一段170號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "9,487",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 1,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "西門加盟店",
+                    "shop_id": 43689,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "564483",
+                    "is_super": 0,
+                    "agent_id": 355789,
+                    "name": "饒明明",
+                    "avatar": "https://img1.591.com.tw/user/2024/05/30/171699925455616605.png!300x360.png",
+                    "user_id": 3962628,
+                    "im_uid": 3962628,
+                    "im_name": "饒女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交13筆",
+                        "在售物件70筆·在租物件2筆",
+                        "熟悉社區·行業深耕3年"
+                    ],
+                    "line": "https://line.me/ti/p/oG4_xoUcrb"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "20年社區",
+                "station_name": "西門",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "11筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "77.6",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 17,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "西門",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164190824731292507.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "新上架1筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 120061,
+                "id": 101654,
+                "name": "世界明珠",
+                "section": "南港區",
+                "lat": "25.0533222",
+                "lng": "121.6001104",
+                "sale_num": 12,
+                "build_purpose_simple": "住宅",
+                "house_holds": 351,
+                "simple_address": "市民大道八段185號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "70,674",
+                "in_rank_list": 1,
+                "follow_status": 0,
+                "rent_num": 3,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "南港昆陽加盟店",
+                    "shop_id": 16759,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "17967",
+                    "is_super": 0,
+                    "agent_id": 16691,
+                    "name": "陳柏任",
+                    "avatar": "https://img2.591.com.tw/user/2023/11/21/170049686646963609.png!300x360.png",
+                    "user_id": 566674,
+                    "im_uid": 566674,
+                    "im_name": "陳先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交25筆",
+                        "在售物件86筆·在租物件6筆",
+                        "熟悉社區·行業深耕13年"
+                    ],
+                    "line": "https://line.me/ti/p/@uqj0298n"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "新成屋",
+                "station_name": "南港",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    }
+                ],
+                "price": {
+                    "price": "144.1",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 287,
+                "housing_ad_union": {
+                    "hid": 120061,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "南港車站",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [
+                    "近一週超 1,835 人看過",
+                    "熱門指數飆升至72%"
+                ],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/house/2025/12/26/176672281390702404.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超13年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "14天內上架2筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 4155,
+                "name": "雲荷",
+                "section": "中正區",
+                "lat": "25.0213330",
+                "lng": "121.5184460",
+                "sale_num": 11,
+                "build_purpose_simple": "住宅",
+                "house_holds": 131,
+                "simple_address": "水源路105號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "17,679",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "西門加盟店",
+                    "shop_id": 43689,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "207084",
+                    "is_super": 0,
+                    "agent_id": 355760,
+                    "name": "饒明明",
+                    "avatar": "https://img1.591.com.tw/user/2024/05/30/171699925455616605.png!300x360.png",
+                    "user_id": 3962628,
+                    "im_uid": 3962628,
+                    "im_name": "饒女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交13筆",
+                        "在售物件70筆·在租物件2筆",
+                        "熟悉社區·行業深耕3年"
+                    ],
+                    "line": "https://line.me/ti/p/oG4_xoUcrb"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "19年社區",
+                "station_name": "古亭",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "11筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "84.7",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 48,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "古亭",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/11/164191120234479609.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "13天內上架5筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 6325,
+                "name": "遠雄米蘭苑",
+                "section": "內湖區",
+                "lat": "25.0605820",
+                "lng": "121.5855400",
+                "sale_num": 16,
+                "build_purpose_simple": "住宅",
+                "house_holds": 81,
+                "simple_address": "新富街156號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "15,377",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "內湖四期",
+                    "shop_id": 41704,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "153024",
+                    "is_super": 0,
+                    "agent_id": 128719,
+                    "name": "簡君容",
+                    "avatar": "https://img1.591.com.tw/user/2023/10/20/169780244967595409.png!300x360.png",
+                    "user_id": 3850782,
+                    "im_uid": 3850782,
+                    "im_name": "簡女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交50筆",
+                        "在售物件37筆",
+                        "熟悉社區·行業深耕16年"
+                    ],
+                    "line": "https://line.me/ti/p/nddTdSL4Of"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "https://img2.591.com.tw/3dmap/2026/04/28/5m76tAnOz5WySrby-RJAy_1777361751850.gif!x.gif",
+                "map_3d_enable": 1,
+                "housing_type_str": "14年社區",
+                "station_name": "首都客運內湖站",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "16筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "91.0",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 75,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "第五期重劃區",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/12/164192188619726309.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超16年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "8天內上架4筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 126531,
+                "id": 3669648,
+                "name": "安家藏玉",
+                "section": "中正區",
+                "lat": "25.0429611",
+                "lng": "121.5285701",
+                "sale_num": 12,
+                "build_purpose_simple": "住宅",
+                "house_holds": 159,
+                "simple_address": "忠孝東路二段64巷10號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "29,717",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 6,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "仁愛敦南加盟店",
+                    "shop_id": 40451,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "716275",
+                    "is_super": 0,
+                    "agent_id": 197355,
+                    "name": "余珮綵",
+                    "avatar": "https://img2.591.com.tw/user/2023/12/04/170165731397799704.png!300x360.png",
+                    "user_id": 589974,
+                    "im_uid": 589974,
+                    "im_name": "余女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交16筆",
+                        "在售物件46筆",
+                        "熟悉社區·行業深耕17年"
+                    ],
+                    "line": "https://line.me/ti/p/5GkyOQpPt9"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "新成屋",
+                "station_name": "忠孝新生",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 1
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    }
+                ],
+                "price": {
+                    "price": "139.0",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 190,
+                "housing_ad_union": {
+                    "hid": 126531,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "善導寺站",
+                "dynamic": {
+                    "date": "2026-09-09",
+                    "content": "成交即可交屋入住，銷售倒數個位數，主力格局為E、F、H戶型，均有在售，現場備有實品屋可供參觀。",
+                    "text": "有最新一條動態",
+                    "hid": 126531
+                },
+                "article": {},
+                "hot_tag": [
+                    "近一週超 1,449 人看過",
+                    "熱門指數73%"
+                ],
+                "photo_src": {
+                    "type": 3,
+                    "src": "https://img1.591.com.tw/house/2021/07/28/162745987054907803.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超17年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 3,
+                        "content": "15天內569人瀏覽"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 130404,
+                "id": 5880647,
+                "name": "新碩大砌",
+                "section": "北投區",
+                "lat": "25.1150060",
+                "lng": "121.5069800",
+                "sale_num": 28,
+                "build_purpose_simple": "住宅",
+                "house_holds": 65,
+                "simple_address": "承德路七段210號",
+                "housing_type": 1,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "9,979",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 5,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "東門加盟店",
+                    "shop_id": 21540,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "461519",
+                    "is_super": 0,
+                    "agent_id": 350375,
+                    "name": "藍仁鴻",
+                    "avatar": "https://img2.591.com.tw/user/2023/12/11/170222485804720807.png!300x360.png",
+                    "user_id": 42309,
+                    "im_uid": 42309,
+                    "im_name": "藍先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交24筆",
+                        "在售物件158筆·在租物件12筆",
+                        "熟悉社區·行業深耕20年"
+                    ],
+                    "line": "https://line.me/ti/p/JK6mtmELOT"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "預售屋",
+                "station_name": "唭哩岸",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 3,
+                        "tag_str": "已完銷"
+                    },
+                    {
+                        "tag_type": 4,
+                        "tag_str": "開箱文"
+                    }
+                ],
+                "price": {
+                    "price": "90.3",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 33,
+                "housing_ad_union": {
+                    "hid": 130404,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "石牌",
+                "dynamic": {},
+                "article": {
+                    "id": 970,
+                    "score": "0.00",
+                    "advantage": "\n位置：「新碩大砌」坐落於60米承德路，前眺關渡平原，完工後中高樓層皆享有寬闊棟距。\n社區規劃：規劃耐震六級建築，且保固年限超越法規。\n",
+                    "is_light": 1
+                },
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/house/2022/05/10/165216550457867300.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超20年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 2,
+                        "content": "2筆降價,最高降33.9%"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "預售屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 4460,
+                "name": "城市光點",
+                "section": "內湖區",
+                "lat": "25.0671520",
+                "lng": "121.5978990",
+                "sale_num": 22,
+                "build_purpose_simple": "住宅",
+                "house_holds": 58,
+                "simple_address": "民權東路六段212號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "9,560",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "內湖麗湖店",
+                    "shop_id": 48391,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "310082",
+                    "is_super": 0,
+                    "agent_id": 348657,
+                    "name": "暨昌學",
+                    "avatar": "https://img1.591.com.tw/user/2026/03/27/177454160698337.png!300x360.png",
+                    "user_id": 1910109,
+                    "im_uid": 1910109,
+                    "im_name": "暨先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交39筆",
+                        "在售物件17筆·在租物件2筆",
+                        "熟悉社區·行業深耕12年"
+                    ],
+                    "line": "https://line.me/ti/p/lu6C2naV36"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "19年社區",
+                "station_name": "長壽抽水站",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "22筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "83.8",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 37,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "第四期重劃區",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164191278290167404.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "15天內上架5筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 1410,
+                "name": "仁愛新城己區",
+                "section": "中正區",
+                "lat": "25.0387280",
+                "lng": "121.5244600",
+                "sale_num": 12,
+                "build_purpose_simple": "住宅",
+                "house_holds": 132,
+                "simple_address": "仁愛路一段51巷1號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "9,528",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "住商不動產",
+                    "sub_company": "仁愛光復加盟店",
+                    "shop_id": 9203,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "346633",
+                    "is_super": 0,
+                    "agent_id": 355449,
+                    "name": "李孟叡",
+                    "avatar": "https://img2.591.com.tw/user/2025/11/18/176339600298593406.png!300x360.png",
+                    "user_id": 1283500,
+                    "im_uid": 1283500,
+                    "im_name": "李先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交260筆",
+                        "在售物件70筆·在租物件2筆",
+                        "熟悉社區·行業深耕14年"
+                    ],
+                    "line": "https://line.me/ti/p/WYI9Wfio99"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "28年社區",
+                "station_name": "東門",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "12筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "86.8",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 28,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "善導寺站",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164189908078247603.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超14年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 2,
+                        "content": "1筆降價,最高降3.1%"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 4863,
+                "name": "愛登堡",
+                "section": "北投區",
+                "lat": "25.1169079",
+                "lng": "121.5141705",
+                "sale_num": 12,
+                "build_purpose_simple": "住宅",
+                "house_holds": 48,
+                "simple_address": "東華街二段36號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "13,855",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "住商不動產",
+                    "sub_company": "三重文化",
+                    "shop_id": 43988,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "554176",
+                    "is_super": 0,
+                    "agent_id": 344245,
+                    "name": "詹子慶",
+                    "avatar": "https://img1.591.com.tw/user/2024/04/03/171211971026684709.png!300x360.png",
+                    "user_id": 4142598,
+                    "im_uid": 4142598,
+                    "im_name": "詹先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交31筆",
+                        "在售物件7筆",
+                        "熟悉社區·行業深耕3年"
+                    ],
+                    "line": "https://line.me/ti/p/-1VoYQBKVX"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "18年社區",
+                "station_name": "石牌",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "12筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "65.0",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 3,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "石牌",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/11/164191483010495300.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "新上架1筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 129392,
+                "id": 5868215,
+                "name": "富域",
+                "section": "北投區",
+                "lat": "25.1310900",
+                "lng": "121.5019500",
+                "sale_num": 26,
+                "build_purpose_simple": "住宅",
+                "house_holds": 201,
+                "simple_address": "中央南路一段93號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "37,773",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 8,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "住商不動產",
+                    "sub_company": "芝山捷運店",
+                    "shop_id": 31690,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "375025",
+                    "is_super": 0,
+                    "agent_id": 338050,
+                    "name": "鄭志和",
+                    "avatar": "https://img2.591.com.tw/user/2026/04/16/177626961287186.png!300x360.png",
+                    "user_id": 2919087,
+                    "im_uid": 2919087,
+                    "im_name": "鄭先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "本社區已成交2筆",
+                        "在售物件16筆",
+                        "熟悉社區·行業深耕17年"
+                    ],
+                    "line": "https://line.me/ti/p/qaeT46D9u6"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "新成屋",
+                "station_name": "北投",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    },
+                    {
+                        "tag_type": 4,
+                        "tag_str": "開箱文"
+                    }
+                ],
+                "price": {
+                    "price": "88.0",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 198,
+                "housing_ad_union": {
+                    "hid": 129392,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "北投",
+                "dynamic": {
+                    "date": "2026-07-09",
+                    "content": "建案可售為40~64坪一般事務所產品，其餘產品已完銷，成交即可交屋。",
+                    "text": "有最新一條動態",
+                    "hid": 129392
+                },
+                "article": {
+                    "id": 633,
+                    "score": "0.00",
+                    "advantage": "1.機能：近北投捷運站2號出口，步行約3分鐘可到;鄰近熱鬧的中央南路商圈，生活採買便利，學區亦步行可達。\n2.社區規劃：規劃SRC+制震壁，一層四戶，戶戶邊間，均質3~4房產品。",
+                    "is_light": 1
+                },
+                "hot_tag": [
+                    "近一週超 749 人看過",
+                    "熱門指數69%"
+                ],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/house/2022/03/24/164810303348869105.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區已成交2筆，更熟悉社區資訊",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "4天內上架2筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 0,
+                "id": 6106,
+                "name": "力麒首御",
+                "section": "中正區",
+                "lat": "25.0270080",
+                "lng": "121.5175860",
+                "sale_num": 14,
+                "build_purpose_simple": "住宅",
+                "house_holds": 68,
+                "simple_address": "和平西路一段101號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "17,690",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": {
+                    "approve_status": 1,
+                    "company": "中信房屋",
+                    "sub_company": "西門加盟店",
+                    "shop_id": 43689,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "657327",
+                    "is_super": 0,
+                    "agent_id": 340714,
+                    "name": "饒明明",
+                    "avatar": "https://img1.591.com.tw/user/2024/05/30/171699925455616605.png!300x360.png",
+                    "user_id": 3962628,
+                    "im_uid": 3962628,
+                    "im_name": "饒女士",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交13筆",
+                        "在售物件70筆·在租物件2筆",
+                        "熟悉社區·行業深耕3年"
+                    ],
+                    "line": "https://line.me/ti/p/oG4_xoUcrb"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "15年社區",
+                "station_name": "古亭",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "14筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "90.8",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 42,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "古亭",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/12/164192076151958107.jpg!600x450.jpg"
+                },
+                "label_info": {
+                    "content": "我在本社區有1筆在售物件",
+                    "icon": "幫我推薦"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "13天內上架4筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "中古屋"
+            }
+        ],
+        "paginate": {
+            "total": 8377,
+            "total_page": 419,
+            "cur_page": 2
+        },
+        "redirect_info": {},
+        "meta": {
+            "title": "台北市社區找房查房價 - 591實價登錄",
+            "keywords": "台北市社區,台北市房價,台北市實價登錄",
+            "description": "591為您提供台北市社區基礎資料、房價查詢，包括中古屋買賣，新成屋、預售屋實價登錄，租屋、買屋，社區找房首選。"
+        },
+        "is_recom": 0,
+        "is_filter": 1,
+        "is_alley_lane": 0,
+        "follow": {
+            "follow_cnt": 0,
+            "follow_upd_cnt": 0
+        }
+    }
+}

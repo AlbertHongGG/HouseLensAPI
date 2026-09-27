@@ -1,0 +1,341 @@
+HTTP/1.1 200 OK
+Server: openresty
+Date: Sun,
+27 Sep 2026 15: 01: 25 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Vary: Accept-Encoding
+Google-Recaptcha-Score: 999
+Vary: Accept-Encoding
+X-Server-Monitor: /v1/app/gateway/sale/detail 200 304 => /app/sale/detail 200 303 | /remark/original 200 5 | /sale/map 200 128 | /advert 200 124 | /api/mortgage/plan/getPerPayInfo 200 108 | /v1/sale/bid-agent 200 11
+Content-Encoding: gzip
+
+{
+    "status": 1,
+    "msg": "success",
+    "data": {
+        "id": 20604856,
+        "kind": 9,
+        "kindStr": "住宅",
+        "room": 3,
+        "regionId": 1,
+        "sectionId": 4,
+        "posttime": 1784807542,
+        "baseInfo": {
+            "user_id": 45430,
+            "title": "5258萬：全新/碧硯閣/民生社區/三房車位*中信葉玲玲",
+            "price": 5258,
+            "unitPrice": "132.2萬/坪",
+            "layout": "3房2廳2衛",
+            "area": 46.29,
+            "unitArea": "46.29坪",
+            "mainArea": "23.10坪",
+            "areaIntro": [
+                {
+                    "name": "登記總面積",
+                    "value": "46.29坪"
+                },
+                {
+                    "name": "主建物",
+                    "value": "23.10坪"
+                },
+                {
+                    "name": "附屬建物",
+                    "value": "2.78坪"
+                },
+                {
+                    "name": "共有部分",
+                    "value": "11.17坪"
+                },
+                {
+                    "name": "土地坪數",
+                    "value": "5.06坪"
+                },
+                {
+                    "name": "車位面積",
+                    "value": "9.24坪"
+                }
+            ],
+            "parking": "9.24坪，平面式，已含售金內",
+            "info": [
+                {
+                    "name": "單價",
+                    "value": "132.2萬/坪"
+                },
+                {
+                    "name": "現況",
+                    "value": "住宅"
+                },
+                {
+                    "name": "朝向",
+                    "value": "坐南朝北"
+                },
+                {
+                    "name": "用途",
+                    "value": "住家用"
+                },
+                {
+                    "name": "樓層",
+                    "value": "2F/24F"
+                },
+                {
+                    "name": "陽台",
+                    "value": "1個"
+                },
+                {
+                    "name": "裝潢",
+                    "value": "簡易裝潢"
+                },
+                {
+                    "name": "帶租約",
+                    "value": "否"
+                },
+                {
+                    "name": "屋齡",
+                    "value": "1年"
+                },
+                {
+                    "name": "型態",
+                    "value": "電梯大樓"
+                },
+                {
+                    "name": "管理費",
+                    "value": "4200元/月"
+                },
+                {
+                    "name": "公設比",
+                    "value": "30%"
+                }
+            ],
+            "address": {
+                "region": "台北市",
+                "section": "松山區",
+                "street": "三民路",
+                "alley": "80",
+                "lane": "",
+                "addr_number": "25",
+                "addr_number_of": 0,
+                "hide_addr_detail": 1,
+                "addr": "80巷",
+                "lat": "25.0561190",
+                "lng": "121.5645131"
+            },
+            "shape": 2
+        },
+        "shareInfo": {
+            "url": "https://www.591.com.tw/2S?salt=SaI9a&s=a",
+            "from": "來自【591APP】",
+            "title": "住宅出售，5258萬元，詳情："
+        },
+        "extraInfo": {
+            "saletype": 1
+        },
+        "goodHouse": [
+            {
+                "icon": "https://www.591.com.tw/images/api/mobile/detail/icon/goodHouseIcon1.png",
+                "tag": "售價低",
+                "desc": "比同社區同格局的房屋，平均售價低1241萬"
+            },
+            {
+                "icon": "https://www.591.com.tw/images/api/mobile/detail/icon/goodHouseIcon3.png",
+                "tag": "搶手房源",
+                "desc": "近兩週647人也在關注此房"
+            },
+            {
+                "icon": "https://www.591.com.tw/images/api/mobile/detail/icon/goodHouseIcon5.png",
+                "tag": "交通便利",
+                "desc": "距離捷運南京三民站516公尺"
+            }
+        ],
+        "linkInfo": {
+            "uid": 45430,
+            "line": "",
+            "liff_url": "https://liff.line.me/2006310106-KlA8Ag69/contact",
+            "imUid": 45430,
+            "imName": "葉女士",
+            "linkman": "葉玲玲",
+            "identity": "仲介",
+            "houseType": 3,
+            "hidCompany": "1",
+            "role": 3,
+            "isAgent": 0,
+            "isGoldAgent": 0,
+            "labelInfo": [
+                "歷史已成交144筆",
+                "在售物件15筆·在租物件1筆"
+            ],
+            "cub_id": 0,
+            "cub_join_time": 0,
+            "cub_experience": "",
+            "mobile": "0937-912-547",
+            "phone": "",
+            "isTransferTel": 0,
+            "avatar": "https://img1.591.com.tw/user/2017/11/02/150960557012341503.jpg!100x100.jpg",
+            "approveStatus": 1,
+            "certificateNum": "99年北市經證字第00478號",
+            "showCertificateNum": 1,
+            "companyname": "中信房屋",
+            "subcompanyname": "延壽健安加盟店",
+            "econName": "豊玉不動產仲介有限公司",
+            "econNumber": "",
+            "isrecmoney": "收服務費",
+            "isServiceFee": 1,
+            "warnmsg": 0,
+            "is_agent": 0,
+            "is_super": 0,
+            "user_role": "medium",
+            "shop_open": 1,
+            "shop_id": 25986,
+            "shop_status": 0,
+            "shop_type": 1,
+            "shop_experience": "1997-10",
+            "shop_name": "葉玲玲的網路店舖",
+            "shop_introduce": "真心誠意，專業服務，使命必達!",
+            "join_time": 1204730676,
+            "email": "",
+            "preferred_contact_method": "mobile",
+            "is_quality": 0,
+            "is_team_quality": 0
+        },
+        "priceInfo": [
+            {
+                "name": "售金",
+                "value": "5,258萬"
+            },
+            {
+                "name": "格局",
+                "value": "3房2廳2衛"
+            },
+            {
+                "name": "權狀坪數",
+                "value": "46.29坪"
+            }
+        ],
+        "nearInfo": {
+            "traffic": "",
+            "living": ""
+        },
+        "remark": "<p></p><p></p><p>1，中工碧硯閣/全新交屋，&nbsp;三民路80巷，民生社區新地標</p><p></p><p>2，5258萬，即可入住碧硯閣，全新/三房+坡道車位，有管理，公設多種。</p><p></p><p>3，台北市區稀有大基地/1445坪/24層氣派/方正/四面鄰路</p><p></p><p>4，靜巷/綠意/退缩4米/大棟距</p><p></p><p>5，24小時管理/雙門禁</p><p></p><p>6，全新大樓/SRC結構，三房雙衛，格局實用，一層6戸/4部電梯，坡道平面車位</p><p></p><p>7，南京三民站8分鐘/賣場，銀行，美食，公車，學校，公園，生活機能強</p><p></p><p>8，預約請洽:&nbsp;中信葉玲玲0937912547</p><p></p><p>#新成屋#南京三民#民生社區#健安新城#平安新城#碧硯閣&nbsp;#鳴森大苑</p><p></p>",
+        "has_ai_feature": 0,
+        "advert": {
+            "149": [
+                {
+                    "order_number": "C202606011344",
+                    "position_name": "中古屋詳細頁小橫幅",
+                    "row": 1,
+                    "img": "https://hp3.591.com.tw/banner/178029469025819604.png",
+                    "img_color": "#d9b8af",
+                    "txt": "",
+                    "txt2": "",
+                    "url": "https://www.100.com.tw/land/mr-living/packages?utm_source=sale&utm_medium=detail&utm_campaign=text_recom",
+                    "event_show": "n-hitc",
+                    "event_click": "n-hitf",
+                    "event_media": "n-hit3",
+                    "event_show_url": "https://union.591.com.tw/stats/event/redirect?e=n-hitc&_source=BANNER.200857",
+                    "event_click_url": "https://union.591.com.tw/stats/event/redirect?e=n-hitf&url=https%3A%2F%2Fwww.100.com.tw%2Fland%2Fmr-living%2Fpackages%3Futm_source%3Dsale%26utm_medium%3Ddetail%26utm_campaign%3Dtext_recom%26prebuild_type%3D1&_source=BANNER.200857",
+                    "event_media_url": "https://union.591.com.tw/stats/event/redirect?e=n-hit3&_source=BANNER.200857",
+                    "did": 213823,
+                    "aid": 200857,
+                    "video_name": "",
+                    "pd_id": 149,
+                    "pd_type": 1,
+                    "order_type": 2,
+                    "advert_name": "",
+                    "hls_video_url": "",
+                    "hls_video_wh": "",
+                    "hls_video_cover": "",
+                    "hls_video_cover_mp4": "",
+                    "source_video_url": "",
+                    "youtube_url": "",
+                    "is_video": 0,
+                    "app_open_url": "tw591:///common/touch?url=https%3A%2F%2Fwww.100.com.tw%2Fland%2Fmr-living%2Fpackages%3Futm_source%3Dsale%26utm_medium%3Ddetail%26utm_campaign%3Dtext_recom&prebuild_type=1",
+                    "region_name": "台北市",
+                    "is_new_img": 0,
+                    "url_type": {
+                        "type": "other"
+                    },
+                    "browsenum": 0,
+                    "browsenum_txt": "0",
+                    "is_new_post": false,
+                    "tag": [],
+                    "is_new_billboard": 1,
+                    "type": "video",
+                    "video_type": 0,
+                    "mask_img": "",
+                    "cover": "",
+                    "thumbnail": "https://hp3.591.com.tw/banner/178029469025819604.png",
+                    "origin": "",
+                    "handle": "",
+                    "duration": "0.00",
+                    "outer_url": "",
+                    "outer_duration": "0.00"
+                }
+            ]
+        },
+        "mortgage": {
+            "per_pay_hide": "1",
+            "mortgage_ratio": "0.8",
+            "mortgage_time": "30",
+            "interest": "1.062",
+            "per_pay": "136,483",
+            "first_pay": "1052",
+            "un_mortgage": "0",
+            "ratio": 20,
+            "payText": "約1052萬，月還款136,483元"
+        },
+        "bidInfo": {
+            "label_type": 1,
+            "bid_rank": 99
+        },
+        "gtm_detail_data": {
+            "item_id": "S20604856",
+            "item_name": "5258萬：全新/碧硯閣/民生社區/三房車位*中信葉玲玲",
+            "region_name": "台北市",
+            "section_name": "松山區",
+            "kind_name": "住宅",
+            "price_name": 5258,
+            "shape_name": "電梯大樓",
+            "layout_name": 3,
+            "area_name": 46.29,
+            "house_age_name": 1,
+            "direction_name": "坐南朝北",
+            "floor_name": "2F",
+            "unit_price_name": "132.2",
+            "fitment_name": "簡易裝潢",
+            "life_name": ""
+        },
+        "otherInfo": {
+            "shareInfo": {
+                "url": "https://www.591.com.tw/2S?salt=SaI9a&s=a",
+                "from": "來自【591APP】",
+                "title": "住宅出售，5258萬元，詳情："
+            },
+            "extraInfo": {
+                "saletype": 1
+            },
+            "meta": {
+                "title": "[住宅]5258萬：全新/碧硯閣/民生社區/三房車位*中信葉玲玲 - 591租屋網",
+                "keywords": "5258萬：全新/碧硯閣/民生社區/三房車位*中信葉玲玲,住宅,台北市租屋,591租屋網",
+                "description": "591為您提供：台北市松山區住宅,,5258萬：全新/碧硯閣/民生社區/三房車位*中信葉玲玲",
+                "ogimage": "https://img1.591.com.tw/house/2026/08/14/178669446039148103.jpg!730x460.water2.jpg"
+            },
+            "views": {
+                "pc": 632,
+                "touch": 603,
+                "android": 345,
+                "ios": 2035
+            },
+            "actions": {
+                "share": 28,
+                "fav": 25
+            },
+            "im_online": false,
+            "show_refresh_package_tag": false,
+            "last_refresh_time_tag": "",
+            "customer_view_data": [],
+            "customer_view_entry": null,
+            "is_ai_speak": true
+        }
+    }
+}

@@ -1,0 +1,4320 @@
+HTTP/1.1 200 OK
+Server: openresty
+Date: Sun,
+27 Sep 2026 15: 02: 40 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Vary: Accept-Encoding
+Google-Recaptcha-Score: 999
+Vary: Accept-Encoding
+X-Server-Monitor: /v1/app/gateway/community/info 200 656 => /oauth/user/data 200 3 | /community/info 200 280 | /v2/community/layout-info 200 41 | /v2/community/image-data 200 8 | /v2/community/price-trend 200 10 | /community/build-info 200 44 | /v1/community/rent-layout 200 259 | /v1/community/nearby-ware-list 200 624 | /v1/community/nearby-ware-list 200 652 | /v1/community/main-layout 200 18
+Content-Encoding: gzip
+
+{
+    "status": 1,
+    "msg": "ok",
+    "data": {
+        "base_info": {
+            "community_id": 5855864,
+            "community_name": "鳴森大苑-碧硯閣",
+            "community_type": 1,
+            "community_type_str": "新建案社區",
+            "build_type": 2,
+            "build_type_str": "新成屋",
+            "sale_tag": "近半年成交",
+            "sale_tag_type": 1,
+            "purpose_str": "住宅",
+            "transport": "南京三民",
+            "address": "台北市松山區延壽街76之1號",
+            "simple_address": "延壽街76之1號",
+            "region_id": 1,
+            "region_name": "台北市",
+            "section_id": 4,
+            "section_name": "松山區",
+            "shopping_district": "民生社區",
+            "hot_tag": [
+                "近一週超 1,273 人看過",
+                "熱門指數72%"
+            ],
+            "agent_tip": "我熟悉社區，加Line幫你預約帶看服務哦",
+            "map_3d_img_url": "https://img1.591.com.tw/3dmap/2026/04/28/uPSguTBpIFnIBECp2SXir_1777377110823.gif!x.gif",
+            "map_3d_enable": 1,
+            "fast_question": {
+                "id": "Y1",
+                "content": "社區3房5258萬起，社區專家專業帶看，免費預約",
+                "is_discount": 0
+            }
+        },
+        "community_score": {
+            "id": 5855864,
+            "shop_id": 169,
+            "trans": 3.7,
+            "business": 5,
+            "edu": 5,
+            "life": 3,
+            "community_planning": 3.6,
+            "layout_planning": 4.5,
+            "total": 4.04,
+            "updated_at": "2024-05-10 16:06:37"
+        },
+        "shop_avg_score": {
+            "trans": 3.56,
+            "business": 5,
+            "edu": 4.68,
+            "life": 2.68,
+            "community_planning": 2.53,
+            "layout_planning": 3.39,
+            "total": 3.22
+        },
+        "community_rank_in_shop": {
+            "shopping_district": "民生社區",
+            "total": 76,
+            "rank": 1,
+            "position": 1,
+            "position_text": "上等"
+        },
+        "article_info": {
+            "active": 1,
+            "article_id": 935,
+            "score": "0.00",
+            "o_score": "?.00",
+            "area_socre": "0.00",
+            "o_area_socre": "?.00",
+            "plan_socre": "0.00",
+            "o_plan_socre": "?.00",
+            "advantage": [
+                "機能：「中工碧硯閣」位於台北市精華區，基本生活機能無虞。",
+                "位置：近捷運南京三民站。"
+            ],
+            "disadvantage": [
+                "社區規劃：單層戶數較多。"
+            ],
+            "photo_src": "https://img1.591.com.tw/house/2021/11/08/163635834299762900.jpg!338x252.jpg",
+            "is_light": 1,
+            "url": "https://m.591.com.tw/v2/news/article/935",
+            "card_data": {
+                "region_view": 1,
+                "community_view": 1,
+                "layout_view": 1,
+                "layout_num": 5
+            },
+            "phone_apply": 0,
+            "show_community_score": 0,
+            "ai_type": "",
+            "line_tip_list": [
+                "同價位社區幫對比",
+                "周邊社區幫比價"
+            ],
+            "line_tip_empty": "問房仲，索取社區攻略"
+        },
+        "surrounding": {
+            "community_id": 5855864,
+            "community_name": "鳴森大苑-碧硯閣",
+            "lat": "25.0569150",
+            "lng": "121.5651082",
+            "address": "台北市松山區延壽街76之1號",
+            "photo_src": "https://img1.591.com.tw/market/2022/01/06/164146482980299708.png!600x600.png",
+            "map_data": [
+                {
+                    "type": "trans",
+                    "name": "交通出行",
+                    "total": 17,
+                    "items": [
+                        {
+                            "name": "三民路",
+                            "type": "bus",
+                            "distance": 179,
+                            "distance_str": "約179公尺",
+                            "lat": "25.0577293",
+                            "lng": "121.5636236"
+                        },
+                        {
+                            "name": "南京三民",
+                            "type": "subway",
+                            "distance": 593,
+                            "distance_str": "約593公尺",
+                            "lat": "25.0514290",
+                            "lng": "121.5638580"
+                        }
+                    ],
+                    "line_tip": "上班高峰期周圍是否堵車？"
+                },
+                {
+                    "type": "edu",
+                    "name": "教育/學區",
+                    "total": 40,
+                    "items": [
+                        {
+                            "name": "臺北市立西松高級中學",
+                            "type": "secondary",
+                            "distance": 201,
+                            "distance_str": "約201公尺",
+                            "lat": "25.0553700",
+                            "lng": "121.5663535"
+                        },
+                        {
+                            "name": "臺北市松山區健康國民小學",
+                            "type": "primary",
+                            "distance": 225,
+                            "distance_str": "約225公尺",
+                            "lat": "25.0564197",
+                            "lng": "121.5627472"
+                        }
+                    ],
+                    "line_tip": "周邊學校的教學質量如何？"
+                },
+                {
+                    "type": "life",
+                    "name": "生活機能",
+                    "total": 29,
+                    "items": [
+                        {
+                            "name": "花家食堂",
+                            "type": "restaurant",
+                            "distance": 104,
+                            "distance_str": "約104公尺",
+                            "lat": "25.0570254",
+                            "lng": "121.5640041"
+                        },
+                        {
+                            "name": "建成花園商場",
+                            "type": "shopping",
+                            "distance": 215,
+                            "distance_str": "約215公尺",
+                            "lat": "25.0586039",
+                            "lng": "121.5648250"
+                        }
+                    ],
+                    "line_tip": "社區周邊有公園嗎？"
+                },
+                {
+                    "type": "medicalAndBank",
+                    "name": "醫療/銀行",
+                    "total": 21,
+                    "items": [
+                        {
+                            "name": "劉內兒科診所",
+                            "type": "medical",
+                            "distance": 344,
+                            "distance_str": "約344公尺",
+                            "lat": "25.0585070",
+                            "lng": "121.5622100"
+                        },
+                        {
+                            "name": "東青中醫診所",
+                            "type": "medical",
+                            "distance": 419,
+                            "distance_str": "約419公尺",
+                            "lat": "25.0594033",
+                            "lng": "121.5678165"
+                        }
+                    ],
+                    "line_tip": "周邊有醫療水平比較高的醫院？"
+                },
+                {
+                    "type": "aversion_facility",
+                    "name": "嫌惡設施",
+                    "total": 20,
+                    "items": [
+                        {
+                            "name": "中油直營 民生東路站",
+                            "type": "aversion",
+                            "distance": 362,
+                            "distance_str": "約362公尺",
+                            "lat": "25.0596914",
+                            "lng": "121.5636138"
+                        },
+                        {
+                            "name": "恩友堂",
+                            "type": "aversion",
+                            "distance": 377,
+                            "distance_str": "約377公尺",
+                            "lat": "25.0541769",
+                            "lng": "121.5674953"
+                        }
+                    ],
+                    "line_tip": "社區居住環境如何？"
+                }
+            ]
+        },
+        "layout_pic": {
+            "active": 1,
+            "items": [
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 37.06,
+                    "small_pic": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!328x252.jpg",
+                    "big_pic": "https://img2.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 36.93,
+                    "small_pic": "https://img2.591.com.tw/house/2025/04/01/174348619571642502.jpg!328x252.jpg",
+                    "big_pic": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 41.84,
+                    "small_pic": "https://img1.591.com.tw/house/2025/04/01/174348619479698107.jpg!328x252.jpg",
+                    "big_pic": "https://img1.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 34.67,
+                    "small_pic": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!328x252.jpg",
+                    "big_pic": "https://img2.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 36.76,
+                    "small_pic": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!328x252.jpg",
+                    "big_pic": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 35.67,
+                    "small_pic": "https://img1.591.com.tw/house/2025/04/01/174348619150518606.jpg!328x252.jpg",
+                    "big_pic": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 34.67,
+                    "small_pic": "https://img1.591.com.tw/house/2025/04/01/174348619021915508.jpg!328x252.jpg",
+                    "big_pic": "https://img1.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                },
+                {
+                    "layout_name": "3房2廳2衛",
+                    "area": 36.01,
+                    "small_pic": "https://img2.591.com.tw/house/2025/04/01/174348618842585502.jpg!328x252.jpg",
+                    "big_pic": "https://img2.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.900x.water3.jpg",
+                    "room": "3房"
+                }
+            ],
+            "line_tip_list": [
+                "樓梯與梯戶情況如何？",
+                "社區樓棟間距是多少？",
+                "樓棟門禁安全性如何？",
+                "臨街樓棟與街道距離是多少？",
+                "社區內部設施有哪些？"
+            ],
+            "line_tip_empty": "問問金牌專家，索取社區配置圖"
+        },
+        "build_layout_pic": {
+            "active": 1,
+            "images": [
+                {
+                    "small_photo": "https://img2.591.com.tw/market/2022/11/23/5855864-1.jpg!1200x.water4.s0.jpg",
+                    "big_photo": "https://img2.591.com.tw/market/2022/11/23/5855864-1.jpg!1200x.water4.s0.jpg"
+                }
+            ]
+        },
+        "nearby_community": {
+            "active": 1,
+            "items": [
+                {
+                    "community_id": 3608,
+                    "name": "延壽國民住宅I區",
+                    "photo_src": "https://img2.591.com.tw/market/2022/01/11/164190848087339502.jpg!338x252.jpg",
+                    "distance": 15,
+                    "info": "距離本社區約 15 公尺",
+                    "build_type": 0,
+                    "build_type_str": "33年社區",
+                    "purpose_str": "華廈",
+                    "price": {
+                        "price": "64.0",
+                        "unit": "萬/坪"
+                    },
+                    "tag": [],
+                    "has_agent": 1,
+                    "sale_num": 0,
+                    "min_price": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "rent_num": 0
+                },
+                {
+                    "community_id": 3564,
+                    "name": "延壽國民住宅J區",
+                    "photo_src": "https://img2.591.com.tw/market/2022/02/02/164374941130846103.jpg!338x252.jpg",
+                    "distance": 97,
+                    "info": "距離本社區約 97 公尺",
+                    "build_type": 0,
+                    "build_type_str": "33年社區",
+                    "purpose_str": "華廈",
+                    "price": {
+                        "price": "63.4",
+                        "unit": "萬/坪"
+                    },
+                    "tag": [
+                        {
+                            "tag_type": 1,
+                            "tag_str": "1筆在售"
+                        }
+                    ],
+                    "has_agent": 0,
+                    "sale_num": 1,
+                    "min_price": 5788,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "rent_num": 0
+                },
+                {
+                    "community_id": 3424,
+                    "name": "健安新城G區",
+                    "photo_src": "https://img1.591.com.tw/market/2022/01/11/164190758429090006.jpg!338x252.jpg",
+                    "distance": 115,
+                    "info": "距離本社區約 115 公尺",
+                    "build_type": 0,
+                    "build_type_str": "22年社區",
+                    "purpose_str": "住宅大樓",
+                    "price": {
+                        "price": "96.6",
+                        "unit": "萬/坪"
+                    },
+                    "tag": [],
+                    "has_agent": 1,
+                    "sale_num": 0,
+                    "min_price": 0,
+                    "label_type": 1,
+                    "bid_rank": 1,
+                    "rent_num": 0
+                },
+                {
+                    "community_id": 5934204,
+                    "name": "鳴森大苑-鳴森苑",
+                    "photo_src": "https://img1.591.com.tw/house/2025/05/20/174770625116767508.jpg!338x252.jpg",
+                    "distance": 128,
+                    "info": "距離本社區約 128 公尺",
+                    "build_type": 1,
+                    "build_type_str": "預售屋",
+                    "purpose_str": "住宅大樓",
+                    "price": {
+                        "price": "141.0",
+                        "unit": "萬/坪"
+                    },
+                    "tag": [
+                        {
+                            "tag_type": 2,
+                            "tag_str": "熱銷中"
+                        }
+                    ],
+                    "has_agent": 1,
+                    "sale_num": 10,
+                    "min_price": 5688,
+                    "label_type": 1,
+                    "bid_rank": 1,
+                    "rent_num": 0
+                },
+                {
+                    "community_id": 5857,
+                    "name": "延壽國宅H區",
+                    "photo_src": "https://img2.591.com.tw/market/2022/02/02/164374936949700409.jpg!338x252.jpg",
+                    "distance": 138,
+                    "info": "距離本社區約 138 公尺",
+                    "build_type": 0,
+                    "build_type_str": "33年社區",
+                    "purpose_str": "住宅大樓",
+                    "price": {
+                        "price": "89.9",
+                        "unit": "萬/坪"
+                    },
+                    "tag": [
+                        {
+                            "tag_type": 1,
+                            "tag_str": "16筆在售"
+                        }
+                    ],
+                    "has_agent": 1,
+                    "sale_num": 16,
+                    "min_price": 2988,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "rent_num": 1
+                }
+            ]
+        },
+        "meta": {
+            "title": "【鳴森大苑-碧硯閣】209筆成交，均價129萬/坪 - 591實價登錄",
+            "og_title": "【鳴森大苑-碧硯閣】209筆成交，均價129萬/坪 - 591實價登錄",
+            "og_description": "鳴森大苑-碧硯閣：位於台北市松山區，屋齡0年，總戶數290戶，26間房屋出售，9間房屋出租。更多鳴森大苑-碧硯閣社區情報，歡迎諮詢社區專家江采緹、廖奕昕。",
+            "og_image": "https://img1.591.com.tw/house/2021/11/08/163635834299762900.jpg!338x252.jpg",
+            "keywords": "鳴森大苑-碧硯閣,鳴森大苑-碧硯閣房價,鳴森大苑-碧硯閣實價登錄,鳴森大苑-碧硯閣台北,鳴森大苑-碧硯閣松山區",
+            "description": "鳴森大苑-碧硯閣：位於台北市松山區，屋齡0年，總戶數290戶，26間房屋出售，9間房屋出租。更多鳴森大苑-碧硯閣社區情報，歡迎諮詢社區專家江采緹、廖奕昕。"
+        },
+        "sale": {
+            "community_id": 5855864,
+            "hid": 128909,
+            "community_type": 1,
+            "layout": {
+                "layout_count": 1,
+                "total": 26,
+                "rooms": [
+                    {
+                        "room": 3,
+                        "name": "3房",
+                        "count": 26,
+                        "area": {
+                            "content": "46~55",
+                            "unit": "坪"
+                        },
+                        "price": {
+                            "content": "5,258~6,988",
+                            "unit": "萬"
+                        },
+                        "discount_count": 0,
+                        "host_count": 1
+                    }
+                ]
+            },
+            "sale_list": [
+                {
+                    "houseid": 20938545,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 465674,
+                    "mobile": "",
+                    "line": "",
+                    "title": "全新碧硯閣三房車位",
+                    "price_v": {
+                        "price": "6,380",
+                        "unit": "萬"
+                    },
+                    "price_unit": "116.6萬/坪",
+                    "room": "3房2廳",
+                    "address": "松山區-三民路",
+                    "area_v": {
+                        "area": "54.72",
+                        "unit": "坪"
+                    },
+                    "floor": "3樓",
+                    "photo_src": "https://img2.591.com.tw/house/2026/01/14/176836134118060500.jpg!400x300.jpg",
+                    "is_online": 1,
+                    "is_mvip": 0,
+                    "floor_en": "3F/24F",
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "post_time": 1789899828,
+                    "has_agent": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "browsenum": 54,
+                    "is_video": 0,
+                    "is_full": 0,
+                    "is_hurry": 0,
+                    "is_discounted": 0,
+                    "is_host": 0,
+                    "original_price": "萬",
+                    "down_price_percent": "",
+                    "label": [
+                        "含車位",
+                        "有陽台"
+                    ],
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/01/14/176836134118060500.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/01/14/176836134113792604.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/01/14/176836134117144508.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/01/14/176836134113008606.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/01/14/176836134112785805.jpg!400x300.jpg"
+                    ],
+                    "type": 2,
+                    "kind": 9,
+                    "pc_good_house": 0,
+                    "community_quality_money": 0,
+                    "operation_tag": [],
+                    "avatar": "https://img1.591.com.tw/user/2016/03/20/145847030547176303.jpg!300x360.jpg",
+                    "name": "徐桂蘭",
+                    "house_type": 3,
+                    "is_visit": 0,
+                    "is_high_value": 0,
+                    "house_rule_score": 2.27,
+                    "model_score": 0
+                },
+                {
+                    "houseid": 20935014,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 2063278,
+                    "mobile": "",
+                    "line": "",
+                    "title": "全新碧硯閣一樓、有車位、稀有專有庭院~@很稀有@",
+                    "price_v": {
+                        "price": "6,988",
+                        "unit": "萬"
+                    },
+                    "price_unit": "156.9萬/坪",
+                    "room": "3房2廳",
+                    "address": "松山區-三民路",
+                    "area_v": {
+                        "area": "51.94",
+                        "unit": "坪"
+                    },
+                    "floor": "1樓",
+                    "photo_src": "https://img2.591.com.tw/house/2026/09/19/178981530046282604.jpg!400x300.jpg",
+                    "is_online": 1,
+                    "is_mvip": 0,
+                    "floor_en": "1F/24F",
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "post_time": 1789815842,
+                    "has_agent": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "browsenum": 52,
+                    "is_video": 0,
+                    "is_full": 0,
+                    "is_hurry": 0,
+                    "is_discounted": 0,
+                    "is_host": 0,
+                    "original_price": "萬",
+                    "down_price_percent": "",
+                    "label": [
+                        "含車位",
+                        "有陽台"
+                    ],
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/09/19/178981530046282604.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/19/178981531650885106.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/19/178981532199416108.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/19/178981533414034408.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/19/178981534574111503.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/19/178981535338312106.jpg!400x300.jpg"
+                    ],
+                    "type": 2,
+                    "kind": 9,
+                    "pc_good_house": 0,
+                    "community_quality_money": 0,
+                    "operation_tag": [],
+                    "avatar": "https://img1.591.com.tw/user/2025/08/27/175622480077200807.png!300x360.png",
+                    "name": "謝青峰",
+                    "house_type": 3,
+                    "is_visit": 0,
+                    "is_high_value": 0,
+                    "house_rule_score": 0.56,
+                    "model_score": 0
+                },
+                {
+                    "houseid": 20934705,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 1090235,
+                    "mobile": "",
+                    "line": "",
+                    "title": "🌈碧硯閣花園邊間一樓＋車位☀️",
+                    "price_v": {
+                        "price": "6,988",
+                        "unit": "萬"
+                    },
+                    "price_unit": "134.5萬/坪",
+                    "room": "3房2廳",
+                    "address": "松山區-三民路",
+                    "area_v": {
+                        "area": "51.94",
+                        "unit": "坪"
+                    },
+                    "floor": "1樓",
+                    "photo_src": "https://img2.591.com.tw/house/2026/09/16/178954561189200004.jpg!400x300.jpg",
+                    "is_online": 1,
+                    "is_mvip": 0,
+                    "floor_en": "1F/24F",
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "post_time": 1789811740,
+                    "has_agent": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "browsenum": 20,
+                    "is_video": 0,
+                    "is_full": 0,
+                    "is_hurry": 0,
+                    "is_discounted": 0,
+                    "is_host": 0,
+                    "original_price": "萬",
+                    "down_price_percent": "",
+                    "label": [
+                        "含車位",
+                        "有陽台"
+                    ],
+                    "pictures": [
+                        "https://img1.591.com.tw/house/2026/09/16/178954561189200004.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954562506334705.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/16/178954564825642802.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954565736438704.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954565743096105.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/16/178954565730691602.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/16/178954565741079801.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/16/178954565746193603.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954565753113506.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954567112436605.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954567120218402.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954568595604307.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954568604278003.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/16/178954569981051201.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/16/178954570417638009.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/16/178954570974341302.jpg!400x300.jpg"
+                    ],
+                    "type": 2,
+                    "kind": 9,
+                    "pc_good_house": 0,
+                    "community_quality_money": 0,
+                    "operation_tag": [],
+                    "avatar": "https://img2.591.com.tw/user/2024/09/22/172693522835913605.png!300x360.png",
+                    "name": "許鈺翎",
+                    "house_type": 3,
+                    "is_visit": 0,
+                    "is_high_value": 0,
+                    "house_rule_score": 0.55,
+                    "model_score": 0
+                },
+                {
+                    "houseid": 20912232,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 5880237,
+                    "mobile": "",
+                    "line": "",
+                    "title": "碧硯閣花園一樓[庭園住家]",
+                    "price_v": {
+                        "price": "6,988",
+                        "unit": "萬"
+                    },
+                    "price_unit": "56.6萬/坪",
+                    "room": "3房2廳",
+                    "address": "松山區-三民路",
+                    "area_v": {
+                        "area": "51.94",
+                        "unit": "坪"
+                    },
+                    "floor": "1樓",
+                    "photo_src": "https://img2.591.com.tw/house/2026/09/15/178947044012212204.jpg!400x300.jpg",
+                    "is_online": 1,
+                    "is_mvip": 0,
+                    "floor_en": "1F/24F",
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "post_time": 1789475167,
+                    "has_agent": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "browsenum": 46,
+                    "is_video": 0,
+                    "is_full": 0,
+                    "is_hurry": 0,
+                    "is_discounted": 0,
+                    "is_host": 0,
+                    "original_price": "萬",
+                    "down_price_percent": "",
+                    "label": [
+                        "含車位",
+                        "有陽台"
+                    ],
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/09/15/178947044012212204.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/15/178947044034003809.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/15/178947044042384304.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/15/178947044036312405.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/15/178947044024197004.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/15/178947044074191303.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/15/178947044063513303.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/15/178947044081175804.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/15/178947044051815805.jpg!400x300.jpg"
+                    ],
+                    "type": 2,
+                    "kind": 9,
+                    "pc_good_house": 0,
+                    "community_quality_money": 0,
+                    "operation_tag": [],
+                    "avatar": "https://img1.591.com.tw/user/2026/08/18/5880237/1787022571804.jpg!300x360.jpg",
+                    "name": "吳美霞",
+                    "house_type": 3,
+                    "is_visit": 0,
+                    "is_high_value": 0,
+                    "house_rule_score": 0.55,
+                    "model_score": 0
+                },
+                {
+                    "houseid": 20890753,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 749915,
+                    "mobile": "",
+                    "line": "",
+                    "title": "◎碧硯閣邊間壹樓+B1車位◎21世紀-黎堡仁",
+                    "price_v": {
+                        "price": "6,988",
+                        "unit": "萬"
+                    },
+                    "price_unit": "134.5萬/坪",
+                    "room": "3房2廳",
+                    "address": "松山區-三民路",
+                    "area_v": {
+                        "area": "51.94",
+                        "unit": "坪"
+                    },
+                    "floor": "1樓",
+                    "photo_src": "https://img2.591.com.tw/house/2026/09/11/178912500449501708.jpg!400x300.jpg",
+                    "is_online": 1,
+                    "is_mvip": 0,
+                    "floor_en": "1F/24F",
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "post_time": 1789125256,
+                    "has_agent": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "browsenum": 103,
+                    "is_video": 0,
+                    "is_full": 0,
+                    "is_hurry": 0,
+                    "is_discounted": 0,
+                    "is_host": 0,
+                    "original_price": "萬",
+                    "down_price_percent": "",
+                    "label": [
+                        "含車位",
+                        "有陽台",
+                        "有格局圖"
+                    ],
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/09/11/178912500449501708.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912498122338305.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178912502797917909.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502780775008.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178912502787563307.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502791497300.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502792630204.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178912502800634609.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502808589705.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502825692309.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502817375407.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178912502823585806.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178912502827517500.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178912502822420004.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178912514115666709.jpg!400x300.jpg"
+                    ],
+                    "type": 2,
+                    "kind": 9,
+                    "pc_good_house": 0,
+                    "community_quality_money": 0,
+                    "operation_tag": [],
+                    "avatar": "https://img2.591.com.tw/user/2023/10/24/169811780630443706.png!300x360.png",
+                    "name": "黎堡仁",
+                    "house_type": 3,
+                    "is_visit": 0,
+                    "is_high_value": 0,
+                    "house_rule_score": 0.56,
+                    "model_score": 0
+                },
+                {
+                    "houseid": 20885980,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 118526,
+                    "mobile": "",
+                    "line": "",
+                    "title": "碧硯閣花園廣場邊間一樓+B1車位😊陳慶洋😊挑高4.2米",
+                    "price_v": {
+                        "price": "6,988",
+                        "unit": "萬"
+                    },
+                    "price_unit": "134.5萬/坪",
+                    "room": "3房2廳",
+                    "address": "松山區-三民路",
+                    "area_v": {
+                        "area": "51.94",
+                        "unit": "坪"
+                    },
+                    "floor": "1樓",
+                    "photo_src": "https://img2.591.com.tw/house/2026/09/11/178909567811692200.jpg!400x300.jpg",
+                    "is_online": 1,
+                    "is_mvip": 0,
+                    "floor_en": "1F/24F",
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "post_time": 1789095709,
+                    "has_agent": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "browsenum": 41,
+                    "is_video": 0,
+                    "is_full": 0,
+                    "is_hurry": 0,
+                    "is_discounted": 0,
+                    "is_host": 0,
+                    "original_price": "萬",
+                    "down_price_percent": "",
+                    "label": [
+                        "含車位",
+                        "有陽台",
+                        "有格局圖"
+                    ],
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/09/11/178909567811692200.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567856510403.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909568643429304.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567883497201.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567888677204.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567883176509.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567883928005.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567871618301.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567869100800.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567851796502.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567848821507.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567816463109.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567850792004.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567842477307.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567841813208.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567813457709.jpg!400x300.jpg",
+                        "https://img2.591.com.tw/house/2026/09/11/178909567823844502.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567816606403.jpg!400x300.jpg",
+                        "https://img1.591.com.tw/house/2026/09/11/178909567822055609.jpg!400x300.jpg"
+                    ],
+                    "type": 2,
+                    "kind": 9,
+                    "pc_good_house": 0,
+                    "community_quality_money": 0,
+                    "operation_tag": [],
+                    "avatar": "https://img2.591.com.tw/user/2023/11/30/170127441637862507.png!300x360.png",
+                    "name": "陳慶洋",
+                    "house_type": 3,
+                    "is_visit": 0,
+                    "is_high_value": 0,
+                    "house_rule_score": 0.55,
+                    "model_score": 0
+                }
+            ],
+            "active": 1,
+            "bottom_tip": "沒有合適的物件？幫你尋好屋"
+        },
+        "price": {
+            "items": [
+                {
+                    "id": 10571773,
+                    "date": "115-07-08",
+                    "month": "115-07",
+                    "address": "三民路80巷25號 | 7樓",
+                    "layout": "3房2廳",
+                    "build_area": "47.57坪",
+                    "build_area_v": {
+                        "area": "47.6",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.1",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,000",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "113.1",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "134.9",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,380萬元",
+                    "total_price_v": "5,380",
+                    "total_price_arr": {
+                        "price": "5,380",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "7樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "380",
+                    "real_park_total_price_v": {
+                        "price": "380",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "380",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "7"
+                },
+                {
+                    "id": 10206133,
+                    "date": "115-07-02",
+                    "month": "115-07",
+                    "address": "三民路80巷27號 | 3樓",
+                    "layout": "3房2廳",
+                    "build_area": "49.24坪",
+                    "build_area_v": {
+                        "area": "49.2",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "38.7",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,020",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "109.3",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "129.6",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,380萬元",
+                    "total_price_v": "5,380",
+                    "total_price_arr": {
+                        "price": "5,380",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "1",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "3樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "360",
+                    "real_park_total_price_v": {
+                        "price": "360",
+                        "unit": "萬",
+                        "estimate": 1
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "3"
+                },
+                {
+                    "id": 10153270,
+                    "date": "115-06-21",
+                    "month": "115-06",
+                    "address": "三民路80巷7號 | 5樓",
+                    "layout": "3房2廳",
+                    "build_area": "48.79坪",
+                    "build_area_v": {
+                        "area": "48.8",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "38.3",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "4,888",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "108.0",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "127.7",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,268萬元",
+                    "total_price_v": "5,268",
+                    "total_price_arr": {
+                        "price": "5,268",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "5樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "380",
+                    "real_park_total_price_v": {
+                        "price": "380",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "380",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "5"
+                },
+                {
+                    "id": 10153219,
+                    "date": "115-06-12",
+                    "month": "115-06",
+                    "address": "三民路80巷19號 | 24樓",
+                    "layout": "3房2廳",
+                    "build_area": "47.06坪",
+                    "build_area_v": {
+                        "area": "47.1",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "36.5",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "4,720",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "107.9",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "129.1",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,080萬元",
+                    "total_price_v": "5,080",
+                    "total_price_arr": {
+                        "price": "5,080",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "24樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "360",
+                    "real_park_total_price_v": {
+                        "price": "360",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "360",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "24"
+                },
+                {
+                    "id": 9683290,
+                    "date": "115-05-14",
+                    "month": "115-05",
+                    "address": "三民路80巷25號 | 24樓",
+                    "layout": "3房2廳",
+                    "build_area": "47.57坪",
+                    "build_area_v": {
+                        "area": "47.6",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.1",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "4,852",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "109.6",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "130.9",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,212萬元",
+                    "total_price_v": "5,212",
+                    "total_price_arr": {
+                        "price": "5,212",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "24樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "360",
+                    "real_park_total_price_v": {
+                        "price": "360",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "360",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "24"
+                },
+                {
+                    "id": 9683298,
+                    "date": "115-05-11",
+                    "month": "115-05",
+                    "address": "三民路80巷29號 | 24樓",
+                    "layout": "3房2廳",
+                    "build_area": "47.09坪",
+                    "build_area_v": {
+                        "area": "47.1",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.8",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "4,898",
+                        "unit": "萬"
+                    },
+                    "park_area": "9.24坪",
+                    "real_park_area": {
+                        "area": "9.2",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "111.3",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "129.4",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,243萬元",
+                    "total_price_v": "5,243",
+                    "total_price_arr": {
+                        "price": "5,243",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "24樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "345",
+                    "real_park_total_price_v": {
+                        "price": "345",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "345",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "24"
+                }
+            ],
+            "max_items": [
+                {
+                    "id": 7238551,
+                    "date": "114-04-02",
+                    "month": "114-04",
+                    "address": "三民路80巷23號 | 1樓",
+                    "layout": "3房2廳",
+                    "build_area": "56.56坪",
+                    "build_area_v": {
+                        "area": "56.6",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "36.8",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,411",
+                        "unit": "萬"
+                    },
+                    "park_area": "19.75坪",
+                    "real_park_area": {
+                        "area": "19.8",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "108.1",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "147.0",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "6,116萬元",
+                    "total_price_v": "6,116",
+                    "total_price_arr": {
+                        "price": "6,116",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "預售屋、或土地及建物分件登記案件；",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "1樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "705",
+                    "real_park_total_price_v": {
+                        "price": "705",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "705",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 1,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 2,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "1"
+                },
+                {
+                    "id": 6935682,
+                    "date": "114-04-02",
+                    "month": "114-04",
+                    "address": "台北松山區延壽街",
+                    "layout": "3房2廳",
+                    "build_area": "56.56坪",
+                    "build_area_v": {
+                        "area": "56.6",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "36.8",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,411",
+                        "unit": "萬"
+                    },
+                    "park_area": "19.75坪",
+                    "real_park_area": {
+                        "area": "19.8",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "108.1",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "147.0",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "6,116萬元",
+                    "total_price_v": "6,116",
+                    "total_price_arr": {
+                        "price": "6,116",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "1樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "705",
+                    "real_park_total_price_v": {
+                        "price": "705",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "705",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 2,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "1"
+                },
+                {
+                    "id": 6336176,
+                    "date": "113-01-24",
+                    "month": "113-01",
+                    "address": "台北松山區延壽街",
+                    "layout": "3房2廳",
+                    "build_area": "47.47坪",
+                    "build_area_v": {
+                        "area": "47.5",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.0",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,265",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "118.5",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "142.5",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,625萬元",
+                    "total_price_v": "5,625",
+                    "total_price_arr": {
+                        "price": "5,625",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "雨遮面積m2：4.61m2",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "24樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "360",
+                    "real_park_total_price_v": {
+                        "price": "360",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "360",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "24"
+                },
+                {
+                    "id": 6935698,
+                    "date": "114-04-10",
+                    "month": "114-04",
+                    "address": "台北松山區延壽街",
+                    "layout": "3房2廳",
+                    "build_area": "56.90坪",
+                    "build_area_v": {
+                        "area": "56.9",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.1",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,280",
+                        "unit": "萬"
+                    },
+                    "park_area": "19.75坪",
+                    "real_park_area": {
+                        "area": "19.8",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "105.2",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "142.1",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,985萬元",
+                    "total_price_v": "5,985",
+                    "total_price_arr": {
+                        "price": "5,985",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "雨遮面積m2：4.57 m2",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "22樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "705",
+                    "real_park_total_price_v": {
+                        "price": "705",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "705",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 2,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "22"
+                },
+                {
+                    "id": 6336177,
+                    "date": "113-01-24",
+                    "month": "113-01",
+                    "address": "台北松山區延壽街",
+                    "layout": "3房2廳",
+                    "build_area": "58.21坪",
+                    "build_area_v": {
+                        "area": "58.2",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.2",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,285",
+                        "unit": "萬"
+                    },
+                    "park_area": "21.02坪",
+                    "real_park_area": {
+                        "area": "21.0",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "103.2",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "142.1",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "6,005萬元",
+                    "total_price_v": "6,005",
+                    "total_price_arr": {
+                        "price": "6,005",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "雨遮面積m2：4.61m2",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "24樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "720",
+                    "real_park_total_price_v": {
+                        "price": "720",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "720",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 2,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "24"
+                },
+                {
+                    "id": 6620631,
+                    "date": "113-07-18",
+                    "month": "113-07",
+                    "address": "台北松山區延壽街",
+                    "layout": "3房2廳",
+                    "build_area": "47.47坪",
+                    "build_area_v": {
+                        "area": "47.5",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "37.0",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "5,243",
+                        "unit": "萬"
+                    },
+                    "park_area": "10.51坪",
+                    "real_park_area": {
+                        "area": "10.5",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "118.0",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "141.9",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "5,603萬元",
+                    "total_price_v": "5,603",
+                    "total_price_arr": {
+                        "price": "5,603",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "雨遮面積m2：4.61 m2",
+                    "has_park": "1",
+                    "unit_has_park": "0",
+                    "total_has_park": "1",
+                    "is_build_land": "0",
+                    "shift_floor": "22樓",
+                    "total_floor": "24樓",
+                    "build_purpose_str": "住宅",
+                    "real_park_total_price": "360",
+                    "real_park_total_price_v": {
+                        "price": "360",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "360",
+                    "trans_sign": 5,
+                    "park_type_str": "平面車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 1,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "22"
+                }
+            ],
+            "min_items": [
+                {
+                    "id": 262580,
+                    "date": "102-12-30",
+                    "month": "102-12",
+                    "address": "三民路80巷7號 | 4樓之1",
+                    "layout": "3房1廳",
+                    "build_area": "33.84坪",
+                    "build_area_v": {
+                        "area": "33.8",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "33.8",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "500",
+                        "unit": "萬"
+                    },
+                    "park_area": "-",
+                    "real_park_area": {
+                        "area": "-",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "14.8",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "14.8",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "500萬元",
+                    "total_price_v": "500",
+                    "total_price_arr": {
+                        "price": "500",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "二親等買賣親友、員工或其他特殊關係間之交易。；",
+                    "has_park": "0",
+                    "unit_has_park": "0",
+                    "total_has_park": "0",
+                    "is_build_land": "1",
+                    "shift_floor": "4樓",
+                    "total_floor": "7樓",
+                    "build_purpose_str": "華廈",
+                    "real_park_total_price": "-",
+                    "real_park_total_price_v": {
+                        "price": "-",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 4,
+                    "park_type_str": "無車位",
+                    "is_special": 1,
+                    "match_type": 1,
+                    "tips": "親友或員工等關係人間交易",
+                    "build_type": 1,
+                    "park_count": 0,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "4"
+                },
+                {
+                    "id": 4140431,
+                    "date": "108-12-18",
+                    "month": "108-12",
+                    "address": "延壽街74號 | 2樓之2",
+                    "layout": "3房2廳",
+                    "build_area": "33.01坪",
+                    "build_area_v": {
+                        "area": "33.0",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "33.0",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "616",
+                        "unit": "萬"
+                    },
+                    "park_area": "-",
+                    "real_park_area": {
+                        "area": "-",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "18.7",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "18.7",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "616萬元",
+                    "total_price_v": "616",
+                    "total_price_arr": {
+                        "price": "616",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "親友、員工或其他特殊關係間之交易。；",
+                    "has_park": "0",
+                    "unit_has_park": "0",
+                    "total_has_park": "0",
+                    "is_build_land": "1",
+                    "shift_floor": "2樓",
+                    "total_floor": "7樓",
+                    "build_purpose_str": "華廈",
+                    "real_park_total_price": "-",
+                    "real_park_total_price_v": {
+                        "price": "-",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 4,
+                    "park_type_str": "無車位",
+                    "is_special": 1,
+                    "match_type": 1,
+                    "tips": "親友或員工等關係人間交易",
+                    "build_type": 1,
+                    "park_count": 0,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "2"
+                },
+                {
+                    "id": 423729,
+                    "date": "104-11-23",
+                    "month": "104-11",
+                    "address": "延壽街74號之1 | 1樓",
+                    "layout": "1房0廳",
+                    "build_area": "15.86坪",
+                    "build_area_v": {
+                        "area": "15.9",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "15.9",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "308",
+                        "unit": "萬"
+                    },
+                    "park_area": "-",
+                    "real_park_area": {
+                        "area": "-",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "19.4",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "19.4",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "308萬元",
+                    "total_price_v": "308",
+                    "total_price_arr": {
+                        "price": "308",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "親友、員工或其他特殊關係間之交易。親友、員工或其他特殊關係間之交易。；",
+                    "has_park": "0",
+                    "unit_has_park": "0",
+                    "total_has_park": "0",
+                    "is_build_land": "1",
+                    "shift_floor": "-",
+                    "total_floor": "7樓",
+                    "build_purpose_str": "華廈",
+                    "real_park_total_price": "-",
+                    "real_park_total_price_v": {
+                        "price": "-",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 4,
+                    "park_type_str": "無車位",
+                    "is_special": 1,
+                    "match_type": 1,
+                    "tips": "親友或員工等關係人間交易",
+                    "build_type": 1,
+                    "park_count": 0,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 1,
+                    "real_shift_floor": ""
+                },
+                {
+                    "id": 5998833,
+                    "date": "112-05-23",
+                    "month": "112-05",
+                    "address": "臺中市龍井區沙田路四段312巷",
+                    "layout": "3房2廳",
+                    "build_area": "36.30坪",
+                    "build_area_v": {
+                        "area": "36.3",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "36.3",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "955",
+                        "unit": "萬"
+                    },
+                    "park_area": "-",
+                    "real_park_area": {
+                        "area": "-",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "26.3",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "26.3",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "955萬元",
+                    "total_price_v": "955",
+                    "total_price_arr": {
+                        "price": "955",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "0",
+                    "unit_has_park": "0",
+                    "total_has_park": "0",
+                    "is_build_land": "1",
+                    "shift_floor": "4樓",
+                    "total_floor": "5樓",
+                    "build_purpose_str": "公寓",
+                    "real_park_total_price": "-",
+                    "real_park_total_price_v": {
+                        "price": "-",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 4,
+                    "park_type_str": "無車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 0,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "4"
+                },
+                {
+                    "id": 6075327,
+                    "date": "112-07-13",
+                    "month": "112-07",
+                    "address": "臺中市龍井區沙田路四段312巷",
+                    "layout": "3房2廳",
+                    "build_area": "36.33坪",
+                    "build_area_v": {
+                        "area": "36.3",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "36.3",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "960",
+                        "unit": "萬"
+                    },
+                    "park_area": "-",
+                    "real_park_area": {
+                        "area": "-",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "26.4",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "26.4",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "960萬元",
+                    "total_price_v": "960",
+                    "total_price_arr": {
+                        "price": "960",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "0",
+                    "unit_has_park": "0",
+                    "total_has_park": "0",
+                    "is_build_land": "1",
+                    "shift_floor": "5樓",
+                    "total_floor": "5樓",
+                    "build_purpose_str": "公寓",
+                    "real_park_total_price": "-",
+                    "real_park_total_price_v": {
+                        "price": "-",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 4,
+                    "park_type_str": "無車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 0,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "5"
+                },
+                {
+                    "id": 6368471,
+                    "date": "113-02-16",
+                    "month": "113-02",
+                    "address": "臺中市龍井區沙田路四段312巷",
+                    "layout": "3房2廳",
+                    "build_area": "36.30坪",
+                    "build_area_v": {
+                        "area": "36.3",
+                        "unit": "坪"
+                    },
+                    "building_area": {
+                        "area": "36.3",
+                        "unit": "坪"
+                    },
+                    "building_total_price": {
+                        "price": "988",
+                        "unit": "萬"
+                    },
+                    "park_area": "-",
+                    "real_park_area": {
+                        "area": "-",
+                        "unit": "坪",
+                        "estimate": 0
+                    },
+                    "unit_price": {
+                        "price": "27.2",
+                        "unit": "萬/坪"
+                    },
+                    "real_unit_price": {
+                        "price": "27.2",
+                        "unit": "萬/坪"
+                    },
+                    "total_price": "988萬元",
+                    "total_price_v": "988",
+                    "total_price_arr": {
+                        "price": "988",
+                        "unit": "萬"
+                    },
+                    "price_tips": "",
+                    "context": "",
+                    "has_park": "0",
+                    "unit_has_park": "0",
+                    "total_has_park": "0",
+                    "is_build_land": "1",
+                    "shift_floor": "2樓",
+                    "total_floor": "5樓",
+                    "build_purpose_str": "公寓",
+                    "real_park_total_price": "-",
+                    "real_park_total_price_v": {
+                        "price": "-",
+                        "unit": "萬",
+                        "estimate": 0
+                    },
+                    "park_total_price": "0",
+                    "trans_sign": 4,
+                    "park_type_str": "無車位",
+                    "is_special": 0,
+                    "match_type": 0,
+                    "tips": "",
+                    "build_type": 1,
+                    "park_count": 0,
+                    "history_trans_count": 1,
+                    "is_new_tag": 0,
+                    "assoc_type": 0,
+                    "room": 3,
+                    "real_shift_floor": "2"
+                }
+            ],
+            "remaining": 203,
+            "price_history": {
+                "min": "26.3",
+                "max": "147.0",
+                "new": "134.9",
+                "unit": "萬"
+            },
+            "total": 209,
+            "update_date": "115年9月",
+            "community_id": 5855864,
+            "community_name": "鳴森大苑-碧硯閣",
+            "housing_type": 0,
+            "active": 1,
+            "has_sale_ctrl": 1,
+            "line_tip": "加Line，為你分析社區合理的估算交易價格"
+        },
+        "has_appraise_record": 1,
+        "has_follow": 0,
+        "housing_ad_union": {
+            "hid": 128909,
+            "roster": 0
+        },
+        "rank_list": {},
+        "feedback_url": "https://www.surveycake.com/s/xDRv0",
+        "has_e_tag": 0,
+        "agent_layout": [
+            {
+                "title": "全部",
+                "count": 8,
+                "room": 0,
+                "layout": [
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "34.67",
+                        "direction": "-",
+                        "direction_code": "朝南",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "34.67",
+                        "direction": "-",
+                        "direction_code": "朝南",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "35.67",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "36.01",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "36.76",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "36.93",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "37.06",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "41.84",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img2.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    }
+                ]
+            },
+            {
+                "title": "3房",
+                "count": 8,
+                "room": 3,
+                "layout": [
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "37.06",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "36.93",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "41.84",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img2.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "34.67",
+                        "direction": "-",
+                        "direction_code": "朝南",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "36.76",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "35.67",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "34.67",
+                        "direction": "-",
+                        "direction_code": "朝南",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    },
+                    {
+                        "layout_id": 0,
+                        "name": "3房2廳2衛",
+                        "room": 3,
+                        "sale": 26,
+                        "area": "36.01",
+                        "direction": "-",
+                        "direction_code": "朝北",
+                        "photo": "https://img1.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.600x450.water3.jpg",
+                        "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.338x252.jpg",
+                        "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.900x.jpg",
+                        "room_flag": "3-2-2",
+                        "is_agent_upload": 0,
+                        "price_str": "5,258萬起"
+                    }
+                ]
+            }
+        ],
+        "liff_url": "https://liff.line.me/2006310106-KlA8Ag69/contact",
+        "showing_king": {
+            "enabled": false
+        },
+        "agent_tabs": {
+            "enabled": false
+        },
+        "contact_booth": {
+            "enabled": false
+        },
+        "community_dynamic": {
+            "enabled": false,
+            "has_dynamic": false,
+            "showing_count_30d": 0,
+            "showing_growth_rate": null,
+            "deal_count_3m": 0,
+            "deal_growth_rate": null,
+            "latest_date": "",
+            "items": [],
+            "agent_guide": {
+                "enabled": false,
+                "scene": "community_dynamic",
+                "title": "",
+                "subtitle": "",
+                "delta_showing_count": 0,
+                "showing_rank": 0,
+                "is_showing_king": false,
+                "action": {
+                    "enabled": false,
+                    "text": "",
+                    "helper_text": "",
+                    "type": "",
+                    "params": []
+                }
+            },
+            "empty_ad": {
+                "enabled": false,
+                "scene": "community_dynamic_empty",
+                "title": "",
+                "subtitle": "",
+                "delta_showing_count": 0,
+                "showing_rank": 0,
+                "is_showing_king": false,
+                "action": {
+                    "enabled": false,
+                    "text": "",
+                    "helper_text": "",
+                    "type": "",
+                    "params": []
+                }
+            }
+        },
+        "layout_info": {
+            "update_date": "09/21",
+            "has_sale_ctrl": 1,
+            "housing_type": 2,
+            "rooms": [
+                {
+                    "room": 0,
+                    "name": "所有",
+                    "price_num": 209,
+                    "sale_num": 26,
+                    "market_price": {
+                        "info": "近1年",
+                        "info_type": 1,
+                        "price": "129.0",
+                        "unit": "萬/坪",
+                        "deal_num": 49
+                    },
+                    "sale_price": {
+                        "price": "160~170",
+                        "unit": "萬/坪",
+                        "rate": "27%",
+                        "type": 1,
+                        "price_desc": "近1年成交均價"
+                    },
+                    "rent_num": 9,
+                    "show_price": {
+                        "price": "129.0",
+                        "unit": "萬/坪",
+                        "desc": "近1年成交均價",
+                        "show_tag": 1
+                    }
+                },
+                {
+                    "room": 1,
+                    "name": "一房",
+                    "price_num": 2,
+                    "sale_num": 0,
+                    "market_price": {
+                        "info": "",
+                        "info_type": 3,
+                        "price": "",
+                        "unit": "萬/坪",
+                        "deal_num": 0
+                    },
+                    "sale_price": {
+                        "price": "",
+                        "unit": "萬/坪",
+                        "rate": "",
+                        "type": 0,
+                        "price_empty": "價格待定"
+                    },
+                    "rent_num": 0,
+                    "show_price": []
+                },
+                {
+                    "room": 2,
+                    "name": "二房",
+                    "price_num": 29,
+                    "sale_num": 0,
+                    "market_price": {
+                        "info": "近1年",
+                        "info_type": 1,
+                        "price": "128.5",
+                        "unit": "萬/坪",
+                        "deal_num": 2
+                    },
+                    "sale_price": {
+                        "price": "",
+                        "unit": "萬/坪",
+                        "rate": "",
+                        "type": 0,
+                        "price_empty": "價格待定"
+                    },
+                    "rent_num": 0,
+                    "show_price": []
+                },
+                {
+                    "room": 3,
+                    "name": "三房",
+                    "price_num": 173,
+                    "sale_num": 26,
+                    "market_price": {
+                        "info": "近1年",
+                        "info_type": 1,
+                        "price": "129.0",
+                        "unit": "萬/坪",
+                        "deal_num": 47
+                    },
+                    "sale_price": {
+                        "price": "",
+                        "unit": "萬/坪",
+                        "rate": "",
+                        "type": 0,
+                        "price_empty": "價格待定"
+                    },
+                    "rent_num": 0,
+                    "show_price": []
+                },
+                {
+                    "room": 5,
+                    "name": "其他",
+                    "price_num": 5,
+                    "sale_num": 0,
+                    "market_price": {
+                        "info": "",
+                        "info_type": 3,
+                        "price": "133.2",
+                        "unit": "萬/坪",
+                        "deal_num": 4
+                    },
+                    "sale_price": {
+                        "price": "",
+                        "unit": "萬/坪",
+                        "rate": "",
+                        "type": 0,
+                        "price_empty": "價格待定"
+                    },
+                    "rent_num": 9,
+                    "show_price": []
+                }
+            ]
+        },
+        "community_brokers": {},
+        "php_sessid": "bvt2ps5jae2u9tmq9famriosln",
+        "banners": {
+            "community_name": "鳴森大苑-碧硯閣",
+            "hid": 128909,
+            "community_images": [
+                {
+                    "type": "all",
+                    "name": "全部圖片",
+                    "count": 24,
+                    "images": [
+                        {
+                            "type": "logo",
+                            "name": "封面",
+                            "count": 1,
+                            "images": [
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2021/11/08/163635834299762900.jpg!688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2021/11/08/163635834299762900.jpg!338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2021/11/08/163635834299762900.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2021/11/08/163635834299762900.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                }
+                            ]
+                        },
+                        {
+                            "type": "layout",
+                            "name": "格局圖",
+                            "count": 8,
+                            "images": [
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619695679401.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/04/01/174348619695679401.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619571642502.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/04/01/174348619571642502.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619479698107.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619479698107.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/04/01/174348619479698107.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619366000409.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/04/01/174348619366000409.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/04/01/174348619252986209.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348619150518606.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2025/04/01/174348619150518606.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348619021915508.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/04/01/174348619021915508.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/04/01/174348619021915508.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/04/01/174348618842585502.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/04/01/174348618842585502.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2025/04/01/174348618842585502.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                }
+                            ]
+                        },
+                        {
+                            "type": "circum",
+                            "name": "環境圖",
+                            "count": 11,
+                            "images": [
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/02/19/173995858932472501.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/02/19/173995858932472501.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/02/19/173995858932472501.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/02/19/173995858932472501.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2025/02/19/173995858858420006.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/02/19/173995858858420006.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/02/19/173995858858420006.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2025/02/19/173995858858420006.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/02/19/173995858769498704.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2025/02/19/173995858769498704.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/02/19/173995858769498704.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2025/02/19/173995858769498704.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/02/19/173995858677471902.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2025/02/19/173995858677471902.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/02/19/173995858677471902.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2025/02/19/173995858677471902.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2021/11/08/163635814157210205.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2021/11/08/163635814157210205.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2021/11/08/163635814157210205.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2021/11/08/163635814157210205.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2021/11/08/163635814281839205.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2021/11/08/163635814281839205.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2021/11/08/163635814281839205.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2021/11/08/163635814281839205.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2021/11/08/163635814566998806.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2021/11/08/163635814566998806.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2021/11/08/163635814566998806.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2021/11/08/163635814566998806.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2021/11/08/163635814767754702.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2021/11/08/163635814767754702.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2021/11/08/163635814767754702.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2021/11/08/163635814767754702.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2021/11/08/163635814968277309.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2021/11/08/163635814968277309.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2021/11/08/163635814968277309.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2021/11/08/163635814968277309.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2021/11/08/163635815114944302.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2021/11/08/163635815114944302.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2021/11/08/163635815114944302.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2021/11/08/163635815114944302.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2021/11/08/163635815233277305.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2021/11/08/163635815233277305.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2021/11/08/163635815233277305.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2021/11/08/163635815233277305.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                }
+                            ]
+                        },
+                        {
+                            "type": "traffic",
+                            "name": "交通圖",
+                            "count": 2,
+                            "images": [
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/03/19/174234898806620107.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2025/03/19/174234898806620107.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2025/03/19/174234898806620107.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2025/03/19/174234898806620107.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                },
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2021/11/08/163636043487691103.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2021/11/08/163636043487691103.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2021/11/08/163636043487691103.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2021/11/08/163636043487691103.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                }
+                            ]
+                        },
+                        {
+                            "type": "3d",
+                            "name": "3D示意圖",
+                            "count": 1,
+                            "images": [
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2021/11/08/163635835896938807.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2021/11/08/163635835896938807.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2021/11/08/163635835896938807.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img2.591.com.tw/house/2021/11/08/163635835896938807.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                }
+                            ]
+                        },
+                        {
+                            "type": "plan",
+                            "name": "平面圖",
+                            "count": 1,
+                            "images": [
+                                {
+                                    "photo": "https://img1.591.com.tw/house/2022/11/23/5855864-1.jpg!fit.688x512.water3.jpg",
+                                    "smallphoto": "https://img1.591.com.tw/house/2022/11/23/5855864-1.jpg!fit.338x252.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/house/2022/11/23/5855864-1.jpg!900x.water3.jpg",
+                                    "bigphoto": "https://img1.591.com.tw/house/2022/11/23/5855864-1.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "video_type": 0
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "video",
+                    "name": "影音",
+                    "count": 1,
+                    "images": [
+                        {
+                            "type": "video",
+                            "name": "影音",
+                            "count": 1,
+                            "images": [
+                                {
+                                    "photo": "https://img2.591.com.tw/house/2025/09/08/175731734109419609.jpg!900x.water3.jpg",
+                                    "smallphoto": "https://img2.591.com.tw/house/2025/09/08/175731734109419609.jpg!900x.water3.jpg",
+                                    "maxphoto": "https://img2.591.com.tw/house/2025/09/08/175731734109419609.jpg!900x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 0,
+                                    "is_video": 1,
+                                    "is_full_720": 0,
+                                    "resource_url": "https://www.youtube.com/embed/vXXHdQwZUvE",
+                                    "video_type": 1
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "full",
+                    "name": "街景",
+                    "count": 1,
+                    "images": [
+                        {
+                            "type": "full",
+                            "name": "街景",
+                            "count": 1,
+                            "images": [
+                                {
+                                    "photo": "https://img2.591.com.tw/market/2022/01/14/164210278247379602.jpg!600x.water3.jpg",
+                                    "maxphoto": "https://img1.591.com.tw/market/2022/01/14/164210278247379602.jpg!1200x.water3.jpg",
+                                    "is_sky": 0,
+                                    "is_full": 1,
+                                    "is_video": 0,
+                                    "is_full_720": 0,
+                                    "resource_url": "",
+                                    "heading": 167.24,
+                                    "pitch": -0.42,
+                                    "lat": "25.05699432049563",
+                                    "lng": "121.5648994328432",
+                                    "video_type": 0
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "meta": {
+                "title": "台北鳴森大苑-碧硯閣社區相冊 - 591實價登錄",
+                "keywords": "鳴森大苑-碧硯閣,鳴森大苑-碧硯閣社區,台北鳴森大苑-碧硯閣,鳴森大苑-碧硯閣社區相冊",
+                "description": "591為您提供：台北社區鳴森大苑-碧硯閣圖片介紹，包括鳴森大苑-碧硯閣街景圖、高空圖、影音、VR、格局圖、樣品屋等。歡迎諮詢社區專家江采緹、廖奕昕。"
+            },
+            "lat": "25.05699432049563",
+            "lng": "121.5648994328432"
+        },
+        "price_trend": {
+            "active": 1,
+            "community_type": 1,
+            "community_name": "鳴森大苑-碧硯閣",
+            "update_date": "09/21",
+            "has_sale_ctrl": 1,
+            "price_num": "209",
+            "new": {
+                "price": "134.9",
+                "unit": "萬",
+                "unit_build": "萬/坪",
+                "info": {
+                    "id": 10571773,
+                    "month": "115-07"
+                }
+            },
+            "min": {
+                "price": "26.3",
+                "unit": "萬",
+                "unit_build": "萬/坪",
+                "info": {
+                    "id": 5998833,
+                    "month": "112-05"
+                }
+            },
+            "max": {
+                "price": "142.5",
+                "unit": "萬",
+                "unit_build": "萬/坪",
+                "info": {
+                    "id": 6336176,
+                    "month": "113-01"
+                }
+            },
+            "trend": {
+                "active": 1,
+                "xAxis": {
+                    "categories": [
+                        "3月",
+                        "4月",
+                        "5月",
+                        "6月",
+                        "7月",
+                        "8月"
+                    ]
+                },
+                "yAxis": {
+                    "min": "0",
+                    "max": "133.6",
+                    "range": [
+                        "133.6",
+                        "120.0",
+                        "130.9",
+                        "128.4",
+                        "132.3",
+                        "0"
+                    ],
+                    "count_by": [
+                        8,
+                        2,
+                        5,
+                        2,
+                        2,
+                        0
+                    ]
+                }
+            },
+            "year": {
+                "info": "近1年",
+                "info_type": 1,
+                "price": "129.0",
+                "unit_build": "萬/坪"
+            }
+        },
+        "build_info": {
+            "community_name": "鳴森大苑-碧硯閣",
+            "dynamic": "",
+            "dynamic_info": {},
+            "hid": 128909,
+            "service_phone": "02-55722000",
+            "build_type": 2,
+            "build_type_str": "新成屋",
+            "price": {
+                "price": "160~170",
+                "unit": "萬/坪"
+            },
+            "total_price": {
+                "price": "",
+                "unit": "萬"
+            },
+            "park_price": {
+                "price": "360~420",
+                "unit": "萬"
+            },
+            "shop_price": {
+                "price": "",
+                "unit": "萬"
+            },
+            "community_type": 1,
+            "age": {
+                "content": "0",
+                "unit": "年"
+            },
+            "all_house_num": {
+                "content": "290",
+                "unit": "戶"
+            },
+            "sell_status": "已完銷",
+            "deal_date": "2026年07月",
+            "deal_time": "2026年第一季度",
+            "completion_date": "2026年",
+            "ratio": "31%",
+            "jbrate": "38.9%",
+            "purpose_str": "住宅大樓",
+            "purpose_other2": "住商用",
+            "structural_engine": "SRC造",
+            "floor": "地上24層,地下4層",
+            "build": "4幢，4棟，278戶住家，12戶店面",
+            "layout": [
+                "二房(27坪)",
+                "三房(36~43坪)"
+            ],
+            "meeting_address": "台北市松山區三民路80巷及延壽街72巷",
+            "down_pay": "25%",
+            "project_pay": "",
+            "decorate": "標準配備",
+            "lend_rate": "75%",
+            "base_area": "1,446坪",
+            "base_area_num": "1,446",
+            "land_division": "第三種住宅區",
+            "park": "平面式309個",
+            "park_rate": "1:1.07",
+            "direction_rule": "朝北、朝南",
+            "all_park_num": 309,
+            "build_intro": "Dormakaba玄關門鎖、YKK室內鋁窗(玻璃)、KOHLER廚具、康沛石檯面、林內三口瓦斯爐、林內隱藏式排油煙機、林內廚下型烘碗機、Hansgrohe廚房伸縮龍頭、諾得廚下型淨水器。\r\n主浴室：BLB浴缸、Hansgrohe浴缸水龍頭、Hansgrohe手持花灑+升降桿組、KOHLER馬桶、KOHLER方形下崁面盆、Hansgrohe單槍面盆龍頭。\r\n客浴室：Hansgrohe淋浴龍頭、Hansgrohe手持花灑+升降桿組、KOHLER馬桶+免治馬桶座、KOHLER方形下崁面盆、Hansgrohe面盆龍頭。",
+            "facility": [
+                "接待大廳",
+                "中庭花園",
+                "空中花園",
+                "交誼廳",
+                "閱覽室",
+                "健身房",
+                "親子遊戲區",
+                "信箱區"
+            ],
+            "manage_committee": "無",
+            "property_company": "",
+            "manage_cost": {
+                "price": "無管理費",
+                "unit": "",
+                "type": 1
+            },
+            "sell_company": "自售",
+            "company": "中華工程股份有限公司",
+            "build_company": "中華工程股份有限公司",
+            "construction_company": "張玉樹建築師事務所",
+            "landscape_name": "境業設計工程有限公司",
+            "postulate_name": "境業設計工程有限公司",
+            "light_company": "",
+            "build_remark": "民生社區擎天地標，橫空出世絕無僅有帝王方正基地，社區門禁規劃一、二門廳，獨享靜謐庭院式公設環境，住宅以A、B二幢分別，中空與高樓層公設環攬絕佳視野，盡享自然山水與都市景觀。\r\n\r\n中華工程延壽街新案「鳴森大苑-碧硯閣」\r\n1445坪、四面臨路大基地，\r\n規劃地上24層SRC建築，\r\n成就民生社區最高地標！\r\n\r\n目前正民生社區唯一大面積條件基地，\r\n南北座向，高樓層視野可遠望松山機場、陽明山，\r\n另一側則面信義計畫區、台北101，視野相當漂亮。\r\n\r\n【心與世界，僅一步之遙】\r\n捷運南京三民站散步8分鐘\r\n松山車站一站即達，\r\n十分鐘可轉接大台北各捷運線\r\n距離松山機場更是咫尺之距，\r\n心懷天下，讓家跟世界暢行無阻！\r\n\r\n【河濱很近，北市最懂生活的地方】\r\n假日不必跑遠，到河濱騎腳踏車吧！\r\n「鳴森大苑-碧硯閣」一旁西松高中就有Ubike站，\r\n從塔悠路進到河濱公園，\r\n向南往饒河夜市、南港，\r\n向北可到迎風狗公園，\r\n健康生活，天天是有氧日！\r\n\r\n【市中心的悠閒延伸】\r\n民生與敦北自成一格的生活圈，\r\n讓假日時間，附近就有方便好去處！\r\n小巨蛋與台北田徑場，\r\n後方連接松山運動中心，\r\n市中心難得的休閒機能規劃，\r\n帶上家人一起運動散步、閒坐休憩，\r\n享受最舒適的午後時光。\r\n「鳴森大苑-碧硯閣」民生社區出發，\r\n15分鐘生活圈 比想像要住得更好！",
+            "school": "健康國小、西松完全中學",
+            "market": "全聯、家樂福超市",
+            "tradition_market": "武昌市場",
+            "public_construction": "基隆河濱公園",
+            "hot_business_area": "民生社區生活圈",
+            "hospital": "三軍總醫院松山分院",
+            "government": "暫無",
+            "other": "暫無",
+            "subway": "南京三民站",
+            "freeway": "國道一號",
+            "rapid_traffic": "環東大道、市民高架",
+            "speed_railway": "暫無",
+            "tw_railway": "松山站",
+            "other_traffic": "民權大橋、台北松山機場",
+            "address": "台北市松山區三民路80巷及延壽街72巷",
+            "has_piles_str": "有充電設備（含預留）",
+            "refuse_disposal_str": "",
+            "license": "108建字第0140號",
+            "use_license": "114使字第0094號",
+            "park_type_str": "平面式",
+            "park_count_str": "平面式309個"
+        },
+        "rent": {
+            "active": 1,
+            "layout_count": 1,
+            "rent_total": 9,
+            "layouts": [
+                {
+                    "room": 4,
+                    "name": "其他",
+                    "count": 9,
+                    "area": "10.76~26.6",
+                    "price": "52,000~57,000"
+                }
+            ],
+            "rent_list": [
+                {
+                    "rent_id": 22011060,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 3992677,
+                    "type": 1,
+                    "kind": 5,
+                    "kind_str": "店面",
+                    "title": "我已成交4戶⭐️全新碧硯閣邊間金店🥇中工專家21賽門",
+                    "layout_info": [
+                        "10.762坪",
+                        "1F/24F"
+                    ],
+                    "deposit": "押金二個月",
+                    "browse_num": 0,
+                    "price": "52,000",
+                    "is_host": 0,
+                    "tags": [
+                        "近捷運",
+                        "可登記",
+                        "可隔間",
+                        "可餐飲",
+                        "隨時可遷入"
+                    ],
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "pictures": [
+                        "https://img1.591.com.tw/house/2026/09/14/178937105800514702.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/09/14/178937105808228308.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/09/14/178937105807605501.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/09/14/178937105791972303.jpg!510x400.jpg"
+                    ],
+                    "has_agent": 1,
+                    "has_video": 0,
+                    "label_type": 1,
+                    "bid_rank": 1,
+                    "agent": {
+                        "approve_status": 1,
+                        "company": "21世紀不動産",
+                        "sub_company": "民生圓環加盟店",
+                        "shop_id": 43473,
+                        "mobile": "0972-528-587",
+                        "mobile_ext": "118180",
+                        "is_super": 0,
+                        "agent_id": 345144,
+                        "name": "廖奕昕",
+                        "avatar": "https://img1.591.com.tw/user/2026/03/06/177272721315297506.png!300x360.png",
+                        "user_id": 3992677,
+                        "im_uid": 3992677,
+                        "im_name": "廖先生",
+                        "label_type": 1,
+                        "im_recommend_tip": 1,
+                        "recommend_type": 0,
+                        "bid_rank": 1,
+                        "label_text": [
+                            "本社區已成交1筆",
+                            "在售物件41筆·在租物件3筆",
+                            "熟悉社區·行業深耕5年"
+                        ],
+                        "line": "https://line.me/ti/p/VkEUo0A2h_"
+                    },
+                    "is_visit": 0,
+                    "has_ai_decorate": 0
+                },
+                {
+                    "rent_id": 22001875,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 3992677,
+                    "type": 1,
+                    "kind": 5,
+                    "kind_str": "店面",
+                    "title": "我已成交4戶⭐️全新碧硯閣金店01（可另租車位）🥇21賽門",
+                    "layout_info": [
+                        "11.568坪",
+                        "1F/24F"
+                    ],
+                    "deposit": "押金二個月",
+                    "browse_num": 0,
+                    "price": "52,000",
+                    "is_host": 0,
+                    "tags": [
+                        "近捷運",
+                        "可登記",
+                        "可隔間",
+                        "可餐飲",
+                        "隨時可遷入"
+                    ],
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/05/30/178014751777915200.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/05/30/178014751751010802.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/05/30/178014751780610904.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/05/30/178014751782513009.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/05/30/178014751778608303.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/05/30/178014751782029909.jpg!510x400.jpg"
+                    ],
+                    "has_agent": 1,
+                    "has_video": 0,
+                    "label_type": 1,
+                    "bid_rank": 1,
+                    "agent": {
+                        "approve_status": 1,
+                        "company": "21世紀不動産",
+                        "sub_company": "民生圓環加盟店",
+                        "shop_id": 43473,
+                        "mobile": "0972-528-587",
+                        "mobile_ext": "118180",
+                        "is_super": 0,
+                        "agent_id": 345144,
+                        "name": "廖奕昕",
+                        "avatar": "https://img1.591.com.tw/user/2026/03/06/177272721315297506.png!300x360.png",
+                        "user_id": 3992677,
+                        "im_uid": 3992677,
+                        "im_name": "廖先生",
+                        "label_type": 1,
+                        "im_recommend_tip": 1,
+                        "recommend_type": 0,
+                        "bid_rank": 1,
+                        "label_text": [
+                            "本社區已成交1筆",
+                            "在售物件41筆·在租物件3筆",
+                            "熟悉社區·行業深耕5年"
+                        ],
+                        "line": "https://line.me/ti/p/VkEUo0A2h_"
+                    },
+                    "is_visit": 0,
+                    "has_ai_decorate": 0
+                },
+                {
+                    "rent_id": 21997357,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 322998,
+                    "type": 1,
+                    "kind": 5,
+                    "kind_str": "店面",
+                    "title": "*本案承辦人*碧硯閣邊間金店面+車位洽21超翔",
+                    "layout_info": [
+                        "10.76坪",
+                        "1F/1F"
+                    ],
+                    "deposit": "押金二個月",
+                    "browse_num": 0,
+                    "price": "52,000",
+                    "is_host": 0,
+                    "tags": [
+                        "近捷運",
+                        "可登記",
+                        "隨時可遷入"
+                    ],
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/09/12/178918120450419805.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/09/12/178918181089794000.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/09/12/178918121064858806.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/09/12/178918120448298905.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/09/12/178918120447420002.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/09/12/178918120447231309.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/09/12/178918120448678004.jpg!510x400.jpg"
+                    ],
+                    "has_agent": 0,
+                    "has_video": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "is_visit": 0,
+                    "has_ai_decorate": 0
+                },
+                {
+                    "rent_id": 21981694,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 45430,
+                    "type": 1,
+                    "kind": 5,
+                    "kind_str": "店面",
+                    "title": "全新金店面/碧硯閣/挑高4米2/延壽街*中信葉玲玲",
+                    "layout_info": [
+                        "16.6坪",
+                        "1F/24F"
+                    ],
+                    "deposit": "押金二個月",
+                    "browse_num": 0,
+                    "price": "52,000",
+                    "is_host": 0,
+                    "tags": [
+                        "近捷運",
+                        "可登記",
+                        "可隔間",
+                        "免租1個月",
+                        "隨時可遷入"
+                    ],
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/08/14/178667318353415203.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/08/14/178667318358263802.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/08/11/178644519201739400.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/08/11/178644519216291501.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/08/11/178644519026340306.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/08/11/178644519194566504.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/08/11/178644519016573105.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/08/11/178644519020285901.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/03/12/177331277241419000.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/03/12/177331277243768103.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/03/12/177331277254490203.jpg!510x400.jpg"
+                    ],
+                    "has_agent": 0,
+                    "has_video": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "is_visit": 0,
+                    "has_ai_decorate": 0
+                },
+                {
+                    "rent_id": 21951262,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 465674,
+                    "type": 1,
+                    "kind": 5,
+                    "kind_str": "店面",
+                    "title": "全新/延壽街/新東街/碧硯閣經店面(含車位)",
+                    "layout_info": [
+                        "26.6坪",
+                        "1F/24F"
+                    ],
+                    "deposit": "押金二個月",
+                    "browse_num": 0,
+                    "price": "57,000",
+                    "is_host": 0,
+                    "tags": [
+                        "近捷運",
+                        "可登記",
+                        "可隔間",
+                        "隨時可遷入"
+                    ],
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "pictures": [
+                        "https://img2.591.com.tw/house/2026/06/01/178028246404256500.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/06/01/178028246743669602.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/06/01/178028246734776709.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/06/01/178028246428492403.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/06/01/178028246403722507.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/06/01/178028246405379403.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/06/01/178028246407184701.jpg!510x400.jpg"
+                    ],
+                    "has_agent": 0,
+                    "has_video": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "is_visit": 0,
+                    "has_ai_decorate": 0
+                },
+                {
+                    "rent_id": 21482628,
+                    "community_id": "",
+                    "community_name": "",
+                    "distance": null,
+                    "info": "距離本社區約  公尺",
+                    "user_id": 847380,
+                    "type": 1,
+                    "kind": 5,
+                    "kind_str": "店面",
+                    "title": "🍎碧硯閣全新金店面可另租車位🍎21冠軍店王玉雲🌟",
+                    "layout_info": [
+                        "11.568坪",
+                        "1F/1F"
+                    ],
+                    "deposit": "押金二個月",
+                    "browse_num": 0,
+                    "price": "52,000",
+                    "is_host": 0,
+                    "tags": [
+                        "近捷運",
+                        "可登記",
+                        "可隔間",
+                        "可餐飲",
+                        "隨時可遷入"
+                    ],
+                    "tag_type": 0,
+                    "tag_str": "",
+                    "pictures": [
+                        "https://img1.591.com.tw/house/2026/06/19/178183217591224202.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/06/19/178183217597699707.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/06/19/178183217596043006.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/06/19/178183217588950209.jpg!510x400.jpg",
+                        "https://img1.591.com.tw/house/2026/06/19/178183214171015201.jpg!510x400.jpg",
+                        "https://img2.591.com.tw/house/2026/06/19/178183214167619205.jpg!510x400.jpg"
+                    ],
+                    "has_agent": 0,
+                    "has_video": 0,
+                    "label_type": 1,
+                    "bid_rank": 99,
+                    "agent": [],
+                    "is_visit": 0,
+                    "has_ai_decorate": 0
+                }
+            ]
+        },
+        "nearby_union": {
+            "sale": {
+                "community_name": "鳴森大苑-碧硯閣",
+                "community_id": 5855864,
+                "total": 50,
+                "current_page": 1,
+                "last_page": 9,
+                "per_page": 6,
+                "list": [
+                    {
+                        "houseid": 20855343,
+                        "community_id": 5934204,
+                        "community_name": "鳴森大苑-鳴森苑",
+                        "distance": 129,
+                        "info": "距離本社區約 129 公尺",
+                        "user_id": 2230255,
+                        "mobile": "",
+                        "line": "",
+                        "title": "已成交中工8戶🌈鳴森苑-地主戶🌈專約有多戶👍徐儀婷",
+                        "price_v": {
+                            "price": "5,688",
+                            "unit": "萬"
+                        },
+                        "price_unit": "111.1萬/坪",
+                        "room": "3房2廳",
+                        "address": "松山區-鳴森大苑-鳴森苑",
+                        "area_v": {
+                            "area": "51.21",
+                            "unit": "坪"
+                        },
+                        "floor": "5樓",
+                        "photo_src": "https://img1.591.com.tw/house/2026/09/26/179043330035015404.jpg!400x300.jpg",
+                        "is_online": 1,
+                        "is_mvip": 0,
+                        "floor_en": "5F/21F",
+                        "tag_type": 0,
+                        "tag_str": "",
+                        "post_time": 1788607959,
+                        "has_agent": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "browsenum": 131,
+                        "is_video": 0,
+                        "is_full": 0,
+                        "is_hurry": 0,
+                        "is_discounted": 0,
+                        "is_host": 0,
+                        "original_price": "萬",
+                        "down_price_percent": "",
+                        "label": [
+                            "含車位",
+                            "有陽台",
+                            "有格局圖"
+                        ],
+                        "pictures": [
+                            "https://img1.591.com.tw/house/2026/09/26/179043330035015404.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/26/179043330034989305.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/26/179043330037317803.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/26/179043330043531102.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/26/179043333385313902.jpg!400x300.jpg"
+                        ],
+                        "type": 2,
+                        "kind": 9,
+                        "pc_good_house": 0,
+                        "community_quality_money": 112999,
+                        "operation_tag": {
+                            "type": 0,
+                            "title": "",
+                            "sub_title": ""
+                        },
+                        "avatar": "https://img1.591.com.tw/user/2025/09/23/175855760762864107.png!300x360.png",
+                        "name": "徐儀婷 ",
+                        "house_type": 3,
+                        "is_visit": 0,
+                        "is_high_value": 0,
+                        "house_rule_score": 2.57,
+                        "model_score": 0
+                    },
+                    {
+                        "houseid": 20969618,
+                        "community_id": 5934204,
+                        "community_name": "鳴森大苑-鳴森苑",
+                        "distance": 129,
+                        "info": "距離本社區約 129 公尺",
+                        "user_id": 37965,
+                        "mobile": "",
+                        "line": "",
+                        "title": "已成交中工8戶🌈鳴森苑-地主戶🌈專約有多戶👍陳淑蓉",
+                        "price_v": {
+                            "price": "5,688",
+                            "unit": "萬"
+                        },
+                        "price_unit": "110.6萬/坪",
+                        "room": "3房2廳",
+                        "address": "松山區-鳴森大苑-鳴森苑",
+                        "area_v": {
+                            "area": "51.44",
+                            "unit": "坪"
+                        },
+                        "floor": "5樓",
+                        "photo_src": "https://img2.591.com.tw/house/2026/09/26/179042876147563505.jpg!400x300.jpg",
+                        "is_online": 1,
+                        "is_mvip": 0,
+                        "floor_en": "5F/21F",
+                        "tag_type": 0,
+                        "tag_str": "",
+                        "post_time": 1790430660,
+                        "has_agent": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "browsenum": 23,
+                        "is_video": 0,
+                        "is_full": 0,
+                        "is_hurry": 0,
+                        "is_discounted": 0,
+                        "is_host": 0,
+                        "original_price": "萬",
+                        "down_price_percent": "",
+                        "label": [
+                            "含車位",
+                            "有陽台",
+                            "有格局圖"
+                        ],
+                        "pictures": [
+                            "https://img1.591.com.tw/house/2026/09/26/179042876147563505.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/26/179042876166023202.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/26/179042876033267608.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/26/179042876153030407.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/26/179042885957715307.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/26/179042927791767600.jpg!400x300.jpg"
+                        ],
+                        "type": 2,
+                        "kind": 9,
+                        "pc_good_house": 0,
+                        "community_quality_money": 105998,
+                        "operation_tag": {
+                            "type": 0,
+                            "title": "",
+                            "sub_title": ""
+                        },
+                        "avatar": "https://img2.591.com.tw/user/2024/01/03/170421205764933307.png!300x360.png",
+                        "name": "陳淑蓉",
+                        "house_type": 3,
+                        "is_visit": 0,
+                        "is_high_value": 0,
+                        "house_rule_score": 2.61,
+                        "model_score": 0
+                    },
+                    {
+                        "houseid": 20815441,
+                        "community_id": 5934204,
+                        "community_name": "鳴森大苑-鳴森苑",
+                        "distance": 129,
+                        "info": "距離本社區約 129 公尺",
+                        "user_id": 3992677,
+                        "mobile": "",
+                        "line": "",
+                        "title": "我已成交6戶⭐️鳴森苑朝南三房＋大車位🥇中工專家21賽門",
+                        "price_v": {
+                            "price": "5,688",
+                            "unit": "萬"
+                        },
+                        "price_unit": "110.6萬/坪",
+                        "room": "3房2廳",
+                        "address": "松山區-鳴森大苑-鳴森苑",
+                        "area_v": {
+                            "area": "51.44",
+                            "unit": "坪"
+                        },
+                        "floor": "5樓",
+                        "photo_src": "https://img1.591.com.tw/house/2026/05/01/177762453826687906.jpg!400x300.jpg",
+                        "is_online": 1,
+                        "is_mvip": 0,
+                        "floor_en": "5F/21F",
+                        "tag_type": 0,
+                        "tag_str": "",
+                        "post_time": 1788057150,
+                        "has_agent": 1,
+                        "label_type": 1,
+                        "bid_rank": 1,
+                        "agent": {
+                            "approve_status": 1,
+                            "company": "21世紀不動産",
+                            "sub_company": "民生圓環加盟店",
+                            "shop_id": 43473,
+                            "mobile": "0972-528-587",
+                            "mobile_ext": "425775",
+                            "is_super": 0,
+                            "agent_id": 349616,
+                            "name": "廖奕昕",
+                            "avatar": "https://img2.591.com.tw/user/2026/03/06/177272721315297506.png!300x360.png",
+                            "user_id": 3992677,
+                            "im_uid": 3992677,
+                            "im_name": "廖先生",
+                            "label_type": 1,
+                            "im_recommend_tip": 1,
+                            "recommend_type": 0,
+                            "bid_rank": 1,
+                            "label_text": [
+                                "歷史已成交79筆",
+                                "在售物件41筆·在租物件3筆",
+                                "熟悉社區·行業深耕5年"
+                            ],
+                            "line": "https://line.me/ti/p/VkEUo0A2h_"
+                        },
+                        "browsenum": 220,
+                        "is_video": 0,
+                        "is_full": 0,
+                        "is_hurry": 0,
+                        "is_discounted": 0,
+                        "is_host": 0,
+                        "original_price": "萬",
+                        "down_price_percent": "",
+                        "label": [
+                            "含車位",
+                            "有陽台"
+                        ],
+                        "pictures": [
+                            "https://img1.591.com.tw/house/2026/05/01/177762453826687906.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/05/01/177762442450643000.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/05/01/177762442432100502.jpg!400x300.jpg"
+                        ],
+                        "type": 2,
+                        "kind": 9,
+                        "pc_good_house": 0,
+                        "community_quality_money": 70997,
+                        "operation_tag": {
+                            "type": 0,
+                            "title": "",
+                            "sub_title": ""
+                        },
+                        "avatar": "https://img1.591.com.tw/user/2026/03/06/177272721315297506.png!300x360.png",
+                        "name": "廖奕昕",
+                        "house_type": 3,
+                        "is_visit": 0,
+                        "is_high_value": 0,
+                        "house_rule_score": 2.61,
+                        "model_score": 0
+                    },
+                    {
+                        "houseid": 20880460,
+                        "community_id": 5857,
+                        "community_name": "延壽國宅H區",
+                        "distance": 138,
+                        "info": "距離本社區約 138 公尺",
+                        "user_id": 3641287,
+                        "mobile": "",
+                        "line": "",
+                        "title": "獨家🍎民生邊間電梯美兩房🍎住商莊宜帆",
+                        "price_v": {
+                            "price": "2,988",
+                            "unit": "萬"
+                        },
+                        "price_unit": "107.3萬/坪",
+                        "room": "2房2廳",
+                        "address": "松山區-延壽國宅H區",
+                        "area_v": {
+                            "area": "27.85",
+                            "unit": "坪"
+                        },
+                        "floor": "6樓",
+                        "photo_src": "https://img1.591.com.tw/house/2026/09/10/178900937176266909.jpg!400x300.jpg",
+                        "is_online": 1,
+                        "is_mvip": 0,
+                        "floor_en": "6F/7F",
+                        "tag_type": 0,
+                        "tag_str": "",
+                        "post_time": 1789009389,
+                        "has_agent": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "browsenum": 59,
+                        "is_video": 0,
+                        "is_full": 0,
+                        "is_hurry": 0,
+                        "is_discounted": 0,
+                        "is_host": 0,
+                        "original_price": "萬",
+                        "down_price_percent": "",
+                        "label": [
+                            "有格局圖"
+                        ],
+                        "pictures": [
+                            "https://img2.591.com.tw/house/2026/09/10/178900937176266909.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900914841847003.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178900918220764507.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178900917818438703.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900917023324806.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900916287527305.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178900916038221107.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900915549357905.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178900915278553206.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900909265291708.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178900913689941201.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900912546005207.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900912276416706.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900911969013307.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178900911496742405.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900911087958701.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178900910070895104.jpg!400x300.jpg"
+                        ],
+                        "type": 2,
+                        "kind": 9,
+                        "pc_good_house": 0,
+                        "community_quality_money": 0,
+                        "operation_tag": [],
+                        "avatar": "https://img2.591.com.tw/user/2024/07/05/1720161747582.jpg!300x360.jpg",
+                        "name": "莊小姐",
+                        "house_type": 3,
+                        "is_visit": 0,
+                        "is_high_value": 1,
+                        "house_rule_score": 5.98,
+                        "model_score": 0.99
+                    },
+                    {
+                        "houseid": 20677764,
+                        "community_id": 5857,
+                        "community_name": "延壽國宅H區",
+                        "distance": 138,
+                        "info": "距離本社區約 138 公尺",
+                        "user_id": 1687835,
+                        "mobile": "",
+                        "line": "",
+                        "title": "小龜獨家A案🐢民生社區邊間電梯2房🐢住商楊志祥",
+                        "price_v": {
+                            "price": "2,988",
+                            "unit": "萬"
+                        },
+                        "price_unit": "107.3萬/坪",
+                        "room": "2房2廳",
+                        "address": "松山區-延壽國宅H區",
+                        "area_v": {
+                            "area": "27.85",
+                            "unit": "坪"
+                        },
+                        "floor": "6樓",
+                        "photo_src": "https://img1.591.com.tw/house/2026/09/10/178903911504943403.jpg!400x300.jpg",
+                        "is_online": 1,
+                        "is_mvip": 0,
+                        "floor_en": "6F/7F",
+                        "tag_type": 0,
+                        "tag_str": "",
+                        "post_time": 1785911156,
+                        "has_agent": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "browsenum": 207,
+                        "is_video": 0,
+                        "is_full": 0,
+                        "is_hurry": 0,
+                        "is_discounted": 0,
+                        "is_host": 0,
+                        "original_price": "萬",
+                        "down_price_percent": "",
+                        "label": [
+                            "有陽台",
+                            "有格局圖"
+                        ],
+                        "pictures": [
+                            "https://img1.591.com.tw/house/2026/09/10/178903911504943403.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901360277502.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178903901394821402.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901358342305.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901357766603.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178903901389270305.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901364865700.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901412839109.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178903901382866000.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178903901399865106.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901431352609.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178903901378002609.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/10/178903901436240502.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901451991900.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903901460048208.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/10/178903903371569409.jpg!400x300.jpg"
+                        ],
+                        "type": 2,
+                        "kind": 9,
+                        "pc_good_house": 0,
+                        "community_quality_money": 0,
+                        "operation_tag": [],
+                        "avatar": "https://img2.591.com.tw/user/2025/03/29/174317841469771503.png!300x360.png",
+                        "name": "楊志祥",
+                        "house_type": 3,
+                        "is_visit": 0,
+                        "is_high_value": 1,
+                        "house_rule_score": 5.98,
+                        "model_score": 0.97
+                    },
+                    {
+                        "houseid": 20848197,
+                        "community_id": 6586,
+                        "community_name": "新光民生廣場華廈",
+                        "distance": 210,
+                        "info": "距離本社區約 210 公尺",
+                        "user_id": 3450166,
+                        "mobile": "",
+                        "line": "",
+                        "title": "專任｜民生圓環新光高樓2+1房",
+                        "price_v": {
+                            "price": "4,298",
+                            "unit": "萬"
+                        },
+                        "price_unit": "95.4萬/坪",
+                        "room": "2房2廳",
+                        "address": "松山區-新光民生廣場華廈",
+                        "area_v": {
+                            "area": "45.07",
+                            "unit": "坪"
+                        },
+                        "floor": "14樓",
+                        "photo_src": "https://img1.591.com.tw/house/2026/09/11/178910870003401106.jpg!400x300.jpg",
+                        "is_online": 1,
+                        "is_mvip": 0,
+                        "floor_en": "14F/16F",
+                        "tag_type": 0,
+                        "tag_str": "",
+                        "post_time": 1788506814,
+                        "has_agent": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "browsenum": 50,
+                        "is_video": 0,
+                        "is_full": 0,
+                        "is_hurry": 0,
+                        "is_discounted": 0,
+                        "is_host": 0,
+                        "original_price": "萬",
+                        "down_price_percent": "",
+                        "label": [
+                            "有陽台",
+                            "有格局圖"
+                        ],
+                        "pictures": [
+                            "https://img2.591.com.tw/house/2026/09/11/178910870003401106.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674216554004.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/07/178875840313443701.png!400x300.png",
+                            "https://img1.591.com.tw/house/2026/09/07/178875840070614704.png!400x300.png",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674254105407.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674256538507.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674251901303.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674264887403.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674249928204.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674230076907.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674233672900.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674178133804.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674220376000.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674217104409.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674215893803.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674203585408.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674206620102.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674187495708.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674182127307.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674185207103.jpg!400x300.jpg",
+                            "https://img2.591.com.tw/house/2026/09/04/178850674185698904.jpg!400x300.jpg",
+                            "https://img1.591.com.tw/house/2026/09/04/178850674175523108.jpg!400x300.jpg"
+                        ],
+                        "type": 2,
+                        "kind": 9,
+                        "pc_good_house": 0,
+                        "community_quality_money": 0,
+                        "operation_tag": [],
+                        "avatar": "https://img2.591.com.tw/user/2025/12/05/176486481633573101.png!300x360.png",
+                        "name": "袁康洋",
+                        "house_type": 3,
+                        "is_visit": 0,
+                        "is_high_value": 1,
+                        "house_rule_score": 6.47,
+                        "model_score": 0.86
+                    }
+                ]
+            },
+            "rent": {
+                "community_name": "鳴森大苑-碧硯閣",
+                "community_id": 5855864,
+                "total": 50,
+                "current_page": 1,
+                "last_page": 9,
+                "per_page": 6,
+                "list": [
+                    {
+                        "rent_id": 21995265,
+                        "community_id": 6211,
+                        "community_name": "國美新美館",
+                        "distance": 321,
+                        "info": "距離本社區約 321 公尺",
+                        "user_id": 3897328,
+                        "type": 1,
+                        "kind": 1,
+                        "kind_str": "整層住家",
+                        "title": "南京三民⁕國美知名建案典雅3+1⁕可寵需公證",
+                        "layout_info": [
+                            "4房2廳2衛",
+                            "89坪",
+                            "9F/15F"
+                        ],
+                        "deposit": "押金二個月",
+                        "browse_num": 0,
+                        "price": "180,000",
+                        "is_host": 0,
+                        "tags": [
+                            "近捷運",
+                            "新上架",
+                            "拎包入住",
+                            "有電梯",
+                            "隨時可遷入",
+                            "可開伙",
+                            "可養寵物",
+                            "有車位"
+                        ],
+                        "tag_type": 1,
+                        "tag_str": "新上架",
+                        "pictures": [
+                            "https://img2.591.com.tw/house/2025/02/25/174045709182621404.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2025/02/25/174045709241706901.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709231669903.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2025/02/25/174045709228849202.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2025/02/25/174045709222651703.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2025/02/25/174045709214887609.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709215307702.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2025/02/25/174045709210073803.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2025/02/25/174045709206822101.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709195845909.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709189573100.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709189257202.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709205677602.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2025/02/25/174045709183089904.jpg!510x400.jpg"
+                        ],
+                        "has_agent": 0,
+                        "has_video": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "is_visit": 0,
+                        "has_ai_decorate": 0
+                    },
+                    {
+                        "rent_id": 22069917,
+                        "community_id": 1864330,
+                        "community_name": "民生社區",
+                        "distance": 518,
+                        "info": "距離本社區約 518 公尺",
+                        "user_id": 3457463,
+                        "type": 1,
+                        "kind": 1,
+                        "kind_str": "整層住家",
+                        "title": "民生社區🏡一樓可當工作室+樓中樓可休憩｜雙層空間好運用🍀",
+                        "layout_info": [
+                            "1房1廳1衛",
+                            "12坪",
+                            "1F/4F"
+                        ],
+                        "deposit": "押金二個月",
+                        "browse_num": 0,
+                        "price": "23,000",
+                        "is_host": 0,
+                        "tags": [
+                            "近捷運",
+                            "新上架",
+                            "隨時可遷入",
+                            "南北通透"
+                        ],
+                        "tag_type": 2,
+                        "tag_str": "2天前上架",
+                        "pictures": [
+                            "https://img2.591.com.tw/house/2026/09/09/178892516363849601.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/08/25/178764980177489404.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/08/25/178764980165166404.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/08/25/178764980182327704.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/09/178892516356476505.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/09/178892516362693604.jpg!510x400.jpg"
+                        ],
+                        "has_agent": 0,
+                        "has_video": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "is_visit": 0,
+                        "has_ai_decorate": 0
+                    },
+                    {
+                        "rent_id": 22069077,
+                        "community_id": 3818,
+                        "community_name": "健康新城C區",
+                        "distance": 389,
+                        "info": "距離本社區約 389 公尺",
+                        "user_id": 5177293,
+                        "type": 1,
+                        "kind": 1,
+                        "kind_str": "整層住家",
+                        "title": "👑松山健康新城c區！大三房可租補可寵物免服務費~~五泰錫章",
+                        "layout_info": [
+                            "3房2廳2衛",
+                            "31.66坪",
+                            "3F/12F"
+                        ],
+                        "deposit": "押金二個月",
+                        "browse_num": 0,
+                        "price": "39,500",
+                        "is_host": 0,
+                        "tags": [
+                            "近捷運",
+                            "新上架",
+                            "有電梯",
+                            "隨時可遷入",
+                            "可開伙",
+                            "可養寵物",
+                            "社會住宅",
+                            "可報稅",
+                            "可入籍"
+                        ],
+                        "tag_type": 2,
+                        "tag_str": "2天前上架",
+                        "pictures": [
+                            "https://img1.591.com.tw/house/2026/09/25/179026976287624200.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/25/179026982011785004.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976319882908.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/25/179026976314689108.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976309323401.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/25/179026976308617902.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/25/179026976319110909.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976275139702.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976285665006.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/25/179026976298974804.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976269903504.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976263091709.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976238712303.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/25/179026976239814800.jpg!510x400.jpg"
+                        ],
+                        "has_agent": 0,
+                        "has_video": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "is_visit": 0,
+                        "has_ai_decorate": 0
+                    },
+                    {
+                        "rent_id": 22066870,
+                        "community_id": 1864330,
+                        "community_name": "民生社區",
+                        "distance": 518,
+                        "info": "距離本社區約 518 公尺",
+                        "user_id": 3457463,
+                        "type": 1,
+                        "kind": 5,
+                        "kind_str": "店面",
+                        "title": "民生社區💎民生東路面寬樹海店面｜使用60坪🌈",
+                        "layout_info": [
+                            "60坪",
+                            "1F/4F"
+                        ],
+                        "deposit": "押金400000元",
+                        "browse_num": 0,
+                        "price": "198,000",
+                        "is_host": 0,
+                        "tags": [
+                            "7日上新",
+                            "近捷運",
+                            "隨時可遷入"
+                        ],
+                        "tag_type": 2,
+                        "tag_str": "3天前上架",
+                        "pictures": [
+                            "https://img2.591.com.tw/house/2026/09/24/179023606507373707.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/24/179023606514253707.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/24/179023606510136503.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/24/179023606492925602.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/24/179023606509519403.jpg!510x400.jpg"
+                        ],
+                        "has_agent": 0,
+                        "has_video": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "is_visit": 0,
+                        "has_ai_decorate": 0
+                    },
+                    {
+                        "rent_id": 22061598,
+                        "community_id": 5947,
+                        "community_name": "藏富",
+                        "distance": 228,
+                        "info": "距離本社區約 228 公尺",
+                        "user_id": 2355020,
+                        "type": 1,
+                        "kind": 1,
+                        "kind_str": "整層住家",
+                        "title": "~~捷運南京三民站旁,精緻裝潢3+1房含車可報稅~~",
+                        "layout_info": [
+                            "4房2廳2衛",
+                            "40坪",
+                            "10F/18F"
+                        ],
+                        "deposit": "押金二個月",
+                        "browse_num": 0,
+                        "price": "148,000",
+                        "is_host": 0,
+                        "tags": [
+                            "近捷運",
+                            "新上架",
+                            "拎包入住",
+                            "有電梯",
+                            "隨時可遷入",
+                            "可開伙",
+                            "有車位",
+                            "可報稅"
+                        ],
+                        "tag_type": 2,
+                        "tag_str": "4天前上架",
+                        "pictures": [
+                            "https://img2.591.com.tw/house/2026/09/14/178937093760741906.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093745538309.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093728395809.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093735016504.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093717858707.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093730246701.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093775136302.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093726863305.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093755463901.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093725030406.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093763938707.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093783686306.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093758774907.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/14/178937093786730503.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/14/178937093756019807.jpg!510x400.jpg"
+                        ],
+                        "has_agent": 0,
+                        "has_video": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "is_visit": 0,
+                        "has_ai_decorate": 0
+                    },
+                    {
+                        "rent_id": 22054101,
+                        "community_id": 4017,
+                        "community_name": "立功花園新城",
+                        "distance": 285,
+                        "info": "距離本社區約 285 公尺",
+                        "user_id": 4910210,
+                        "type": 1,
+                        "kind": 1,
+                        "kind_str": "整層住家",
+                        "title": "民生社區商圈｜明亮舒適・質感生活宅",
+                        "layout_info": [
+                            "3房2廳2衛",
+                            "25.88坪",
+                            "5F/11F"
+                        ],
+                        "deposit": "無押金",
+                        "browse_num": 0,
+                        "price": "48,800",
+                        "is_host": 0,
+                        "tags": [
+                            "近捷運",
+                            "新上架",
+                            "有電梯",
+                            "隨時可遷入",
+                            "可開伙",
+                            "可養寵物",
+                            "有車位"
+                        ],
+                        "tag_type": 2,
+                        "tag_str": "5天前上架",
+                        "pictures": [
+                            "https://img1.591.com.tw/house/2026/09/22/179004983134559305.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983174933006.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/22/179004983155993402.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/22/179004983144069108.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983172884507.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/22/179004983160195603.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983168649604.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983143612709.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983148026000.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983122842901.jpg!510x400.jpg",
+                            "https://img2.591.com.tw/house/2026/09/22/179004983113477708.jpg!510x400.jpg",
+                            "https://img1.591.com.tw/house/2026/09/22/179004983113498206.jpg!510x400.jpg"
+                        ],
+                        "has_agent": 0,
+                        "has_video": 0,
+                        "label_type": 1,
+                        "bid_rank": 99,
+                        "agent": [],
+                        "is_visit": 0,
+                        "has_ai_decorate": 0
+                    }
+                ]
+            },
+            "active": 1
+        },
+        "share_info": {
+            "url": "https://market.591.com.tw/5855864",
+            "desc": "【鳴森大苑-碧硯閣】209筆成交，均價129萬/坪 - 591實價登錄",
+            "from": "來自【591實價登錄】"
+        }
+    }
+}
