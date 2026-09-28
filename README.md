@@ -96,6 +96,8 @@ uv run houselens db vacuum
 | `community`, `sale`, `newhouse` | `--keyword` | `-k` | string | None | 名稱、社區或路名關鍵字 |
 | `sale` | `--min-price` | - | int | None | 最低總價（萬元） |
 | `sale` | `--max-price` | - | int | None | 最高總價（萬元） |
+| `sale` | `--min-age` | - | int | None | 最小屋齡（年） |
+| `sale` | `--max-age` | - | int | None | 最大屋齡（年） |
 | `newhouse` | `--status` | `-s` | string | `1,2` | 銷售狀態（1: 預售屋, 2: 新成屋） |
 
 子指令涵蓋：`community`（社區）、`sale`（中古屋）、`newhouse`（新建案）、`all`（一鍵同步全領域）。
@@ -103,8 +105,8 @@ uv run houselens db vacuum
 #### 常用範例
 
 ```bash
-# 依總價區間同步台北市中古屋（自動去重合併，並深入拆解產權坪數）
-uv run houselens sync sale -r 1 --min-price 2000 --max-price 5000 --details -l 20
+# 依總價與屋齡區間（10年以下）同步台北市中古屋（自動去重合併，並深入拆解產權坪數）
+uv run houselens sync sale -r 1 --max-age 10 --min-price 2000 --max-price 5000 --details -l 20
 
 # 關鍵字搜尋特定社區並同步完整公設清單與建商詳情
 uv run houselens sync community -r 1 -k "鳴森大苑" --details
@@ -134,6 +136,8 @@ uv run houselens sync all -r 1 -l 10 --details
 | 全部 | `--format` | `-f` | string | `text` | 輸出格式：彩色終端表格或 JSON 格式 |
 | `sale` | `--min-price` | - | int | None | 最低總價（萬元） |
 | `sale` | `--max-price` | - | int | None | 最高總價（萬元） |
+| `sale` | `--min-age` | - | int | None | 最小屋齡（年） |
+| `sale` | `--max-age` | - | int | None | 最大屋齡（年） |
 
 子指令涵蓋：`community`（社區節點）、`sale`（中古屋實體）、`newhouse`（新建案清單）。
 
@@ -143,8 +147,8 @@ uv run houselens sync all -r 1 -l 10 --details
 # 依行政區檢索社區節點
 uv run houselens list community -r 台北市 -s 松山區
 
-# 依價格篩選中古屋（顯示刊登數與聚合比價徽章）
-uv run houselens list sale -r 台北市 --min-price 2000 --max-price 5000
+# 依總價與屋齡篩選中古屋（顯示刊登數與聚合比價徽章）
+uv run houselens list sale -r 台北市 --min-age 0 --max-age 5 --min-price 2000 --max-price 5000
 
 # JSON 輸出模式（供管道管線處理或自動化腳本串接）
 uv run houselens list sale --format json | jq '.[0]'

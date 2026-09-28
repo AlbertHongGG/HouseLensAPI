@@ -6,6 +6,7 @@
 from typing import Any, Dict, Optional
 
 from src.domain.sale_house import SaleHouseDetail, SaleHouseSummary
+from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 
 
 def map_sale_house_summary(item: Dict[str, Any]) -> Optional[SaleHouseSummary]:
@@ -122,6 +123,9 @@ def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
     num_str = f"{address_info.get('addr_number')}號" if address_info.get("addr_number") else ""
     full_address = f"{region_str}{section_str}{street_str}{addr_str}{num_str}"
 
+    raw_age_str = info_dict.get("屋齡")
+    building_age = Source591AgeMapper.parse_building_age(raw_age_str)
+
     return SaleHouseDetail(
         house_id=str(data.get("id")),
         title=base_info.get("title") or "",
@@ -133,7 +137,8 @@ def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
         building_structure=info_dict.get("型態"),
         # 建築規格
         floor=info_dict.get("樓層"),
-        age=info_dict.get("屋齡"),
+        age=raw_age_str,
+        building_age=building_age,
         orientation=info_dict.get("朝向"),
         management_fee=info_dict.get("管理費"),
         public_ratio=info_dict.get("公設比"),

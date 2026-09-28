@@ -63,6 +63,8 @@ def sync_sale_houses_cmd(
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="房屋搜尋關鍵字"),
     min_price: Optional[int] = typer.Option(None, "--min-price", help="最低總價 (萬元)"),
     max_price: Optional[int] = typer.Option(None, "--max-price", help="最高總價 (萬元)"),
+    min_age: Optional[int] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
+    max_age: Optional[int] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
     details: bool = typer.Option(False, "--details", "-d", help="是否深入爬取產權面積拆解與建築規格詳情"),
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help="同步筆數上限 (留空則同步整頁)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
@@ -74,6 +76,8 @@ def sync_sale_houses_cmd(
         keywords=keyword,
         min_price=min_price,
         max_price=max_price,
+        min_age=min_age,
+        max_age=max_age,
     )
 
     try:

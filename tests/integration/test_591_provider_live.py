@@ -63,6 +63,11 @@ async def test_591_sale_house_live_flow():
     assert detail.title != ""
     assert detail.region is not None
 
+    # 3. 測試 591 屋齡篩選 (5年以下: _5)
+    query_age = SaleHouseSearchQuery(region_id=1, max_age=5, page=1)
+    res_age = await provider.sale_house.search_sale_houses(query_age)
+    assert len(res_age.items) > 0
+
 
 @pytest.mark.asyncio
 async def test_591_new_house_live_flow():

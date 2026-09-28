@@ -129,6 +129,7 @@ class PropertyRepository(IPropertyRepository):
                 building_structure=detail.building_structure,
                 floor=detail.floor,
                 age=detail.age,
+                building_age=detail.building_age,
                 orientation=detail.orientation,
                 management_fee=detail.management_fee,
                 public_ratio=detail.public_ratio,
@@ -164,6 +165,8 @@ class PropertyRepository(IPropertyRepository):
             )
             property_entity.floor = detail.floor or property_entity.floor
             property_entity.age = detail.age or property_entity.age
+            if detail.building_age is not None:
+                property_entity.building_age = detail.building_age
             property_entity.orientation = detail.orientation or property_entity.orientation
             property_entity.management_fee = detail.management_fee or property_entity.management_fee
             property_entity.public_ratio = detail.public_ratio or property_entity.public_ratio
@@ -268,6 +271,8 @@ class PropertyRepository(IPropertyRepository):
                 layout=summary.layout,
                 building_type=summary.building_type,
                 floor=summary.floor,
+                age=summary.age,
+                building_age=summary.building_age,
                 region=summary.region,
                 section=summary.section,
                 street=summary.street,
@@ -282,6 +287,10 @@ class PropertyRepository(IPropertyRepository):
                 property_entity.unit_price = summary.unit_price
             if summary.total_area is not None:
                 property_entity.total_area = summary.total_area
+            if summary.age:
+                property_entity.age = summary.age
+            if summary.building_age is not None:
+                property_entity.building_age = summary.building_age
 
         if listing is None:
             listing = PropertyListingTable(
@@ -339,6 +348,8 @@ class PropertyRepository(IPropertyRepository):
         keyword: Optional[str] = None,
         min_price: Optional[int] = None,
         max_price: Optional[int] = None,
+        min_age: Optional[int] = None,
+        max_age: Optional[int] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[PropertyTable]:
@@ -352,6 +363,10 @@ class PropertyRepository(IPropertyRepository):
             stmt = stmt.where(PropertyTable.price >= min_price)
         if max_price is not None:
             stmt = stmt.where(PropertyTable.price <= max_price)
+        if min_age is not None:
+            stmt = stmt.where(PropertyTable.building_age >= min_age)
+        if max_age is not None:
+            stmt = stmt.where(PropertyTable.building_age <= max_age)
         if keyword:
             pattern = f"%{keyword}%"
             stmt = stmt.where(

@@ -19,12 +19,13 @@ def render_property_table(properties: List[PropertyTable]) -> Table:
     )
 
     table.add_column("實體 ID", style="dim", max_width=10, overflow="ellipsis")
-    table.add_column("標題 / 物件描述", style="bold white", max_width=30, overflow="ellipsis")
+    table.add_column("標題 / 物件描述", style="bold white", max_width=28, overflow="ellipsis")
     table.add_column("所屬社區", style="cyan")
     table.add_column("總價", justify="right", style="bold green")
     table.add_column("單價", justify="right", style="yellow")
     table.add_column("權狀總坪", justify="right")
     table.add_column("格局 / 樓層", justify="center")
+    table.add_column("屋齡", justify="center", style="cyan")
     table.add_column("跨平台刊登數", justify="center", style="bold white")
 
     for p in properties:
@@ -38,6 +39,7 @@ def render_property_table(properties: List[PropertyTable]) -> Table:
         price_str = f"{p.price} 萬元"
         area_str = f"{p.total_area:.2f} 坪" if p.total_area else "-"
         specs = f"{p.layout or '-'} / {p.floor or '-'}"
+        age_str = p.age or (f"{p.building_age:.0f}年" if p.building_age is not None else "-")
 
         table.add_row(
             p.id[:8] + "...",
@@ -47,6 +49,7 @@ def render_property_table(properties: List[PropertyTable]) -> Table:
             p.unit_price or "-",
             area_str,
             specs,
+            age_str,
             badge,
         )
 
@@ -129,6 +132,7 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
         "building_structure": p.building_structure,
         "floor": p.floor,
         "age": p.age,
+        "building_age": p.building_age,
         "orientation": p.orientation,
         "management_fee": p.management_fee,
         "public_ratio": p.public_ratio,

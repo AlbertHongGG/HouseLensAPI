@@ -98,3 +98,14 @@ def test_cli_get_detail_views():
         res_get_prop = runner.invoke(app, ["get", "sale", pid])
         assert res_get_prop.exit_code == 0
         assert "客觀房屋實體資訊" in res_get_prop.output
+
+
+def test_cli_sale_house_age_filtering():
+    """測試 list sale 之屋齡過濾參數"""
+    res = runner.invoke(app, ["list", "sale", "--min-age", "0", "--max-age", "10", "--format", "json"])
+    assert res.exit_code == 0
+    data = json.loads(res.output)
+    assert isinstance(data, list)
+    for item in data:
+        if item.get("building_age") is not None:
+            assert 0.0 <= item["building_age"] <= 10.0

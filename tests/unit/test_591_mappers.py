@@ -104,6 +104,7 @@ class Test591SaleHouseMappers:
         # 10 specs
         assert detail.floor == "2F/24F"
         assert detail.age == "1年"
+        assert detail.building_age == 1.0
         assert detail.orientation == "坐南朝北"
         assert detail.management_fee == "4200元/月"
         assert detail.public_ratio == "30%"
@@ -119,6 +120,45 @@ class Test591SaleHouseMappers:
         # Coordinates
         assert detail.lat == 25.056119
         assert detail.lng == 121.5645131
+
+
+class Test591AgeMapper:
+    def test_age_str_mapping_single_and_combinations(self):
+        from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
+
+        # (None, 5) -> 5年以下
+        assert Source591AgeMapper.to_age_str(None, 5) == "_5"
+        # (None, 10) -> 10年以下
+        assert Source591AgeMapper.to_age_str(None, 10) == "_5,5_10"
+        # (5, 10) -> 5-10年
+        assert Source591AgeMapper.to_age_str(5, 10) == "5_10"
+        # (10, 30) -> 10-20年, 20-30年
+        assert Source591AgeMapper.to_age_str(10, 30) == "10_20,20_30"
+        # (30, None) -> 30-40年, 40年以上
+        assert Source591AgeMapper.to_age_str(30, None) == "30_40,40_"
+        # (40, None) -> 40年以上
+        assert Source591AgeMapper.to_age_str(40, None) == "40_"
+        # None, None -> None (無篩選)
+        assert Source591AgeMapper.to_age_str(None, None) is None
+        # 全選涵蓋全區間 -> None (無過濾)
+        assert Source591AgeMapper.to_age_str(0, 100) is None
+
+    def test_age_str_mapping_validation_error(self):
+        from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
+        with pytest.raises(ValueError):
+            Source591AgeMapper.to_age_str(20, 10)
+
+    def test_parse_building_age_strings(self):
+        from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
+        assert Source591AgeMapper.parse_building_age("1年") == 1.0
+        assert Source591AgeMapper.parse_building_age("33.5年") == 33.5
+        assert Source591AgeMapper.parse_building_age("全新") == 0.0
+        assert Source591AgeMapper.parse_building_age("0年") == 0.0
+        assert Source591AgeMapper.parse_building_age("未滿1年") == 0.5
+        assert Source591AgeMapper.parse_building_age("3個月") == 0.25
+        assert Source591AgeMapper.parse_building_age("6個月") == 0.5
+        assert Source591AgeMapper.parse_building_age(None) is None
+        assert Source591AgeMapper.parse_building_age("") is None
 
 
 class Test591NewHouseMappers:

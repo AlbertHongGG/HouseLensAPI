@@ -93,6 +93,8 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
             building_type="住宅",
             building_structure="電梯大樓",
             floor="2F/24F",
+            age="1年",
+            building_age=1.0,
             region="台北市",
             section="松山區",
             address="台北市松山區三民路80巷25號",
@@ -151,6 +153,15 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
         queried = await repo.get_by_listing("sinyi", "SY_889900")
         assert queried is not None
         assert queried.id == prop1.id
+
+        # 驗證 building_age 數值化存取與範圍檢索
+        assert reloaded.building_age == 1.0
+        results_matched = await repo.search(min_age=0, max_age=5)
+        assert len(results_matched) == 1
+        assert results_matched[0].id == prop1.id
+
+        results_unmatched = await repo.search(min_age=10, max_age=20)
+        assert len(results_unmatched) == 0
 
 
 @pytest.mark.asyncio

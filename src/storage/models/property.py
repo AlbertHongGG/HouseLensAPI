@@ -45,6 +45,7 @@ class PropertyTable(Base, TimestampMixin):
     # 核心建築規格
     floor: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
     age: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    building_age: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)
     orientation: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     management_fee: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     public_ratio: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)

@@ -6,6 +6,7 @@ from src.core.interfaces.sale_house import ISaleHouseProvider
 from src.domain.common import PageResult
 from src.domain.sale_house import SaleHouseDetail, SaleHouseSearchQuery, SaleHouseSummary
 from src.providers.source_591.client import Source591Client
+from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 from src.providers.source_591.mappers.sale_house_mapper import (
     map_sale_house_detail,
     map_sale_house_summary,
@@ -38,6 +39,10 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
             params["min_price"] = query.min_price
         if query.max_price is not None:
             params["max_price"] = query.max_price
+        if query.min_age is not None or query.max_age is not None:
+            age_str = Source591AgeMapper.to_age_str(min_age=query.min_age, max_age=query.max_age)
+            if age_str:
+                params["age_str"] = age_str
 
         res = await self._client.get("house", "/v1/app/gateway/sale/list", params=params)
         data_block = res.get("data") or {}

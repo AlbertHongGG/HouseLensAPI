@@ -39,16 +39,17 @@ def list_communities_cmd(
         print_error(f"檢索社區失敗: {e}")
         raise typer.Exit(code=1)
 
+    if format_opt == "json":
+        data = [community_to_dict(c) for c in communities]
+        print_json_data(data)
+        return
+
     if not communities:
         print_warning("查無符合條件之在庫社區。請先執行 'houselens sync community' 同步資料！")
         return
 
-    if format_opt == "json":
-        data = [community_to_dict(c) for c in communities]
-        print_json_data(data)
-    else:
-        table = render_community_table(communities)
-        console.print(table)
+    table = render_community_table(communities)
+    console.print(table)
 
 
 @list_app.command("sale")
@@ -57,6 +58,8 @@ def list_sale_houses_cmd(
     section: Optional[str] = typer.Option(None, "--section", "-s", help="行政區篩選 (例如: 松山區)"),
     min_price: Optional[int] = typer.Option(None, "--min-price", help="最低總價 (萬元)"),
     max_price: Optional[int] = typer.Option(None, "--max-price", help="最高總價 (萬元)"),
+    min_age: Optional[int] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
+    max_age: Optional[int] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="物件標題或社區關鍵字"),
     limit: int = typer.Option(20, "--limit", "-l", help="每頁筆數上限"),
     offset: int = typer.Option(0, "--offset", help="分頁偏移量"),
@@ -72,6 +75,8 @@ def list_sale_houses_cmd(
                 keyword=keyword,
                 min_price=min_price,
                 max_price=max_price,
+                min_age=min_age,
+                max_age=max_age,
                 limit=limit,
                 offset=offset,
             )
@@ -80,16 +85,17 @@ def list_sale_houses_cmd(
         print_error(f"檢索中古屋失敗: {e}")
         raise typer.Exit(code=1)
 
+    if format_opt == "json":
+        data = [property_to_dict(p) for p in properties]
+        print_json_data(data)
+        return
+
     if not properties:
         print_warning("查無符合條件之在庫中古屋。請先執行 'houselens sync sale' 同步資料！")
         return
 
-    if format_opt == "json":
-        data = [property_to_dict(p) for p in properties]
-        print_json_data(data)
-    else:
-        table = render_property_table(properties)
-        console.print(table)
+    table = render_property_table(properties)
+    console.print(table)
 
 
 @list_app.command("newhouse")
@@ -117,13 +123,14 @@ def list_new_houses_cmd(
         print_error(f"檢索新建案失敗: {e}")
         raise typer.Exit(code=1)
 
+    if format_opt == "json":
+        data = [new_house_to_dict(nh) for nh in new_houses]
+        print_json_data(data)
+        return
+
     if not new_houses:
         print_warning("查無符合條件之在庫新建案。請先執行 'houselens sync newhouse' 同步資料！")
         return
 
-    if format_opt == "json":
-        data = [new_house_to_dict(nh) for nh in new_houses]
-        print_json_data(data)
-    else:
-        table = render_new_house_table(new_houses)
-        console.print(table)
+    table = render_new_house_table(new_houses)
+    console.print(table)

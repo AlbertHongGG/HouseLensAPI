@@ -43,6 +43,8 @@ class QueryUseCase:
         keyword: Optional[str] = None,
         min_price: Optional[int] = None,
         max_price: Optional[int] = None,
+        min_age: Optional[int] = None,
+        max_age: Optional[int] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[PropertyTable]:
@@ -55,6 +57,8 @@ class QueryUseCase:
                 keyword=keyword,
                 min_price=min_price,
                 max_price=max_price,
+                min_age=min_age,
+                max_age=max_age,
                 limit=limit,
                 offset=offset,
             )

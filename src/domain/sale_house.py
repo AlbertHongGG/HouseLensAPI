@@ -25,6 +25,8 @@ class SaleHouseSummary(BaseModel):
     community_name: Optional[str] = Field(None, description="所屬社區名稱")
     floor: Optional[str] = Field(None, description="所在樓層 (例如: 2)")
     total_floor: Optional[str] = Field(None, description="總樓層數 (例如: 24)")
+    age: Optional[str] = Field(None, description="屋齡文字描述 (例如: 1年)")
+    building_age: Optional[float] = Field(None, description="屋齡數值 (例如: 1.0)")
     has_parking: bool = Field(default=False, description="是否含車位")
     cover_image_url: Optional[str] = Field(None, description="封面照片網址")
 
@@ -42,7 +44,8 @@ class SaleHouseDetail(BaseModel):
 
     # 核心建築規格
     floor: Optional[str] = Field(None, description="所在與總樓層區間 (例如: 2F/24F)")
-    age: Optional[str] = Field(None, description="完工屋齡 (例如: 1年、33年)")
+    age: Optional[str] = Field(None, description="完工屋齡文字描述 (例如: 1年、33年)")
+    building_age: Optional[float] = Field(None, description="完工屋齡數值 (例如: 1.0, 33.0)")
     orientation: Optional[str] = Field(None, description="主要朝向 (例如: 坐南朝北)")
     management_fee: Optional[str] = Field(None, description="管理費 (例如: 4200元/月、無)")
     public_ratio: Optional[str] = Field(None, description="公設比率 (例如: 30%)")
@@ -77,4 +80,6 @@ class SaleHouseSearchQuery(BaseModel):
     kind: Optional[int] = Field(default=0, description="物件型態代碼 (0: 全部)")
     min_price: Optional[int] = Field(None, description="最低總價 (萬元)")
     max_price: Optional[int] = Field(None, description="最高總價 (萬元)")
+    min_age: Optional[int] = Field(None, ge=0, description="最小屋齡 (年)")
+    max_age: Optional[int] = Field(None, ge=0, description="最大屋齡 (年)")
     sort_order: Optional[str] = Field(default="90", description="排序模式")
