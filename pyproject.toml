@@ -9,7 +9,12 @@ dependencies = [
     "httpx>=0.27.0",
     "sqlalchemy[asyncio]>=2.0.0",
     "aiosqlite>=0.20.0",
+    "typer>=0.27.2",
+    "rich>=15.0.0",
 ]
+
+[project.scripts]
+houselens = "src.cli.main:app"
 
 [build-system]
 requires = ["hatchling"]

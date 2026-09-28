@@ -11,19 +11,31 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.config import settings
 from src.storage.models.base import Base
-
-DEFAULT_DB_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///houselens.db")
 
 
 class DatabaseManager:
     """非同步資料庫連線與 Session 生命週期管理器"""
 
-    def __init__(self, db_url: str = DEFAULT_DB_URL, echo: bool = False):
-        self.db_url = db_url
+    def __init__(self, db_url: Optional[str] = None, echo: bool = False):
+        self._db_url = db_url
         self.echo = echo
         self._engine: Optional[AsyncEngine] = None
         self._sessionmaker: Optional[async_sessionmaker[AsyncSession]] = None
+
+    @property
+    def db_url(self) -> str:
+        """取得目前連線字串"""
+        return self._db_url or settings.database_url
+
+    def configure(self, db_url: str, echo: Optional[bool] = None) -> None:
+        """動態重新配置資料庫連線字串"""
+        self._db_url = db_url
+        if echo is not None:
+            self.echo = echo
+        self._engine = None
+        self._sessionmaker = None
 
     @property
     def engine(self) -> AsyncEngine:
