@@ -1,0 +1,62 @@
+"""HouseLensAPI - 591 新建案領域服務實作 (591 New House Provider)"""
+
+from typing import Any, Dict
+
+from src.core.interfaces.new_house import INewHouseProvider
+from src.domain.common import PageResult
+from src.domain.new_house import NewHouseDetail, NewHouseSearchQuery, NewHouseSummary
+from src.providers.source_591.client import Source591Client
+from src.providers.source_591.mappers.new_house_mapper import (
+    map_new_house_detail,
+    map_new_house_summary,
+)
+
+
+class Source591NewHouseProvider(INewHouseProvider):
+    """591 新建案領域提供者實作"""
+
+    def __init__(self, client: Source591Client):
+        self._client = client
+
+    async def search_new_houses(self, query: NewHouseSearchQuery) -> PageResult[NewHouseSummary]:
+        """多元條件新建案搜尋"""
+        params: Dict[str, Any] = {
+            "searchtype": 1,
+            "p": query.page,
+            "limit": query.page_size,
+            "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdsaXN0",
+        }
+        if query.region_id is not None:
+            params["regionid"] = query.region_id
+        if query.keywords:
+            params["keywords"] = query.keywords
+        if query.build_status:
+            params["buildstatus"] = query.build_status
+
+        res = await self._client.get("newhouse", "/v1/list-search", params=params)
+        data_block = res.get("data") or {}
+        items_raw = data_block.get("items") or []
+        total_records = int(data_block.get("total") or len(items_raw))
+
+        items = [
+            map_new_house_summary(it)
+            for it in items_raw
+            if isinstance(it, dict) and "hid" in it and it.get("hid") is not None
+        ]
+        return PageResult.create(
+            items=items,
+            total_records=total_records,
+            page=query.page,
+            page_size=query.page_size,
+        )
+
+    async def get_new_house_detail(self, new_house_id: str) -> NewHouseDetail:
+        """根據建案 HID 取得完整新建案詳情"""
+        params = {
+            "id": new_house_id,
+            "short_video": 1,
+            "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw=",
+        }
+        res = await self._client.get("newhouse", "/v1/detail/base-info", params=params)
+        data_block = res.get("data") or {}
+        return map_new_house_detail(data_block)

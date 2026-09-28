@@ -1,695 +1,1871 @@
 HTTP/1.1 200 OK
 Server: openresty
 Date: Sun,
-27 Sep 2026 16: 02: 14 GMT
+27 Sep 2026 17: 52: 16 GMT
 Content-Type: application/json
 Transfer-Encoding: chunked
 Connection: keep-alive
 Vary: Accept-Encoding
 Vary: Accept-Encoding
-X-Server-Monitor: /v1/search/match 200 113 => /search/community/match 200 112
+X-Server-Monitor: /v1/search/list 200 504 => /oauth/user/data 200 3 | /v2/search/list 200 501
 Content-Encoding: gzip
 
 {
     "status": 1,
-    "msg": "success",
+    "msg": "ok",
     "data": {
         "items": [
             {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 134475,
                 "id": 5934204,
                 "name": "鳴森大苑-鳴森苑",
-                "regionid": 1,
-                "sectionid": 4,
-                "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
-                "region": "台北市",
                 "section": "松山區",
-                "streetid": 26174,
-                "street": "延壽街",
-                "price": {
-                    "price": "141.0",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "延壽街72巷、健康路325巷25弄",
-                "address": "延壽街72巷、健康路325巷25弄",
                 "lat": "25.0567200",
                 "lng": "121.5662300",
-                "housing_type": 1,
-                "housing_type_str": "預售屋",
-                "shop_name": "民生社區",
-                "has_agent": 0,
                 "sale_num": 9,
-                "price_num": 44,
+                "build_purpose_simple": "住宅",
+                "house_holds": 490,
+                "simple_address": "延壽街72巷、健康路325巷25弄",
+                "housing_type": 1,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "17,381",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>鳴</hightlight><hightlight>森</hightlight><hightlight>大</hightlight><hightlight>苑</hightlight>-<hightlight>鳴</hightlight><hightlight>森</hightlight><hightlight>苑</hightlight>",
-                "price_unit": {
+                "agent": {
+                    "approve_status": 1,
+                    "company": "21世紀不動産",
+                    "sub_company": "民生圓環加盟店",
+                    "shop_id": 43473,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "425775",
+                    "is_super": 0,
+                    "agent_id": 349616,
+                    "name": "廖奕昕",
+                    "avatar": "https://img2.591.com.tw/user/2026/03/06/177272721315297506.png!300x360.png",
+                    "user_id": 3992677,
+                    "im_uid": 3992677,
+                    "im_name": "廖先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "歷史已成交79筆",
+                        "在售物件41筆·在租物件3筆",
+                        "熟悉社區·行業深耕5年"
+                    ],
+                    "line": "https://line.me/ti/p/VkEUo0A2h_"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "https://img1.591.com.tw/3dmap/2026/04/28/8RP_Hhc8HwX9a1y2U_X-L_1777378299412.gif!x.gif",
+                "map_3d_enable": 1,
+                "housing_type_str": "預售屋",
+                "station_name": "南京三民",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 1,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    },
+                    {
+                        "tag_type": 4,
+                        "tag_str": "開箱文"
+                    }
+                ],
+                "price": {
                     "price": "141.0",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市松山區延壽街72巷、健康路325巷25弄",
-                "address_highlight": "延壽街72巷、健康路325巷25弄",
-                "full_address_highlight": "台北市松山區延壽街72巷、健康路325巷25弄",
-                "housing_text": "預售屋",
-                "price_count": 44,
-                "community_age": 0
+                "price_num": 44,
+                "housing_ad_union": {
+                    "hid": 134475,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "民生社區",
+                "dynamic": {
+                    "date": "2026-07-13",
+                    "content": "建案工程進度至結構體，各格局均有在售，接待中心備有模型及VR可供參觀。",
+                    "text": "有最新一條動態",
+                    "hid": 134475
+                },
+                "article": {
+                    "id": 10547,
+                    "score": "0.00",
+                    "advantage": "\n\n機能：步行距離內可到達國中小學區，學童上下學方便。\n&nbsp;\n\n\n社區：「鳴森大苑-鳴森苑」擁有包括健身房、兒童遊戲室等多項公設。\n\n",
+                    "is_light": 1
+                },
+                "hot_tag": [
+                    "近一週超 635 人看過",
+                    "熱門指數68%"
+                ],
+                "photo_src": {
+                    "type": 1,
+                    "src": "https://img2.591.com.tw/house/2025/09/08/175731742781238808.jpg!600x450.water1.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超5年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "3天內上架3筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "預售屋"
             },
             {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 1,
+                "hid": 128909,
                 "id": 5855864,
                 "name": "鳴森大苑-碧硯閣",
-                "regionid": 1,
-                "sectionid": 4,
-                "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
-                "region": "台北市",
                 "section": "松山區",
-                "streetid": 26158,
-                "street": "三民路",
-                "price": {
-                    "price": "129.0",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "三民路80巷29號",
-                "address": "三民路80巷29號",
                 "lat": "25.0566700",
                 "lng": "121.5649600",
-                "housing_type": 2,
-                "housing_type_str": "新成屋",
-                "shop_name": "民生社區",
-                "has_agent": 0,
                 "sale_num": 26,
-                "price_num": 209,
+                "build_purpose_simple": "住宅",
+                "house_holds": 290,
+                "simple_address": "三民路80巷29號",
+                "housing_type": 2,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "48,613",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 9,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>鳴</hightlight><hightlight>森</hightlight><hightlight>大</hightlight><hightlight>苑</hightlight>-碧硯閣",
-                "price_unit": {
+                "agent": {
+                    "approve_status": 1,
+                    "company": "21世紀不動産",
+                    "sub_company": "民生圓環加盟店",
+                    "shop_id": 43473,
+                    "mobile": "0972-528-587",
+                    "mobile_ext": "118180",
+                    "is_super": 0,
+                    "agent_id": 345144,
+                    "name": "廖奕昕",
+                    "avatar": "https://img1.591.com.tw/user/2026/03/06/177272721315297506.png!300x360.png",
+                    "user_id": 3992677,
+                    "im_uid": 3992677,
+                    "im_name": "廖先生",
+                    "label_type": 1,
+                    "im_recommend_tip": 1,
+                    "recommend_type": 0,
+                    "bid_rank": 1,
+                    "label_text": [
+                        "本社區已成交1筆",
+                        "在售物件41筆·在租物件3筆",
+                        "熟悉社區·行業深耕5年"
+                    ],
+                    "line": "https://line.me/ti/p/VkEUo0A2h_"
+                },
+                "has_discount": null,
+                "map_3d_img_url": "https://img2.591.com.tw/3dmap/2026/04/28/uPSguTBpIFnIBECp2SXir_1777377110823.gif!x.gif",
+                "map_3d_enable": 1,
+                "housing_type_str": "新成屋",
+                "station_name": "南京三民",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 1,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 3,
+                        "tag_str": "已完銷"
+                    },
+                    {
+                        "tag_type": 4,
+                        "tag_str": "開箱文"
+                    }
+                ],
+                "price": {
                     "price": "129.0",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市松山區三民路80巷29號",
-                "address_highlight": "三民路80巷29號",
-                "full_address_highlight": "台北市松山區三民路80巷29號",
-                "housing_text": "新成屋",
-                "price_count": 209,
-                "community_age": 0
+                "price_num": 209,
+                "housing_ad_union": {
+                    "hid": 128909,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "民生社區",
+                "dynamic": {},
+                "article": {
+                    "id": 935,
+                    "score": "0.00",
+                    "advantage": "\n\n機能：「中工碧硯閣」位於台北市精華區，基本生活機能無虞。\n\n\n位置：近捷運南京三民站。\n\n",
+                    "is_light": 1
+                },
+                "hot_tag": [
+                    "近一週超 1,273 人看過",
+                    "熱門指數72%"
+                ],
+                "photo_src": {
+                    "type": 1,
+                    "src": "https://img2.591.com.tw/house/2025/09/08/175731734109419609.jpg!600x450.water1.jpg"
+                },
+                "label_info": {
+                    "content": "我從業超5年，行業經驗豐富",
+                    "icon": "幫我找房"
+                },
+                "tag_v2": [
+                    {
+                        "type": 3,
+                        "content": "15天內595人瀏覽"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": {},
+                "housing_text": "新成屋"
             },
             {
-                "id": 35425,
-                "name": "鳳鳴大厦",
-                "regionid": 1,
-                "sectionid": 3,
-                "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
                 "region": "台北市",
-                "section": "中山區",
-                "streetid": 25716,
-                "street": "林森北路",
-                "price": {
-                    "price": "70.7",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "林森北路282號",
-                "address": "林森北路282號",
-                "lat": "25.0554980",
-                "lng": "121.5253300",
-                "housing_type": 0,
-                "housing_type_str": "51年社區",
-                "shop_name": "林森北路",
-                "has_agent": 0,
-                "sale_num": 17,
-                "price_num": 34,
-                "rent_num": 1,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "鳳<hightlight>鳴</hightlight><hightlight>大</hightlight>厦",
-                "price_unit": {
-                    "price": "70.7",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "full_address": "台北市中山區林森北路282號",
-                "address_highlight": "林森北路282號",
-                "full_address_highlight": "台北市中山區林森北路282號",
-                "housing_text": "中古屋",
-                "price_count": 34,
-                "community_age": 51
-            },
-            {
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
                 "id": 5214,
                 "name": "森學苑大樓",
-                "regionid": 1,
-                "sectionid": 5,
-                "build_type": 1,
-                "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
-                "region": "台北市",
                 "section": "大安區",
-                "streetid": 25633,
-                "street": "和平東路二段",
-                "price": {
-                    "price": "89.1",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "和平東路二段18巷5號",
-                "address": "和平東路二段18巷5號",
                 "lat": "25.0246530",
                 "lng": "121.5360200",
-                "housing_type": 0,
-                "housing_type_str": "17年社區",
-                "shop_name": "科技大樓",
-                "has_agent": 0,
                 "sale_num": 0,
-                "price_num": 9,
+                "build_purpose_simple": "華廈",
+                "house_holds": 17,
+                "simple_address": "和平東路二段18巷5號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "4,085",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>森</hightlight>學<hightlight>苑</hightlight><hightlight>大</hightlight>樓",
-                "price_unit": {
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "17年社區",
+                "station_name": "科技大樓",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
                     "price": "89.1",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市大安區和平東路二段18巷5號",
-                "address_highlight": "和平東路二段18巷5號",
-                "full_address_highlight": "台北市大安區和平東路二段18巷5號",
-                "housing_text": "中古屋",
-                "price_count": 9,
-                "community_age": 17
+                "price_num": 9,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "科技大樓",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164191640422834000.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             },
             {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 119086,
                 "id": 35198,
                 "name": "森濤苑",
-                "regionid": 1,
-                "sectionid": 10,
-                "build_type": 1,
-                "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
-                "region": "台北市",
                 "section": "內湖區",
-                "streetid": 25873,
-                "street": "民權東路六段",
-                "price": {
-                    "price": "74.9",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "民權東路六段180巷70弄23號",
-                "address": "民權東路六段180巷70弄23號",
                 "lat": "25.0666954",
                 "lng": "121.5917671",
-                "housing_type": 0,
-                "housing_type_str": "7年社區",
-                "shop_name": "第四期重劃區",
-                "has_agent": 0,
                 "sale_num": 0,
-                "price_num": 60,
+                "build_purpose_simple": "華廈",
+                "house_holds": 37,
+                "simple_address": "民權東路六段180巷70弄23號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "6,343",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>森</hightlight>濤<hightlight>苑</hightlight>",
-                "price_unit": {
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "7年社區",
+                "station_name": "長壽抽水站",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 1
+                },
+                "tag": [],
+                "price": {
                     "price": "74.9",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市內湖區民權東路六段180巷70弄23號",
-                "address_highlight": "民權東路六段180巷70弄23號",
-                "full_address_highlight": "台北市內湖區民權東路六段180巷70弄23號",
-                "housing_text": "中古屋",
-                "price_count": 60,
-                "community_age": 7
+                "price_num": 60,
+                "housing_ad_union": {
+                    "hid": 119086,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "第四期重劃區",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 3,
+                    "src": "https://img2.591.com.tw/house/2019/03/21/155315556054948404.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             },
             {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
                 "id": 997,
                 "name": "大自然森林學苑",
-                "regionid": 1,
-                "sectionid": 12,
-                "build_type": 1,
-                "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
-                "region": "台北市",
                 "section": "文山區",
-                "streetid": 25983,
-                "street": "福興路",
-                "price": {
-                    "price": "36.5",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "福興路82巷6弄1號",
-                "address": "福興路82巷6弄1號",
                 "lat": "25.0060420",
                 "lng": "121.5513680",
-                "housing_type": 0,
-                "housing_type_str": "35年社區",
-                "shop_name": "興隆",
-                "has_agent": 0,
                 "sale_num": 1,
-                "price_num": 12,
+                "build_purpose_simple": "華廈",
+                "house_holds": 54,
+                "simple_address": "福興路82巷6弄1號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "2,730",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>大</hightlight>自然<hightlight>森</hightlight>林學<hightlight>苑</hightlight>",
-                "price_unit": {
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "35年社區",
+                "station_name": "辛亥",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "1筆在售"
+                    }
+                ],
+                "price": {
                     "price": "36.5",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市文山區福興路82巷6弄1號",
-                "address_highlight": "福興路82巷6弄1號",
-                "full_address_highlight": "台北市文山區福興路82巷6弄1號",
-                "housing_text": "中古屋",
-                "price_count": 12,
-                "community_age": 35
+                "price_num": 12,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "興隆",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/11/164189737759581700.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "9天內上架1筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             },
             {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 35425,
+                "name": "鳳鳴大厦",
+                "section": "中山區",
+                "lat": "25.0554980",
+                "lng": "121.5253300",
+                "sale_num": 17,
+                "build_purpose_simple": "住宅",
+                "house_holds": 179,
+                "simple_address": "林森北路282號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "9,078",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 1,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "51年社區",
+                "station_name": "雙連",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "17筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "70.7",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 34,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "林森北路",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/13/164202251592567000.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "5天內上架3筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
                 "id": 6546,
                 "name": "月光奏鳴曲大廈",
-                "regionid": 1,
-                "sectionid": 10,
-                "build_type": 1,
-                "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
-                "region": "台北市",
                 "section": "內湖區",
-                "streetid": 25873,
-                "street": "民權東路六段",
-                "price": {
-                    "price": "79.9",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "民權東路六段256號",
-                "address": "民權東路六段256號",
                 "lat": "25.0680840",
                 "lng": "121.6021300",
-                "housing_type": 0,
-                "housing_type_str": "17年社區",
-                "shop_name": "第四期重劃區",
-                "has_agent": 0,
                 "sale_num": 7,
-                "price_num": 37,
+                "build_purpose_simple": "華廈",
+                "house_holds": 25,
+                "simple_address": "民權東路六段256號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "12,469",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "月光奏<hightlight>鳴</hightlight>曲<hightlight>大</hightlight>廈",
-                "price_unit": {
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "17年社區",
+                "station_name": "葫洲",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "7筆在售"
+                    }
+                ],
+                "price": {
                     "price": "79.9",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市內湖區民權東路六段256號",
-                "address_highlight": "民權東路六段256號",
-                "full_address_highlight": "台北市內湖區民權東路六段256號",
-                "housing_text": "中古屋",
-                "price_count": 37,
-                "community_age": 17
+                "price_num": 37,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "第四期重劃區",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/12/164192304536532306.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [
+                    {
+                        "type": 2,
+                        "content": "2筆降價,最高降4.2%"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             },
             {
-                "id": 6647,
-                "name": "森冠大樓",
-                "regionid": 1,
-                "sectionid": 2,
-                "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
                 "region": "台北市",
-                "section": "大同區",
-                "streetid": 25574,
-                "street": "赤峰街",
-                "price": {
-                    "price": "65.8",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "赤峰街37巷2號",
-                "address": "赤峰街37巷2號",
-                "lat": "25.0545520",
-                "lng": "121.5196820",
-                "housing_type": 0,
-                "housing_type_str": "13年社區",
-                "shop_name": "中山",
-                "has_agent": 0,
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 3879,
+                "name": "星苑大廈",
+                "section": "士林區",
+                "lat": "25.0919100",
+                "lng": "121.5011380",
                 "sale_num": 0,
-                "price_num": 30,
+                "build_purpose_simple": "其他",
+                "house_holds": 19,
+                "simple_address": "倫等街22號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "967",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>森</hightlight>冠<hightlight>大</hightlight>樓",
-                "price_unit": {
-                    "price": "65.8",
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "20年社區",
+                "station_name": "社子派出所",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "46.1",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市大同區赤峰街37巷2號",
-                "address_highlight": "赤峰街37巷2號",
-                "full_address_highlight": "台北市大同區赤峰街37巷2號",
-                "housing_text": "中古屋",
-                "price_count": 30,
-                "community_age": 13
+                "price_num": 1,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "社子",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/11/164190978143416403.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             },
             {
-                "id": 2404,
-                "name": "政大森活",
-                "regionid": 1,
-                "sectionid": 12,
-                "build_type": 1,
-                "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
                 "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 3288,
+                "name": "馥苑大樓",
+                "section": "北投區",
+                "lat": "25.1169540",
+                "lng": "121.5184930",
+                "sale_num": 0,
+                "build_purpose_simple": "華廈",
+                "house_holds": 7,
+                "simple_address": "石牌路二段90巷36號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "683",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "21年社區",
+                "station_name": "石牌",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": " 暫無均價"
+                },
+                "price_num": 1,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "石牌",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164190695431088709.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 1473,
+                "name": "試苑大樓",
                 "section": "文山區",
-                "streetid": 25949,
-                "street": "政大一街",
-                "price": {
-                    "price": "42.1",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "政大一街320巷88號",
-                "address": "政大一街320巷88號",
-                "lat": "24.9859210",
-                "lng": "121.5864600",
-                "housing_type": 0,
-                "housing_type_str": "25年社區",
-                "shop_name": "政大",
-                "has_agent": 0,
+                "lat": "24.9873490",
+                "lng": "121.5485980",
                 "sale_num": 0,
-                "price_num": 18,
-                "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "政<hightlight>大</hightlight><hightlight>森</hightlight>活",
-                "price_unit": {
-                    "price": "42.1",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "full_address": "台北市文山區政大一街320巷88號",
-                "address_highlight": "政大一街320巷88號",
-                "full_address_highlight": "台北市文山區政大一街320巷88號",
-                "housing_text": "中古屋",
-                "price_count": 18,
-                "community_age": 25
-            },
-            {
-                "id": 36038,
-                "name": "森城大院",
-                "regionid": 1,
-                "sectionid": 1,
-                "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
-                "region": "台北市",
-                "section": "中正區",
-                "streetid": 25815,
-                "street": "牯嶺街",
-                "price": {
-                    "price": "66.2",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "牯嶺街142號",
-                "address": "牯嶺街142號",
-                "lat": "25.0215509",
-                "lng": "121.5189500",
-                "housing_type": 0,
-                "housing_type_str": "6年社區",
-                "shop_name": "古亭",
-                "has_agent": 0,
-                "sale_num": 13,
-                "price_num": 59,
-                "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>森</hightlight>城<hightlight>大</hightlight>院",
-                "price_unit": {
-                    "price": "66.2",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "full_address": "台北市中正區牯嶺街142號",
-                "address_highlight": "牯嶺街142號",
-                "full_address_highlight": "台北市中正區牯嶺街142號",
-                "housing_text": "中古屋",
-                "price_count": 59,
-                "community_age": 6
-            },
-            {
-                "id": 876,
-                "name": "大安森活",
-                "regionid": 1,
-                "sectionid": 5,
-                "build_type": 1,
                 "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
+                "house_holds": 24,
+                "simple_address": "木柵路一段121號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "465",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "30年社區",
+                "station_name": "大坪林",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": " 暫無均價"
+                },
+                "price_num": 1,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "木柵",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164189937483914307.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
                 "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 2506,
+                "name": "學苑大廈",
                 "section": "大安區",
-                "streetid": 25647,
-                "street": "信義路三段",
-                "price": {
-                    "price": "99.2",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "信義路三段3號",
-                "address": "信義路三段3號",
-                "lat": "25.0337880",
-                "lng": "121.5332430",
-                "housing_type": 0,
-                "housing_type_str": "29年社區",
-                "shop_name": "大安",
-                "has_agent": 0,
-                "sale_num": 0,
-                "price_num": 6,
-                "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>大</hightlight>安<hightlight>森</hightlight>活",
-                "price_unit": {
-                    "price": "99.2",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "full_address": "台北市大安區信義路三段3號",
-                "address_highlight": "信義路三段3號",
-                "full_address_highlight": "台北市大安區信義路三段3號",
-                "housing_text": "中古屋",
-                "price_count": 6,
-                "community_age": 29
-            },
-            {
-                "id": 3671020,
-                "name": "台大仰森",
-                "regionid": 1,
-                "sectionid": 12,
-                "build_type": 1,
+                "lat": "25.0272750",
+                "lng": "121.5251220",
+                "sale_num": 15,
                 "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
-                "region": "台北市",
-                "section": "文山區",
-                "streetid": 25977,
-                "street": "萬盛街",
-                "price": {
-                    "price": "48.4",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "萬盛街142號",
-                "address": "萬盛街142號",
-                "lat": "25.0054950",
-                "lng": "121.5421964",
+                "house_holds": "",
+                "simple_address": "和平東路一段75巷1號",
                 "housing_type": 0,
-                "housing_type_str": "14年社區",
-                "shop_name": "萬隆",
-                "has_agent": 0,
-                "sale_num": 0,
-                "price_num": 11,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "4,489",
+                "in_rank_list": 0,
+                "follow_status": 0,
                 "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "台<hightlight>大</hightlight>仰<hightlight>森</hightlight>",
-                "price_unit": {
-                    "price": "48.4",
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "42年社區",
+                "station_name": "古亭",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "15筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "102.1",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市文山區萬盛街142號",
-                "address_highlight": "萬盛街142號",
-                "full_address_highlight": "台北市文山區萬盛街142號",
-                "housing_text": "中古屋",
-                "price_count": 11,
-                "community_age": 14
+                "price_num": 5,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "師大",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2021/11/13/163673393714699003.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "14天內上架4筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             },
             {
-                "id": 1680,
-                "name": "林森大廈",
-                "regionid": 1,
-                "sectionid": 1,
-                "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
                 "region": "台北市",
-                "section": "中正區",
-                "streetid": 25817,
-                "street": "重慶南路二段",
-                "price": {
-                    "price": "64.7",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "重慶南路二段92號",
-                "address": "重慶南路二段92號",
-                "lat": "25.0300110",
-                "lng": "121.5150190",
-                "housing_type": 0,
-                "housing_type_str": "44年社區",
-                "shop_name": "植物園",
-                "has_agent": 0,
-                "sale_num": 0,
-                "price_num": 14,
-                "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "林<hightlight>森</hightlight><hightlight>大</hightlight>廈",
-                "price_unit": {
-                    "price": "64.7",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "full_address": "台北市中正區重慶南路二段92號",
-                "address_highlight": "重慶南路二段92號",
-                "full_address_highlight": "台北市中正區重慶南路二段92號",
-                "housing_text": "中古屋",
-                "price_count": 14,
-                "community_age": 44
-            },
-            {
-                "id": 5362,
-                "name": "森昌大廈",
-                "regionid": 1,
-                "sectionid": 4,
                 "build_type": 1,
-                "build_purpose_simple": "住宅",
-                "build_purpose_key": 10,
-                "region": "台北市",
-                "section": "松山區",
-                "streetid": 26170,
-                "street": "光復北路",
-                "price": {
-                    "price": "77.8",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "光復北路7號",
-                "address": "光復北路7號",
-                "lat": "25.0489650",
-                "lng": "121.5580180",
-                "housing_type": 0,
-                "housing_type_str": "44年社區",
-                "shop_name": "南京三民",
-                "has_agent": 0,
-                "sale_num": 0,
-                "price_num": 13,
-                "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>森</hightlight>昌<hightlight>大</hightlight>廈",
-                "price_unit": {
-                    "price": "77.8",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "full_address": "台北市松山區光復北路7號",
-                "address_highlight": "光復北路7號",
-                "full_address_highlight": "台北市松山區光復北路7號",
-                "housing_text": "中古屋",
-                "price_count": 13,
-                "community_age": 44
-            },
-            {
-                "id": 2672,
-                "name": "森田大廈",
-                "regionid": 1,
-                "sectionid": 1,
-                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 1837,
+                "name": "尊苑大廈",
+                "section": "士林區",
+                "lat": "25.1184360",
+                "lng": "121.5338610",
+                "sale_num": 3,
                 "build_purpose_simple": "華廈",
-                "build_purpose_key": 6,
-                "region": "台北市",
-                "section": "中正區",
-                "streetid": 25775,
-                "street": "汀州路一段",
-                "price": {
-                    "price": "50.4",
-                    "unit": "萬/坪",
-                    "single_unit": "萬",
-                    "text": "成交均價"
-                },
-                "simple_address": "汀州路一段187號",
-                "address": "汀州路一段187號",
-                "lat": "25.0270440",
-                "lng": "121.5111790",
+                "house_holds": 21,
+                "simple_address": "天母東路61巷1號",
                 "housing_type": 0,
-                "housing_type_str": "36年社區",
-                "shop_name": "古亭",
                 "has_agent": 0,
-                "sale_num": 0,
-                "price_num": 2,
-                "rent_num": 0,
-                "search_type": 1,
-                "search_type_key": "community",
-                "name_highlight": "<hightlight>森</hightlight>田<hightlight>大</hightlight>廈",
-                "price_unit": {
-                    "price": "50.4",
+                "label_type": 1,
+                "browse_num": "1,381",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 1,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "40年社區",
+                "station_name": "",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "3筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "62.7",
                     "unit": "萬/坪",
                     "single_unit": "萬",
                     "text": "成交均價"
                 },
-                "full_address": "台北市中正區汀州路一段187號",
-                "address_highlight": "汀州路一段187號",
-                "full_address_highlight": "台北市中正區汀州路一段187號",
-                "housing_text": "中古屋",
-                "price_count": 2,
-                "community_age": 36
+                "price_num": 5,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "天母",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164190067601488106.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 709,
+                "name": "雅苑大廈",
+                "section": "內湖區",
+                "lat": "25.0783570",
+                "lng": "121.5978420",
+                "sale_num": 6,
+                "build_purpose_simple": "住宅",
+                "house_holds": "",
+                "simple_address": "康寧路一段290號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "16,365",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "https://img1.591.com.tw/3dmap/2026/04/28/kNn-OVqbBPyc12hkzaw1G_1777346741735.gif!x.gif",
+                "map_3d_enable": 1,
+                "housing_type_str": "34年社區",
+                "station_name": "內湖",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "6筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "83.5",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 101,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "內湖",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/market/2022/01/11/164189611866740608.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 120676,
+                "id": 101877,
+                "name": "品陽大苑",
+                "section": "中正區",
+                "lat": "25.0289180",
+                "lng": "121.5099230",
+                "sale_num": 4,
+                "build_purpose_simple": "住宅",
+                "house_holds": 107,
+                "simple_address": "三元街83號旁",
+                "housing_type": 1,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "21,446",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "預售屋",
+                "station_name": "小南門",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 2,
+                        "tag_str": "熱銷中"
+                    }
+                ],
+                "price": {
+                    "price": "86.3",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 66,
+                "housing_ad_union": {
+                    "hid": 120676,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "植物園",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img2.591.com.tw/house/2019/06/25/156144869578737802.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "預售屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 4501,
+                "name": "大湖馨苑",
+                "section": "內湖區",
+                "lat": "25.0841790",
+                "lng": "121.6031900",
+                "sale_num": 0,
+                "build_purpose_simple": "華廈",
+                "house_holds": 10,
+                "simple_address": "大湖山莊街23巷2號之1",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "1,189",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "https://img2.591.com.tw/3dmap/2026/04/28/E5Tc73Znqq4J4boUolcS9_1777350519929.gif!x.gif",
+                "map_3d_enable": 1,
+                "housing_type_str": "19年社區",
+                "station_name": "大湖公園",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "73.5",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 2,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "內湖",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2021/11/13/163679382658552000.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 1542,
+                "name": "台大師苑",
+                "section": "大安區",
+                "lat": "25.0224070",
+                "lng": "121.5418470",
+                "sale_num": 0,
+                "build_purpose_simple": "套房",
+                "house_holds": 5,
+                "simple_address": "和平東路二段118巷52弄21號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "399",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "28年社區",
+                "station_name": "科技大樓",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": " 暫無均價"
+                },
+                "price_num": 0,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "科技大樓",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2021/11/12/163670670812849008.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 102611,
+                "id": 6863,
+                "name": "大同璽苑",
+                "section": "南港區",
+                "lat": "25.0576002",
+                "lng": "121.6167358",
+                "sale_num": 11,
+                "build_purpose_simple": "住宅",
+                "house_holds": 148,
+                "simple_address": "經貿二路157巷36弄100號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "22,248",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 3,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "12年社區",
+                "station_name": "南港展覽館",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "11筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "99.5",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 210,
+                "housing_ad_union": {
+                    "hid": 102611,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "南港經貿園區",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/house/2022/02/08/164430962270988000.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [
+                    {
+                        "type": 1,
+                        "content": "7天內上架2筆物件"
+                    }
+                ],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 134342,
+                "id": 35968,
+                "name": "和平大苑",
+                "section": "大安區",
+                "lat": "25.0270320",
+                "lng": "121.5262140",
+                "sale_num": 4,
+                "build_purpose_simple": "住宅",
+                "house_holds": 106,
+                "simple_address": "和平東路一段111號",
+                "housing_type": 0,
+                "has_agent": 1,
+                "label_type": 1,
+                "browse_num": "88,296",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "11年社區",
+                "station_name": "古亭",
+                "cover_icon": {
+                    "has_img": 1,
+                    "has_street_img": 1,
+                    "has_video": 1,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [
+                    {
+                        "tag_type": 1,
+                        "tag_str": "4筆在售"
+                    }
+                ],
+                "price": {
+                    "price": "163.7",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 100,
+                "housing_ad_union": {
+                    "hid": 134342,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "師大",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 1,
+                    "src": "https://img2.591.com.tw/house/2023/07/27/169042237951817900.jpeg!600x450.water1.jpeg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 3281,
+                "name": "馥桂苑大樓",
+                "section": "中正區",
+                "lat": "25.0350420",
+                "lng": "121.5296510",
+                "sale_num": 0,
+                "build_purpose_simple": "其他",
+                "house_holds": 7,
+                "simple_address": "臨沂街71巷16號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "289",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "21年社區",
+                "station_name": "東門",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": " 暫無均價"
+                },
+                "price_num": 0,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "東門",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2022/01/11/164190691765540109.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
+            },
+            {
+                "region": "台北市",
+                "build_type": 1,
+                "has_sale_ctrl": 1,
+                "has_bid_im_agent": 0,
+                "hid": 0,
+                "id": 3524,
+                "name": "安和苑大廈",
+                "section": "大安區",
+                "lat": "25.0396510",
+                "lng": "121.5506620",
+                "sale_num": 0,
+                "build_purpose_simple": "華廈",
+                "house_holds": 14,
+                "simple_address": "忠孝東路四段170巷22號",
+                "housing_type": 0,
+                "has_agent": 0,
+                "label_type": 1,
+                "browse_num": "1,483",
+                "in_rank_list": 0,
+                "follow_status": 0,
+                "rent_num": 0,
+                "agent": [],
+                "has_discount": null,
+                "map_3d_img_url": "",
+                "map_3d_enable": 0,
+                "housing_type_str": "42年社區",
+                "station_name": "忠孝敦化",
+                "cover_icon": {
+                    "has_img": 0,
+                    "has_street_img": 1,
+                    "has_video": 0,
+                    "has_full_sky": 0,
+                    "has_full_720": 0
+                },
+                "tag": [],
+                "price": {
+                    "price": "113.8",
+                    "unit": "萬/坪",
+                    "single_unit": "萬",
+                    "text": "成交均價"
+                },
+                "price_num": 1,
+                "housing_ad_union": {
+                    "hid": 0,
+                    "roster": 0,
+                    "roster_pc": 0,
+                    "roster_touch": 0,
+                    "roster_ios": 0,
+                    "roster_android": 0
+                },
+                "shop_name": "東區商圈",
+                "dynamic": {},
+                "article": {},
+                "hot_tag": [],
+                "photo_src": {
+                    "type": 0,
+                    "src": "https://img1.591.com.tw/market/2021/11/13/163676865576866603.jpg!600x450.jpg"
+                },
+                "label_info": [],
+                "tag_v2": [],
+                "showing": {
+                    "enabled": false,
+                    "count_30d": 0,
+                    "count_7d": 0,
+                    "hot": 0,
+                    "rank_7d_section": 0,
+                    "latest": {
+                        "showing_at": null,
+                        "honorific": ""
+                    },
+                    "agents": [],
+                    "header_tag": {
+                        "enabled": false,
+                        "hot": 0,
+                        "content": ""
+                    }
+                },
+                "gold_agent_label": [],
+                "community_labels": [],
+                "recommend_shop": [],
+                "housing_text": "中古屋"
             }
-        ]
+        ],
+        "paginate": {
+            "total": 47,
+            "total_page": 3,
+            "cur_page": 1
+        },
+        "redirect_info": {},
+        "meta": {
+            "title": "台北市社區找房查房價 - 591實價登錄",
+            "keywords": "台北市社區,台北市房價,台北市實價登錄",
+            "description": "591為您提供台北市社區基礎資料、房價查詢，包括中古屋買賣，新成屋、預售屋實價登錄，租屋、買屋，社區找房首選。"
+        },
+        "is_recom": 0,
+        "is_filter": 0,
+        "is_alley_lane": 0,
+        "follow": {
+            "follow_cnt": 0,
+            "follow_upd_cnt": 0
+        }
     }
 }
