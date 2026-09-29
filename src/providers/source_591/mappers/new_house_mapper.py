@@ -1,106 +1,115 @@
-"""HouseLensAPI - 591 新建案資料模型轉換器 (New House Mapper)"""
+"""HouseLensAPI - 591 新建案模組轉換器 (591 New House Mapper)
+
+內部專用適配轉換器：將 591 特化封包解析正規化為領域純強型別規範。
+所有雜質、未清洗字串在進入核心層前必須徹底清洗完畢。
+"""
 
 from typing import Any, Dict, List
 
-from src.domain.new_house import NewHouseDetail, NewHouseLayoutItem, NewHouseSummary
+from src.domain.new_house import (
+    NewHouseLayoutSpec,
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
+from src.providers.source_591.normalizers import (
+    parse_currency_amount,
+    parse_households_count,
+    parse_percent,
+    parse_pin,
+    parse_range_float,
+    parse_room_count,
+)
 
 
-def map_new_house_summary(item: Dict[str, Any]) -> NewHouseSummary:
-    """將 591 list-search item 轉換為標準 NewHouseSummary"""
-    return NewHouseSummary(
+def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
+    """將 591 list-search item 正規化為 NormalizedNewHouseSummary"""
+    min_unit_price, max_unit_price = parse_range_float(item.get("price"))
+    min_area, max_area = parse_range_float(item.get("area"))
+
+    return NormalizedNewHouseSummary(
         source_hid=int(item.get("hid")),
         project_name=item.get("build_name") or "",
         project_status=item.get("build_type_name") or "",
         region_name=item.get("region") or "",
         section_name=item.get("section") or "",
         address=item.get("address") or "",
-        price=str(item.get("price") or ""),
-        area=str(item.get("area") or ""),
-        room_layout_summary=item.get("room"),
+        min_unit_price_wan=min_unit_price,
+        max_unit_price_wan=max_unit_price,
+        min_area_pin=min_area,
+        max_area_pin=max_area,
+        room_summary=item.get("room"),
         developer=item.get("company"),
         cover_image_url=item.get("photo_src"),
     )
 
 
-def map_new_house_detail(data: Dict[str, Any]) -> NewHouseDetail:
-    """將 591 detail/base-info 回應轉換為標準 NewHouseDetail。
-    
-    解析結構化 layout_v2 房型坪數陣列，並擷取完整建案建築與車位規劃規格。
-    """
+def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
+    """將 591 detail/base-info 回應正規化為 NormalizedNewHouseDetail。"""
     housing = data.get("housing") or {}
 
-    # layout_v2 結構化解析
+    # 1. 房型與坪數結構化解析
     layout_v2_raw = housing.get("layout_v2") or []
-    layout_v2_items: List[NewHouseLayoutItem] = []
+    layouts: List[NewHouseLayoutSpec] = []
     if isinstance(layout_v2_raw, list):
         for it in layout_v2_raw:
             if isinstance(it, dict) and "room" in it:
-                layout_v2_items.append(
-                    NewHouseLayoutItem(
-                        room=str(it.get("room")),
-                        area=str(it.get("area") or ""),
+                r_name = str(it.get("room") or "").strip()
+                r_count = parse_room_count(r_name)
+                min_a, max_a = parse_range_float(it.get("area"))
+                layouts.append(
+                    NewHouseLayoutSpec(
+                        room_name=r_name,
+                        rooms_count=r_count,
+                        min_area_pin=min_a,
+                        max_area_pin=max_a,
                     )
                 )
 
-    # 管理費字串組裝
-    manage_cost_raw = housing.get("manage_cost")
-    manage_cost_str: str = ""
-    if isinstance(manage_cost_raw, dict):
-        p = manage_cost_raw.get("price", "")
-        u = manage_cost_raw.get("unit", "")
-        manage_cost_str = f"{p} {u}".strip()
-    elif manage_cost_raw:
-        manage_cost_str = str(manage_cost_raw)
-
-    # 開價字串組裝
+    # 2. 開價單價區間解析 (萬元/坪)
     price_obj = housing.get("price")
-    unit_price_str = None
-    if isinstance(price_obj, dict):
-        p = price_obj.get("price", "")
-        u = price_obj.get("unit", "")
-        unit_price_str = f"{p} {u}".strip() if p else None
+    min_price, max_price = parse_range_float(price_obj)
 
-    # 基地坪數數值解析
-    base_area_ping: float = None
-    raw_base_area = housing.get("base_area")
-    if raw_base_area is not None:
-        try:
-            base_area_ping = float(raw_base_area)
-        except (ValueError, TypeError):
-            base_area_ping = None
+    # 3. 基地坪數
+    base_area_raw = housing.get("base_area")
+    base_area_pin = None
+    if isinstance(base_area_raw, dict):
+        base_area_pin = parse_pin(base_area_raw.get("area"))
+    else:
+        base_area_pin = parse_pin(base_area_raw)
 
-    # 車位價格組裝
-    park_price_raw = housing.get("park_price")
-    park_price_str = None
-    if isinstance(park_price_raw, dict):
-        p = park_price_raw.get("price", "")
-        u = park_price_raw.get("unit", "")
-        park_price_str = f"{p}{u}".strip() if p else None
-    elif park_price_raw:
-        park_price_str = str(park_price_raw)
+    # 4. 管理費 (元/坪/月)
+    manage_cost_raw = housing.get("manage_cost")
+    manage_fee_per_pin = None
+    if isinstance(manage_cost_raw, dict):
+        manage_fee_per_pin = parse_currency_amount(manage_cost_raw.get("price"))
+    elif manage_cost_raw:
+        manage_fee_per_pin = parse_currency_amount(manage_cost_raw)
 
-    return NewHouseDetail(
+    # 5. 公設比 (百分比)
+    public_ratio_pct = parse_percent(housing.get("ratio"))
+
+    # 6. 總戶數 (純整數)
+    total_households = parse_households_count(housing.get("households"))
+
+    return NormalizedNewHouseDetail(
         hid=int(housing.get("hid")),
         project_name=housing.get("build_name") or "",
         build_type=housing.get("build_type_name") or "",
         region=housing.get("region") or "",
         section=housing.get("section") or "",
         address=housing.get("address") or "",
-        manage_cost=manage_cost_str or None,
+        base_area_pin=base_area_pin,
+        public_ratio_pct=public_ratio_pct,
+        total_households=total_households,
+        manage_fee_per_pin=manage_fee_per_pin,
+        min_unit_price_wan=min_price,
+        max_unit_price_wan=max_price,
+        layouts=layouts,
         structural_engine=housing.get("structural_engine"),
-        park_planning=housing.get("park_planning"),
         direction_rule=housing.get("direction_rule"),
         build_intro=housing.get("build_intro"),
-        park_ratio=housing.get("park_ratio"),
-        layout_v2=layout_v2_items,
-        unit_price_str=unit_price_str,
-        parking_price_str=park_price_str,
-        base_area_ping=base_area_ping,
-        public_ratio=str(housing.get("ratio")) if housing.get("ratio") is not None else None,
-        total_households=str(housing.get("households")) if housing.get("households") is not None else None,
         developer_company=housing.get("company"),
         builder_company=housing.get("build_company"),
         architect_company=housing.get("construction_company"),
         reception_address=housing.get("reception_address"),
-        community_id_ref=housing.get("community_id"),
     )

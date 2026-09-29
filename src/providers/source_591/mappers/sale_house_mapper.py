@@ -1,35 +1,62 @@
-"""HouseLensAPI - 591 中古屋資料模型轉換器 (Sale House Mapper)
+"""HouseLensAPI - 591 中古屋模組資料正規化映射器 (591 Sale House Mapper)
 
-全量過濾廣告物件，將原始 591 封包深度清洗為無冗餘、跨平台統一之 SaleHouseSummary 與 SaleHouseDetail。
+將原始 591 封包在模組內部徹底清洗與正規化，直接輸出符合核心標準的
+NormalizedSaleListing 與 NormalizedSalePropertyDetail。
 """
 
 from typing import Any, Dict, Optional
 
-from src.domain.sale_house import SaleHouseDetail, SaleHouseSummary
+from src.domain.sale_house import (
+    NormalizedSaleListing,
+    NormalizedSalePropertyDetail,
+)
 from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
+from src.providers.source_591.normalizers import (
+    parse_boolean,
+    parse_currency_amount,
+    parse_floor,
+    parse_int_count,
+    parse_layout,
+    parse_percent,
+    parse_pin,
+    parse_price_wan,
+    parse_unit_price,
+)
 
 
-def map_sale_house_summary(item: Dict[str, Any]) -> Optional[SaleHouseSummary]:
-    """將 591 sale/list 項目轉換為標準 SaleHouseSummary。
-    
-    若為廣告項目 (is_ads == "1") 則回傳 None。
+def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListing]:
+    """將 591 sale/list 原始項目轉換為標準 NormalizedSaleListing。
+
+    若為廣告推廣項目 (is_ads == "1") 則回傳 None。
     """
-    # 嚴格過濾廣告推廣建案/外部廣告
     if str(item.get("is_ads")) == "1":
         return None
 
-    # 權狀坪數解析
+    # 1. 權狀總坪數數值化解析
+    total_area_pin: float = 0.0
     area_obj = item.get("areaUnit") or {}
-    total_area: Optional[float] = None
-    if isinstance(area_obj, dict):
-        raw_area = area_obj.get("area")
-        if raw_area:
-            try:
-                total_area = float(raw_area)
-            except (ValueError, TypeError):
-                total_area = None
+    if isinstance(area_obj, dict) and area_obj.get("area"):
+        parsed = parse_pin(area_obj.get("area"))
+        if parsed is not None:
+            total_area_pin = parsed
+    if total_area_pin == 0.0:
+        parsed = parse_pin(item.get("area_str"))
+        if parsed is not None:
+            total_area_pin = parsed
 
-    # 社區名稱解析
+    # 2. 價格與單價數值化解析
+    price_wan = parse_price_wan(item.get("price"))
+    unit_price_wan = parse_unit_price(item.get("area_price"))
+
+    # 3. 樓層與格局數值化解析
+    floor_curr, floor_tot = parse_floor(item.get("floor"))
+    if floor_tot is None and item.get("all_floor"):
+        _, parsed_tot = parse_floor(item.get("all_floor"))
+        floor_tot = parsed_tot or parse_int_count(item.get("all_floor"))
+
+    rooms, living, baths = parse_layout(item.get("layout_str"))
+
+    # 4. 社區名稱解析
     comm_info = item.get("community_info")
     comm_name: Optional[str] = None
     if isinstance(comm_info, dict):
@@ -37,31 +64,35 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[SaleHouseSummary]:
     if not comm_name:
         comm_name = item.get("community_addr")
 
-    return SaleHouseSummary(
-        house_id=str(item.get("houseid")),
-        title=item.get("title") or "",
-        price=item.get("price") or "",
-        unit_price=item.get("area_price"),
-        total_area=total_area,
-        layout=item.get("layout_str"),
+    return NormalizedSaleListing(
+        provider_id="591",
+        external_house_id=str(item.get("houseid")),
+        title=str(item.get("title") or ""),
+        price_wan=price_wan,
+        unit_price_wan=unit_price_wan,
+        total_area_pin=total_area_pin,
+        floor_current=floor_curr,
+        floor_total=floor_tot,
+        rooms=rooms,
+        living_rooms=living,
+        bathrooms=baths,
+        building_age_years=None,  # 591 清單端點無屋齡欄位，詳情端點補齊
         building_type=item.get("kindStr"),
-        region=item.get("region") or "",
-        section=item.get("section") or "",
+        region=str(item.get("region") or ""),
+        section=str(item.get("section") or ""),
         street=item.get("street_name"),
         address=item.get("address"),
         community_id=item.get("community_id"),
         community_name=comm_name,
-        floor=item.get("floor"),
-        total_floor=item.get("all_floor"),
         has_parking=str(item.get("cartplace")) == "1",
         cover_image_url=item.get("photo_src"),
     )
 
 
-def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
-    """將 591 sale/detail 回應轉換為跨平台標準 SaleHouseDetail。
-    
-    深入解析 10 大建築規格與 6 大產權坪數拆解，排除平台特化欄位與冗餘。
+def map_sale_house_detail(data: Dict[str, Any]) -> NormalizedSalePropertyDetail:
+    """將 591 sale/detail 回應在模組內部清洗為標準 NormalizedSalePropertyDetail。
+
+    所有欄位皆以強型別數值封裝，徹底杜絕文字殘留。
     """
     base_info = data.get("baseInfo") or {}
     address_info = base_info.get("address") or {}
@@ -74,7 +105,7 @@ def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
         if isinstance(item, dict) and "name" in item
     }
 
-    # 2. 解析 baseInfo.areaIntro 產權坪數明細字典
+    # 2. 解析 baseInfo.areaIntro 產權坪數字典 (直接轉 float)
     area_list = base_info.get("areaIntro") or []
     area_dict = {
         item.get("name"): item.get("value")
@@ -82,10 +113,17 @@ def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
         if isinstance(item, dict) and "name" in item
     }
 
-    # 土地持份相容性解析 (多筆實測兼顧 '土地持分坪數' 與 '土地坪數')
-    land_area = area_dict.get("土地持分坪數") or area_dict.get("土地坪數")
+    main_area = parse_pin(area_dict.get("主建物"))
+    aux_area = parse_pin(area_dict.get("附屬建物"))
+    common_area = parse_pin(area_dict.get("共有部分"))
+    land_area = parse_pin(area_dict.get("土地持分坪數") or area_dict.get("土地坪數"))
+    parking_area = parse_pin(area_dict.get("車位面積"))
 
-    # 3. 座標浮點數解析
+    # 3. 樓層與格局數值化
+    floor_curr, floor_tot = parse_floor(info_dict.get("樓層"))
+    rooms, living, baths = parse_layout(base_info.get("layout"))
+
+    # 4. 座標浮點數解析
     lat: Optional[float] = None
     lng: Optional[float] = None
     raw_lat = address_info.get("lat")
@@ -97,25 +135,21 @@ def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
         except (ValueError, TypeError):
             lat, lng = None, None
 
-    # 4. 總登記坪數浮點數解析
-    total_area: Optional[float] = None
-    raw_total_area = base_info.get("area")
-    if raw_total_area is not None:
-        try:
-            total_area = float(raw_total_area)
-        except (ValueError, TypeError):
-            total_area = None
+    # 5. 總登記坪數浮點數
+    total_area = parse_pin(base_info.get("area")) or 0.0
 
-    # 5. 總價純整數解析 (原生 int)
-    price_val: int = 0
-    raw_price = base_info.get("price")
-    if raw_price is not None:
-        try:
-            price_val = int(raw_price)
-        except (ValueError, TypeError):
-            price_val = 0
+    # 6. 金額與單價
+    price_wan = parse_price_wan(base_info.get("price"))
+    unit_price = parse_unit_price(base_info.get("unitPrice"))
 
-    # 6. 地址組裝 (若缺少完整地址，由結構化路徑自動拼裝)
+    # 7. 屋齡、公設比、管理費數值化
+    building_age = Source591AgeMapper.parse_building_age(info_dict.get("屋齡"))
+    public_ratio = parse_percent(info_dict.get("公設比"))
+    manage_fee = parse_currency_amount(info_dict.get("管理費"))
+    has_lease = parse_boolean(info_dict.get("帶租約"))
+    balconies = parse_int_count(info_dict.get("陽台"))
+
+    # 8. 結構化地址組裝
     region_str = address_info.get("region") or ""
     section_str = address_info.get("section") or ""
     street_str = address_info.get("street") or ""
@@ -123,37 +157,33 @@ def map_sale_house_detail(data: Dict[str, Any]) -> SaleHouseDetail:
     num_str = f"{address_info.get('addr_number')}號" if address_info.get("addr_number") else ""
     full_address = f"{region_str}{section_str}{street_str}{addr_str}{num_str}"
 
-    raw_age_str = info_dict.get("屋齡")
-    building_age = Source591AgeMapper.parse_building_age(raw_age_str)
-
-    return SaleHouseDetail(
-        house_id=str(data.get("id")),
-        title=base_info.get("title") or "",
-        price=price_val,
-        unit_price=base_info.get("unitPrice"),
-        layout=base_info.get("layout"),
-        total_area=total_area,
+    return NormalizedSalePropertyDetail(
+        external_house_id=str(data.get("id")),
+        title=str(base_info.get("title") or ""),
+        price_wan=price_wan,
+        unit_price_wan=unit_price,
+        total_area_pin=total_area,
+        main_area_pin=main_area,
+        auxiliary_area_pin=aux_area,
+        common_area_pin=common_area,
+        land_area_pin=land_area,
+        parking_area_pin=parking_area,
+        floor_current=floor_curr,
+        floor_total=floor_tot,
+        rooms=rooms,
+        living_rooms=living,
+        bathrooms=baths,
+        balconies=balconies,
+        building_age_years=building_age,
+        public_ratio_pct=public_ratio,
+        management_fee_monthly=manage_fee,
+        has_lease=has_lease,
         building_type=data.get("kindStr"),
         building_structure=info_dict.get("型態"),
-        # 建築規格
-        floor=info_dict.get("樓層"),
-        age=raw_age_str,
-        building_age=building_age,
         orientation=info_dict.get("朝向"),
-        management_fee=info_dict.get("管理費"),
-        public_ratio=info_dict.get("公設比"),
-        has_lease=info_dict.get("帶租約"),
-        balcony=info_dict.get("陽台"),
         purpose=info_dict.get("用途"),
         current_state=info_dict.get("現況"),
         parking_desc=base_info.get("parking"),
-        # 產權面積明細
-        main_building_area=area_dict.get("主建物"),
-        auxiliary_area=area_dict.get("附屬建物"),
-        common_area=area_dict.get("共有部分"),
-        land_area=land_area,
-        parking_area=area_dict.get("車位面積"),
-        # 結構化地理座標
         region=region_str or None,
         section=section_str or None,
         street=street_str or None,

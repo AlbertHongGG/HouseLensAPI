@@ -9,23 +9,22 @@ from src.domain.enums import (
 from src.domain.common import (
     GeoPoint,
     StructuredAddress,
-    PageQuery,
     PageResult,
 )
 from src.domain.community import (
-    CommunitySummary,
-    CommunityDetail,
+    NormalizedCommunitySummary,
+    NormalizedCommunityDetail,
     CommunitySearchQuery,
 )
 from src.domain.sale_house import (
-    SaleHouseSummary,
-    SaleHouseDetail,
+    NormalizedSaleListing,
+    NormalizedSalePropertyDetail,
     SaleHouseSearchQuery,
 )
 from src.domain.new_house import (
-    NewHouseLayoutItem,
-    NewHouseSummary,
-    NewHouseDetail,
+    NewHouseLayoutSpec,
+    NormalizedNewHouseSummary,
+    NormalizedNewHouseDetail,
     NewHouseSearchQuery,
 )
 
@@ -36,16 +35,16 @@ __all__ = [
     "AgeRange",
     "GeoPoint",
     "StructuredAddress",
-    "PageQuery",
     "PageResult",
-    "CommunitySummary",
-    "CommunityDetail",
+    "NormalizedCommunitySummary",
+    "NormalizedCommunityDetail",
     "CommunitySearchQuery",
-    "SaleHouseSummary",
-    "SaleHouseDetail",
+    "NormalizedSaleListing",
+    "NormalizedSalePropertyDetail",
     "SaleHouseSearchQuery",
-    "NewHouseLayoutItem",
-    "NewHouseSummary",
-    "NewHouseDetail",
+    "NewHouseLayoutSpec",
+    "NormalizedNewHouseSummary",
+    "NormalizedNewHouseDetail",
     "NewHouseSearchQuery",
 ]
+

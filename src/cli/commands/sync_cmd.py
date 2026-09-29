@@ -12,7 +12,7 @@ from src.domain.new_house import NewHouseSearchQuery
 from src.domain.sale_house import SaleHouseSearchQuery
 from src.storage.database import db_manager
 
-sync_app = typer.Typer(help="🔄 從外部房產平台同步資料並進行入庫與去重")
+sync_app = typer.Typer(help="從外部房產平台同步資料並進行入庫與去重")
 
 
 @sync_app.command("community")
@@ -20,13 +20,21 @@ def sync_communities_cmd(
     provider: str = typer.Option("591", "--provider", "-p", help="來源平台代碼"),
     region_id: int = typer.Option(1, "--region-id", "-r", help="縣市代碼 (1: 台北市...)"),
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="社區關鍵字"),
+    min_age: Optional[float] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
+    max_age: Optional[float] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
     details: bool = typer.Option(False, "--details", "-d", help="是否深入爬取完整規格與公設詳情"),
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help="同步筆數上限 (留空則同步整頁)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
 ):
-    """同步社區資料 (支援區域與關鍵字檢索)"""
+    """同步社區資料 (支援區域、關鍵字與屋齡檢索)"""
     uc = SyncUseCase(database=db_manager)
-    query = CommunitySearchQuery(region_id=region_id, keyword=keyword, page_size=limit or 20)
+    query = CommunitySearchQuery(
+        region_id=region_id,
+        keyword=keyword,
+        min_age_years=min_age,
+        max_age_years=max_age,
+        page_size=limit or 20,
+    )
 
     try:
         if format_opt == "json":
@@ -63,8 +71,9 @@ def sync_sale_houses_cmd(
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="房屋搜尋關鍵字"),
     min_price: Optional[int] = typer.Option(None, "--min-price", help="最低總價 (萬元)"),
     max_price: Optional[int] = typer.Option(None, "--max-price", help="最高總價 (萬元)"),
-    min_age: Optional[int] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
-    max_age: Optional[int] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
+    min_age: Optional[float] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
+    max_age: Optional[float] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
+    rooms: Optional[int] = typer.Option(None, "--rooms", help="格局房數篩選"),
     details: bool = typer.Option(False, "--details", "-d", help="是否深入爬取產權面積拆解與建築規格詳情"),
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help="同步筆數上限 (留空則同步整頁)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
@@ -74,10 +83,12 @@ def sync_sale_houses_cmd(
     query = SaleHouseSearchQuery(
         region_id=region_id,
         keywords=keyword,
-        min_price=min_price,
-        max_price=max_price,
-        min_age=min_age,
-        max_age=max_age,
+        min_price_wan=min_price,
+        max_price_wan=max_price,
+        min_age_years=min_age,
+        max_age_years=max_age,
+        rooms=rooms,
+        page_size=limit or 20,
     )
 
     try:
@@ -113,17 +124,22 @@ def sync_new_houses_cmd(
     provider: str = typer.Option("591", "--provider", "-p", help="來源平台代碼"),
     region_id: int = typer.Option(1, "--region-id", "-r", help="縣市代碼 (1: 台北市...)"),
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="建案名稱關鍵字"),
-    status: Optional[str] = typer.Option("1,2", "--status", "-s", help="建案狀態 (1: 預售屋, 2: 新成屋)"),
+    status: Optional[str] = typer.Option("1,2", "--status", "-s", help="建案狀態 (1: 預售屋, 2: 新成屋, 1,2: 全部)"),
     details: bool = typer.Option(False, "--details", "-d", help="是否深入爬取 layout_v2 房型規劃矩陣與建商團隊"),
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help="同步筆數上限"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
 ):
     """同步預售屋與新建案資料 (含 layout_v2 結構化房型坪數)"""
     uc = SyncUseCase(database=db_manager)
+
+    is_pre = "1" in status if status else True
+    is_new = "2" in status if status else True
+
     query = NewHouseSearchQuery(
         region_id=region_id,
         keywords=keyword,
-        build_status=status,
+        is_presale=is_pre,
+        is_new_construction=is_new,
         page_size=limit or 20,
     )
 
@@ -164,7 +180,7 @@ def sync_all_cmd(
 ):
     """一鍵同步指定行政區的社區、中古屋與新建案三大領域完整資料"""
     print_success(f"開始全域同步 (來源: {provider}, 縣市 ID: {region_id})...")
-    sync_communities_cmd(provider=provider, region_id=region_id, details=details, limit=limit, keyword=None, format_opt="text")
-    sync_sale_houses_cmd(provider=provider, region_id=region_id, details=details, limit=limit, keyword=None, min_price=None, max_price=None, format_opt="text")
+    sync_communities_cmd(provider=provider, region_id=region_id, details=details, limit=limit, keyword=None, min_age=None, max_age=None, format_opt="text")
+    sync_sale_houses_cmd(provider=provider, region_id=region_id, details=details, limit=limit, keyword=None, min_price=None, max_price=None, min_age=None, max_age=None, rooms=None, format_opt="text")
     sync_new_houses_cmd(provider=provider, region_id=region_id, details=details, limit=limit, keyword=None, status="1,2", format_opt="text")
     print_success("全域三大領域同步作業全部完成！")

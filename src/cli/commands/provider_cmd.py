@@ -11,7 +11,7 @@ from src.config import settings
 from src.core.registry import registry
 import src.providers  # 載入內建 providers
 
-provider_app = typer.Typer(help="🔌 來源外掛模組管理與即時健康狀態檢查")
+provider_app = typer.Typer(help="來源外掛模組管理與即時健康狀態檢查")
 
 
 @provider_app.command("list")
@@ -37,7 +37,7 @@ def list_providers(
         return
 
     table = Table(
-        title=f"🔌 已註冊房產來源外掛模組 (共 {len(providers_info)} 個)",
+        title=f"已註冊房產來源外掛模組 (共 {len(providers_info)} 個)",
         box=box.ROUNDED,
         header_style="bold cyan",
     )
@@ -48,7 +48,7 @@ def list_providers(
     table.add_column("支援領域模組", style="green")
 
     for p in providers_info:
-        default_badge = "[bold green]✔ 是[/bold green]" if p.get("is_default") else "[dim]否[/dim]"
+        default_badge = "[bold green]是[/bold green]" if p.get("is_default") else "[dim]否[/dim]"
         aliases_str = ", ".join(p.get("aliases", [])) or "-"
         table.add_row(
             p["provider_id"],
@@ -72,7 +72,7 @@ def check_provider(
         print_error(f"找不到外掛模組 '{provider_id}': {e}")
         raise typer.Exit(code=1)
 
-    console.print(f"📡 正在對外掛 [bold cyan]{prov.provider_name}[/bold cyan] ({provider_id}) 發送健康檢查...")
+    console.print(f"正在對外掛 [bold cyan]{prov.provider_name}[/bold cyan] ({provider_id}) 發送健康檢查...")
 
     start_time = time.perf_counter()
     try:

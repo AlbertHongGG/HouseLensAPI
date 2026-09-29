@@ -34,22 +34,22 @@ def get_console() -> Console:
 
 def print_success(message: str) -> None:
     """輸出成功訊息"""
-    console.print(f"[success]✔[/success] {message}")
+    console.print(f"[success][OK][/success] {message}")
 
 
 def print_error(message: str) -> None:
     """輸出錯誤訊息至 stderr"""
-    err_console.print(f"[error]✘ 錯誤:[/error] {message}")
+    err_console.print(f"[error][ERROR][/error] {message}")
 
 
 def print_warning(message: str) -> None:
     """輸出警告訊息"""
-    console.print(f"[warning]! 警告:[/warning] {message}")
+    console.print(f"[warning][WARNING][/warning] {message}")
 
 
 def print_info(message: str) -> None:
     """輸出提示訊息"""
-    console.print(f"[info]ℹ[/info] {message}")
+    console.print(f"[info][INFO][/info] {message}")
 
 
 def print_json_data(data: Any) -> None:

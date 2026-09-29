@@ -11,7 +11,7 @@ from src.cli.views.new_house_views import new_house_to_dict, render_new_house_ta
 from src.cli.views.property_views import property_to_dict, render_property_table
 from src.storage.database import db_manager
 
-list_app = typer.Typer(help="📋 檢索本地資料庫庫存房產資料 (支援表格與 JSON 輸出)")
+list_app = typer.Typer(help="檢索本地資料庫庫存房產資料 (支援表格與 JSON 輸出)")
 
 
 @list_app.command("community")
@@ -19,6 +19,8 @@ def list_communities_cmd(
     region: Optional[str] = typer.Option(None, "--region", "-r", help="縣市篩選 (例如: 台北市)"),
     section: Optional[str] = typer.Option(None, "--section", "-s", help="行政區篩選 (例如: 松山區)"),
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="關鍵字比對"),
+    min_age: Optional[float] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
+    max_age: Optional[float] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
     limit: int = typer.Option(20, "--limit", "-l", help="每頁筆數上限"),
     offset: int = typer.Option(0, "--offset", help="分頁偏移量"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
@@ -31,6 +33,8 @@ def list_communities_cmd(
                 region=region,
                 section=section,
                 keyword=keyword,
+                min_age=min_age,
+                max_age=max_age,
                 limit=limit,
                 offset=offset,
             )
@@ -58,8 +62,9 @@ def list_sale_houses_cmd(
     section: Optional[str] = typer.Option(None, "--section", "-s", help="行政區篩選 (例如: 松山區)"),
     min_price: Optional[int] = typer.Option(None, "--min-price", help="最低總價 (萬元)"),
     max_price: Optional[int] = typer.Option(None, "--max-price", help="最高總價 (萬元)"),
-    min_age: Optional[int] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
-    max_age: Optional[int] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
+    min_age: Optional[float] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
+    max_age: Optional[float] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
+    rooms: Optional[int] = typer.Option(None, "--rooms", help="格局房數篩選"),
     keyword: Optional[str] = typer.Option(None, "--keyword", "-k", help="物件標題或社區關鍵字"),
     limit: int = typer.Option(20, "--limit", "-l", help="每頁筆數上限"),
     offset: int = typer.Option(0, "--offset", help="分頁偏移量"),
@@ -77,6 +82,7 @@ def list_sale_houses_cmd(
                 max_price=max_price,
                 min_age=min_age,
                 max_age=max_age,
+                rooms=rooms,
                 limit=limit,
                 offset=offset,
             )

@@ -1,7 +1,6 @@
 """Unit Tests for Core Interfaces and ProviderRegistry"""
 
 import pytest
-from typing import List
 
 from src.core.exceptions import ProviderError, ProviderNotFoundError
 from src.core.interfaces import (
@@ -12,17 +11,29 @@ from src.core.interfaces import (
 )
 from src.core.registry import ProviderRegistry
 from src.domain.common import PageResult
-from src.domain.community import CommunityDetail, CommunitySearchQuery, CommunitySummary
-from src.domain.new_house import NewHouseDetail, NewHouseSearchQuery, NewHouseSummary
-from src.domain.sale_house import SaleHouseDetail, SaleHouseSearchQuery, SaleHouseSummary
+from src.domain.community import (
+    CommunitySearchQuery,
+    NormalizedCommunityDetail,
+    NormalizedCommunitySummary,
+)
+from src.domain.new_house import (
+    NewHouseSearchQuery,
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
+from src.domain.sale_house import (
+    NormalizedSaleListing,
+    NormalizedSalePropertyDetail,
+    SaleHouseSearchQuery,
+)
 
 
 class MockCommunityProvider(ICommunityProvider):
-    async def search_communities(self, query: CommunitySearchQuery) -> PageResult[CommunitySummary]:
+    async def search_communities(self, query: CommunitySearchQuery) -> PageResult[NormalizedCommunitySummary]:
         return PageResult.create(items=[], total_records=0, page=1, page_size=20)
 
-    async def get_community_detail(self, community_id: str) -> CommunityDetail:
-        return CommunityDetail(
+    async def get_community_detail(self, community_id: str) -> NormalizedCommunityDetail:
+        return NormalizedCommunityDetail(
             community_id=community_id,
             community_name="測試社區",
             address="測試地址",
@@ -32,23 +43,24 @@ class MockCommunityProvider(ICommunityProvider):
 
 
 class MockSaleHouseProvider(ISaleHouseProvider):
-    async def search_sale_houses(self, query: SaleHouseSearchQuery) -> PageResult[SaleHouseSummary]:
+    async def search_sale_houses(self, query: SaleHouseSearchQuery) -> PageResult[NormalizedSaleListing]:
         return PageResult.create(items=[], total_records=0, page=1, page_size=20)
 
-    async def get_sale_house_detail(self, house_id: str) -> SaleHouseDetail:
-        return SaleHouseDetail(
-            house_id=house_id,
+    async def get_sale_house_detail(self, house_id: str) -> NormalizedSalePropertyDetail:
+        return NormalizedSalePropertyDetail(
+            external_house_id=house_id,
             title="測試房屋",
-            price=2000,
+            price_wan=2000,
+            total_area_pin=30.0,
         )
 
 
 class MockNewHouseProvider(INewHouseProvider):
-    async def search_new_houses(self, query: NewHouseSearchQuery) -> PageResult[NewHouseSummary]:
+    async def search_new_houses(self, query: NewHouseSearchQuery) -> PageResult[NormalizedNewHouseSummary]:
         return PageResult.create(items=[], total_records=0, page=1, page_size=20)
 
-    async def get_new_house_detail(self, new_house_id: str) -> NewHouseDetail:
-        return NewHouseDetail(
+    async def get_new_house_detail(self, new_house_id: str) -> NormalizedNewHouseDetail:
+        return NormalizedNewHouseDetail(
             hid=int(new_house_id),
             project_name="測試建案",
             build_type="預售屋",
@@ -138,7 +150,7 @@ async def test_mock_provider_flow():
 
     house_detail = await provider.sale_house.get_sale_house_detail("S12345")
     assert house_detail.house_id == "S12345"
-    assert house_detail.price == 2000
+    assert house_detail.price_wan == 2000
 
     new_house_detail = await provider.new_house.get_new_house_detail("9999")
     assert new_house_detail.hid == 9999

@@ -1,4 +1,7 @@
-"""HouseLensAPI - 中古屋實體與跨平台比價 Rich 視圖渲染器 (Property Views)"""
+"""HouseLensAPI - 中古屋實體與跨平台比價 Rich 視圖渲染器 (Property Views)
+
+純淨規範：以專業清晰之終端排版呈現，嚴禁使用裝飾性 emoji。
+"""
 
 from typing import Any, Dict, List
 from rich import box
@@ -10,43 +13,63 @@ from src.storage.models.property import PropertyTable
 
 
 def render_property_table(properties: List[PropertyTable]) -> Table:
-    """渲染中古屋實體庫存清單表格 (含關聯刊登數量徽章)"""
+    """渲染中古屋實體庫存清單表格"""
     table = Table(
-        title=f"🏡 庫存中古屋物件實體 (共 {len(properties)} 棟/戶)",
+        title=f"中古屋物件實體列表 (共 {len(properties)} 筆)",
         box=box.ROUNDED,
         header_style="bold magenta",
         show_lines=True,
     )
 
     table.add_column("實體 ID", style="dim", max_width=10, overflow="ellipsis")
-    table.add_column("標題 / 物件描述", style="bold white", max_width=28, overflow="ellipsis")
+    table.add_column("標題 / 物件描述", style="bold white", max_width=30, overflow="ellipsis")
     table.add_column("所屬社區", style="cyan")
     table.add_column("總價", justify="right", style="bold green")
     table.add_column("單價", justify="right", style="yellow")
     table.add_column("權狀總坪", justify="right")
     table.add_column("格局 / 樓層", justify="center")
     table.add_column("屋齡", justify="center", style="cyan")
-    table.add_column("跨平台刊登數", justify="center", style="bold white")
+    table.add_column("刊登狀態", justify="center", style="bold white")
 
     for p in properties:
         listings_count = len(p.listings)
         badge = (
-            f"[bold green]✔ 獨家 ({listings_count})[/bold green]"
+            f"[bold green]獨家 ({listings_count})[/bold green]"
             if listings_count <= 1
-            else f"[bold magenta]⚡ 聚合比價 ({listings_count}處)[/bold magenta]"
+            else f"[bold magenta]聚合比價 ({listings_count}處)[/bold magenta]"
         )
 
-        price_str = f"{p.price} 萬元"
-        area_str = f"{p.total_area:.2f} 坪" if p.total_area else "-"
-        specs = f"{p.layout or '-'} / {p.floor or '-'}"
-        age_str = p.age or (f"{p.building_age:.0f}年" if p.building_age is not None else "-")
+        price_str = f"{p.price_wan} 萬"
+        unit_price_str = f"{p.unit_price_wan:.1f} 萬/坪" if p.unit_price_wan else "-"
+        area_str = f"{p.total_area_pin:.2f} 坪" if p.total_area_pin else "-"
+
+        # 格局字串
+        layout_parts = []
+        if p.rooms is not None:
+            layout_parts.append(f"{p.rooms}房")
+        if p.living_rooms is not None:
+            layout_parts.append(f"{p.living_rooms}廳")
+        if p.bathrooms is not None:
+            layout_parts.append(f"{p.bathrooms}衛")
+        layout_str = "".join(layout_parts) if layout_parts else "-"
+
+        # 樓層字串
+        if p.floor_current is not None and p.floor_total is not None:
+            floor_str = f"{p.floor_current}F/{p.floor_total}F"
+        elif p.floor_current is not None:
+            floor_str = f"{p.floor_current}F"
+        else:
+            floor_str = "-"
+
+        specs = f"{layout_str} / {floor_str}"
+        age_str = f"{p.building_age_years:.1f} 年" if p.building_age_years is not None else "-"
 
         table.add_row(
             p.id[:8] + "...",
             p.title,
             p.community_name or "-",
             price_str,
-            p.unit_price or "-",
+            unit_price_str,
             area_str,
             specs,
             age_str,
@@ -58,7 +81,6 @@ def render_property_table(properties: List[PropertyTable]) -> Table:
 
 def render_property_detail_view(p: PropertyTable) -> Group:
     """渲染中古屋詳細規格與跨平台刊登比價群組視圖"""
-    # 1. 客觀物理規格 Table
     specs_table = Table.grid(padding=(0, 2))
     specs_table.add_column(style="bold cyan", justify="right")
     specs_table.add_column(style="white")
@@ -66,35 +88,69 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     specs_table.add_column(style="white")
 
     coords_str = f"({p.lat:.5f}, {p.lng:.5f})" if p.lat and p.lng else "-"
+    unit_price_str = f"{p.unit_price_wan:.1f} 萬/坪" if p.unit_price_wan else "-"
+    total_area_str = f"{p.total_area_pin:.2f} 坪" if p.total_area_pin else "-"
+
+    # 格局
+    layout_parts = []
+    if p.rooms is not None:
+        layout_parts.append(f"{p.rooms}房")
+    if p.living_rooms is not None:
+        layout_parts.append(f"{p.living_rooms}廳")
+    if p.bathrooms is not None:
+        layout_parts.append(f"{p.bathrooms}衛")
+    if p.balconies is not None:
+        layout_parts.append(f"{p.balconies}陽台")
+    layout_str = "".join(layout_parts) if layout_parts else "-"
+
+    # 樓層
+    if p.floor_current is not None and p.floor_total is not None:
+        floor_str = f"{p.floor_current}F / 共{p.floor_total}F"
+    elif p.floor_current is not None:
+        floor_str = f"{p.floor_current}F"
+    else:
+        floor_str = "-"
+
+    age_str = f"{p.building_age_years:.1f} 年" if p.building_age_years is not None else "-"
+    mgmt_fee_str = f"{p.management_fee_monthly} 元/月" if p.management_fee_monthly is not None else "-"
+    pub_ratio_str = f"{p.public_ratio_pct:.1f}%" if p.public_ratio_pct is not None else "-"
+    lease_str = "帶租約" if p.has_lease is True else ("無租約" if p.has_lease is False else "-")
+
     specs_table.add_row("客觀實體 ID:", p.id, "所屬社區:", p.community_name or "-")
-    specs_table.add_row("刊登參考標題:", p.title, "參考總價:", f"[bold green]{p.price} 萬元[/bold green]")
-    specs_table.add_row("權狀登記總坪:", f"{p.total_area or '-'} 坪", "參考單價:", p.unit_price or "-")
-    specs_table.add_row("格局規劃:", p.layout or "-", "建物型態/結構:", f"{p.building_type or '-'} / {p.building_structure or '-'}")
-    specs_table.add_row("所在樓層:", p.floor or "-", "屋齡/座向:", f"{p.age or '-'} / {p.orientation or '-'}")
+    specs_table.add_row("刊登參考標題:", p.title, "參考總價:", f"[bold green]{p.price_wan} 萬元[/bold green]")
+    specs_table.add_row("權狀登記總坪:", total_area_str, "參考單價:", unit_price_str)
+    specs_table.add_row("格局規劃:", layout_str, "建物型態/結構:", f"{p.building_type or '-'} / {p.building_structure or '-'}")
+    specs_table.add_row("所在樓層:", floor_str, "屋齡/座向:", f"{age_str} / {p.orientation or '-'}")
     specs_table.add_row("行政區地址:", f"{p.region or ''}{p.section or ''} {p.address or ''}", "地理座標:", coords_str)
-    specs_table.add_row("管理費:", p.management_fee or "-", "公設比/陽台:", f"{p.public_ratio or '-'} / {p.balcony or '-'}")
-    specs_table.add_row("帶租約現況:", f"{p.has_lease or '-'} / {p.current_state or '-'}", "車位規格說明:", p.parking_desc or "-")
+    specs_table.add_row("管理費:", mgmt_fee_str, "公設比/現況:", f"{pub_ratio_str} / {p.current_state or '-'}")
+    specs_table.add_row("帶租約現況:", lease_str, "車位規格說明:", p.parking_desc or "-")
 
     # 產權面積明細
+    main_b = f"{p.main_area_pin:.2f}坪" if p.main_area_pin is not None else "-"
+    aux_b = f"{p.auxiliary_area_pin:.2f}坪" if p.auxiliary_area_pin is not None else "-"
+    com_b = f"{p.common_area_pin:.2f}坪" if p.common_area_pin is not None else "-"
+    land_b = f"{p.land_area_pin:.2f}坪" if p.land_area_pin is not None else "-"
+    park_b = f"{p.parking_area_pin:.2f}坪" if p.parking_area_pin is not None else "-"
+
     area_breakdown = (
-        f"主建物: {p.main_building_area or '-'} │ "
-        f"附屬建物: {p.auxiliary_area or '-'} │ "
-        f"共有部分: {p.common_area or '-'} │ "
-        f"車位面積: {p.parking_area or '-'} │ "
-        f"土地持份: {p.land_area or '-'}"
+        f"主建物: {main_b} │ "
+        f"附屬建物: {aux_b} │ "
+        f"共有部分: {com_b} │ "
+        f"車位面積: {park_b} │ "
+        f"土地持份: {land_b}"
     )
     specs_table.add_row("產權面積拆解:", f"[yellow]{area_breakdown}[/yellow]", "", "")
 
     property_panel = Panel(
         specs_table,
-        title=f"🏡 客觀房屋實體資訊 - {p.title}",
+        title=f"客觀房屋實體資訊 - {p.title}",
         border_style="magenta",
         box=box.ROUNDED,
     )
 
     # 2. 跨平台來源刊登比價 Table (Listings Comparison)
     listings_table = Table(
-        title="🔍 跨平台來源刊登明細與比價追蹤 (Listing References)",
+        title="跨平台來源刊登明細與比價追蹤",
         box=box.SIMPLE_HEAD,
         header_style="bold yellow",
     )
@@ -106,11 +162,12 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     listings_table.add_column("更新時間", style="dim")
 
     for listing in p.listings:
+        price_disp = f"{listing.listing_price_wan} 萬" if listing.listing_price_wan is not None else "-"
         listings_table.add_row(
             f"[{listing.provider_id.upper()}]",
             listing.external_house_id,
             listing.listing_title or "-",
-            listing.listing_price or "-",
+            price_disp,
             listing.cover_image_url or "-",
             listing.updated_at.strftime("%Y-%m-%d %H:%M") if listing.updated_at else "-",
         )
@@ -124,32 +181,35 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
         "id": p.id,
         "community_name": p.community_name,
         "title": p.title,
-        "price_wan": p.price,
-        "unit_price": p.unit_price,
-        "total_area": p.total_area,
-        "layout": p.layout,
+        "price_wan": p.price_wan,
+        "unit_price_wan": p.unit_price_wan,
+        "total_area_pin": p.total_area_pin,
+        "rooms": p.rooms,
+        "living_rooms": p.living_rooms,
+        "bathrooms": p.bathrooms,
+        "balconies": p.balconies,
+        "floor_current": p.floor_current,
+        "floor_total": p.floor_total,
+        "building_age_years": p.building_age_years,
+        "management_fee_monthly": p.management_fee_monthly,
+        "public_ratio_pct": p.public_ratio_pct,
+        "has_lease": p.has_lease,
         "building_type": p.building_type,
         "building_structure": p.building_structure,
-        "floor": p.floor,
-        "age": p.age,
-        "building_age": p.building_age,
         "orientation": p.orientation,
-        "management_fee": p.management_fee,
-        "public_ratio": p.public_ratio,
-        "has_lease": p.has_lease,
-        "balcony": p.balcony,
         "purpose": p.purpose,
         "current_state": p.current_state,
         "parking_desc": p.parking_desc,
         "area_breakdown": {
-            "main_building": p.main_building_area,
-            "auxiliary": p.auxiliary_area,
-            "common": p.common_area,
-            "land": p.land_area,
-            "parking": p.parking_area,
+            "main_area_pin": p.main_area_pin,
+            "auxiliary_area_pin": p.auxiliary_area_pin,
+            "common_area_pin": p.common_area_pin,
+            "land_area_pin": p.land_area_pin,
+            "parking_area_pin": p.parking_area_pin,
         },
         "region": p.region,
         "section": p.section,
+        "street": p.street,
         "address": p.address,
         "lat": p.lat,
         "lng": p.lng,
@@ -160,7 +220,7 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
                 "provider_id": it.provider_id,
                 "external_house_id": it.external_house_id,
                 "listing_title": it.listing_title,
-                "listing_price": it.listing_price,
+                "listing_price_wan": it.listing_price_wan,
                 "cover_image_url": it.cover_image_url,
                 "updated_at": it.updated_at.isoformat() if it.updated_at else None,
             }

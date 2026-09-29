@@ -3,18 +3,22 @@
 from abc import ABC, abstractmethod
 
 from src.domain.common import PageResult
-from src.domain.sale_house import SaleHouseDetail, SaleHouseSearchQuery, SaleHouseSummary
+from src.domain.sale_house import (
+    NormalizedSaleListing,
+    NormalizedSalePropertyDetail,
+    SaleHouseSearchQuery,
+)
 
 
 class ISaleHouseProvider(ABC):
     """中古屋領域服務介面 (所有來源模組之中古屋適配器必須實作)"""
 
     @abstractmethod
-    async def search_sale_houses(self, query: SaleHouseSearchQuery) -> PageResult[SaleHouseSummary]:
-        """多元條件中古屋搜尋 (支援縣市、關鍵字、價格區間篩選)"""
+    async def search_sale_houses(self, query: SaleHouseSearchQuery) -> PageResult[NormalizedSaleListing]:
+        """多元條件中古屋搜尋 (回傳標準化刊登規格清單)"""
         pass
 
     @abstractmethod
-    async def get_sale_house_detail(self, house_id: str) -> SaleHouseDetail:
-        """根據房屋唯一 ID 取得完整物件詳情、規格屬性字典、坪數拆解與結構化地理位置"""
+    async def get_sale_house_detail(self, house_id: str) -> NormalizedSalePropertyDetail:
+        """根據房屋唯一 ID 取得完整物件物理詳情與產權面積純數值規格"""
         pass

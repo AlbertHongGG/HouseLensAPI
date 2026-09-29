@@ -19,7 +19,7 @@ from src.cli.views.property_views import (
 )
 from src.storage.database import db_manager
 
-get_app = typer.Typer(help="🔍 檢視單一房產物件深度規格與跨平台比價卡片")
+get_app = typer.Typer(help="檢視單一房產物件深度規格與跨平台比價卡片")
 
 
 @get_app.command("community")

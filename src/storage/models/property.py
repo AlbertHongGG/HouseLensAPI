@@ -1,13 +1,17 @@
-"""HouseLensAPI - 中古屋物件與來源刊登持久化資料表模型 (Property & Listing Models)"""
+"""HouseLensAPI - 中古屋物件與來源刊登持久化資料表模型 (Property & Listing Models)
+
+純淨強型別規格：所有數值皆以 int / float / bool 存儲，禁止未解析字串與雜質入庫。
+"""
 
 import uuid
 from typing import Any, Dict, List, Optional
 from sqlalchemy import (
-    JSON,
+    Boolean,
     Float,
     ForeignKey,
     Index,
     Integer,
+    JSON,
     String,
     UniqueConstraint,
 )
@@ -35,32 +39,40 @@ class PropertyTable(Base, TimestampMixin):
     community_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, index=True)
 
     title: Mapped[str] = mapped_column(String(256), nullable=False)
-    price: Mapped[int] = mapped_column(Integer, nullable=False, index=True)  # 總價萬元純整數
-    unit_price: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    total_area: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)
-    layout: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
+    price_wan: Mapped[int] = mapped_column(Integer, nullable=False, index=True)  # 總價 (萬元純整數)
+    unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 單價 (萬元/坪)
+    total_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)  # 總坪數 (純浮點數)
+
+    # 格局數值化規格 (純整數)
+    rooms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)  # 房數
+    living_rooms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 廳數
+    bathrooms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 衛數
+    balconies: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 陽台數
+
+    # 樓層數值化規格 (純整數，地下室為負數)
+    floor_current: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)  # 所在樓層
+    floor_total: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 總樓層
+
+    # 屋齡與費用
+    building_age_years: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)  # 屋齡 (年)
+    management_fee_monthly: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 管理費 (元/月)
+    public_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 公設比 (%)
+    has_lease: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)  # 是否帶租約
+
+    # 建築類型與描述
     building_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     building_structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-
-    # 核心建築規格
-    floor: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
-    age: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    building_age: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)
     orientation: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    management_fee: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    public_ratio: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    has_lease: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
-    balcony: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     current_state: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     parking_desc: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
 
-    # 產權面積明細
-    main_building_area: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    auxiliary_area: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    common_area: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    land_area: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    parking_area: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    # 產權面積純數值明細 (坪)
+    main_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 主建物面積
+    auxiliary_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 附屬建物面積
+    common_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 共用部分面積
+    land_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 土地面積
+    parking_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位面積
 
     # 地理位置與座標
     region: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
@@ -79,8 +91,10 @@ class PropertyTable(Base, TimestampMixin):
     )
 
     __table_args__ = (
-        Index("ix_property_dedup", "community_name", "floor", "layout"),
+        Index("ix_property_dedup", "community_name", "floor_current", "rooms"),
         Index("ix_property_region_section", "region", "section"),
+        Index("ix_property_price_wan", "price_wan"),
+        Index("ix_property_building_age_years", "building_age_years"),
     )
 
 
@@ -104,7 +118,7 @@ class PropertyListingTable(Base, TimestampMixin):
     external_house_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
 
     listing_title: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
-    listing_price: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    listing_price_wan: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 刊登總價 (萬元)
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     raw_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
 

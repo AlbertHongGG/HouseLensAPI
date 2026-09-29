@@ -1,14 +1,26 @@
-"""HouseLensAPI - 持久化層 Repository 抽象合約 (Storage Repository Interfaces)"""
+"""HouseLensAPI - 持久化層 Repository 抽象合約 (Storage Repository Interfaces)
+
+純強型別規範：所有合約僅接受領域正規化規範 (Normalized Specifications)。
+"""
 
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from src.domain.community import CommunityDetail, CommunitySummary
-from src.domain.new_house import NewHouseDetail, NewHouseSummary
-from src.domain.sale_house import SaleHouseDetail, SaleHouseSummary
+from src.domain.community import (
+    NormalizedCommunityDetail,
+    NormalizedCommunitySummary,
+)
+from src.domain.new_house import (
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
+from src.domain.sale_house import (
+    NormalizedSaleListing,
+    NormalizedSalePropertyDetail,
+)
 from src.storage.models.community import CommunityTable
 from src.storage.models.new_house import NewHouseTable
-from src.storage.models.property import PropertyListingTable, PropertyTable
+from src.storage.models.property import PropertyTable
 
 
 class ICommunityRepository(ABC):
@@ -16,16 +28,16 @@ class ICommunityRepository(ABC):
 
     @abstractmethod
     async def upsert_from_summary(
-        self, summary: CommunitySummary, provider_id: str
+        self, summary: NormalizedCommunitySummary, provider_id: str
     ) -> CommunityTable:
-        """從 CommunitySummary 新增或更新社區節點"""
+        """從 NormalizedCommunitySummary 新增或更新社區節點"""
         pass
 
     @abstractmethod
     async def upsert_from_detail(
-        self, detail: CommunityDetail, provider_id: str
+        self, detail: NormalizedCommunityDetail, provider_id: str
     ) -> CommunityTable:
-        """從 CommunityDetail 新增或更新社區完整規格"""
+        """從 NormalizedCommunityDetail 新增或更新社區完整規格"""
         pass
 
     @abstractmethod
@@ -46,6 +58,8 @@ class ICommunityRepository(ABC):
         region: Optional[str] = None,
         section: Optional[str] = None,
         keyword: Optional[str] = None,
+        min_age_years: Optional[float] = None,
+        max_age_years: Optional[float] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[CommunityTable]:
@@ -59,9 +73,9 @@ class IPropertyRepository(ABC):
     @abstractmethod
     async def upsert_property_with_listing(
         self,
-        detail: SaleHouseDetail,
+        detail: NormalizedSalePropertyDetail,
         provider_id: str,
-        summary: Optional[SaleHouseSummary] = None,
+        summary: Optional[NormalizedSaleListing] = None,
         candidate_property_id: Optional[str] = None,
     ) -> PropertyTable:
         """寫入物件完整詳情並同步維護來源刊登對應關係 (支援去重合併)"""
@@ -70,7 +84,7 @@ class IPropertyRepository(ABC):
     @abstractmethod
     async def upsert_from_summary(
         self,
-        summary: SaleHouseSummary,
+        summary: NormalizedSaleListing,
         provider_id: str,
         candidate_property_id: Optional[str] = None,
     ) -> PropertyTable:
@@ -93,12 +107,12 @@ class IPropertyRepository(ABC):
     async def find_duplicate_candidate(
         self,
         community_name: Optional[str],
-        floor: Optional[str],
-        total_area: Optional[float],
-        layout: Optional[str],
+        floor_current: Optional[int],
+        rooms: Optional[int],
+        total_area_pin: Optional[float],
         area_tolerance_pct: float = 0.02,
     ) -> Optional[PropertyTable]:
-        """依社區、樓層、格局與坪數誤差 (預設 ±2%) 尋找庫內可能之重複物件"""
+        """依社區、樓層純整數、房數純整數與坪數誤差 (預設 ±2%) 尋找庫內可能之重複物件"""
         pass
 
     @abstractmethod
@@ -107,10 +121,11 @@ class IPropertyRepository(ABC):
         region: Optional[str] = None,
         section: Optional[str] = None,
         keyword: Optional[str] = None,
-        min_price: Optional[int] = None,
-        max_price: Optional[int] = None,
-        min_age: Optional[int] = None,
-        max_age: Optional[int] = None,
+        min_price_wan: Optional[int] = None,
+        max_price_wan: Optional[int] = None,
+        min_age_years: Optional[float] = None,
+        max_age_years: Optional[float] = None,
+        rooms: Optional[int] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[PropertyTable]:
@@ -123,16 +138,16 @@ class INewHouseRepository(ABC):
 
     @abstractmethod
     async def upsert_from_summary(
-        self, summary: NewHouseSummary, provider_id: str
+        self, summary: NormalizedNewHouseSummary, provider_id: str
     ) -> NewHouseTable:
-        """從 NewHouseSummary 新增或更新新建案基本資料"""
+        """從 NormalizedNewHouseSummary 新增或更新新建案基本資料"""
         pass
 
     @abstractmethod
     async def upsert_from_detail(
-        self, detail: NewHouseDetail, provider_id: str
+        self, detail: NormalizedNewHouseDetail, provider_id: str
     ) -> NewHouseTable:
-        """從 NewHouseDetail 新增或更新新建案完整規劃規格"""
+        """從 NormalizedNewHouseDetail 新增或更新新建案完整規劃規格"""
         pass
 
     @abstractmethod

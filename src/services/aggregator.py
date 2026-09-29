@@ -153,6 +153,8 @@ class HouseAggregatorService:
         region: Optional[str] = None,
         section: Optional[str] = None,
         keyword: Optional[str] = None,
+        min_age_years: Optional[float] = None,
+        max_age_years: Optional[float] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[CommunityTable]:
@@ -163,6 +165,8 @@ class HouseAggregatorService:
                 region=region,
                 section=section,
                 keyword=keyword,
+                min_age_years=min_age_years,
+                max_age_years=max_age_years,
                 limit=limit,
                 offset=offset,
             )
@@ -174,18 +178,24 @@ class HouseAggregatorService:
         keyword: Optional[str] = None,
         min_price: Optional[int] = None,
         max_price: Optional[int] = None,
+        min_age_years: Optional[float] = None,
+        max_age_years: Optional[float] = None,
+        rooms: Optional[int] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[PropertyTable]:
-        """在庫中古屋物件跨條件檢索"""
+        """在庫中古屋物件跨條件檢索 (含屋齡與房數篩選)"""
         async with self.db.session() as session:
             repo = PropertyRepository(session)
             return await repo.search(
                 region=region,
                 section=section,
                 keyword=keyword,
-                min_price=min_price,
-                max_price=max_price,
+                min_price_wan=min_price,
+                max_price_wan=max_price,
+                min_age_years=min_age_years,
+                max_age_years=max_age_years,
+                rooms=rooms,
                 limit=limit,
                 offset=offset,
             )
@@ -208,3 +218,4 @@ class HouseAggregatorService:
                 limit=limit,
                 offset=offset,
             )
+

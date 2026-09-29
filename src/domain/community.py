@@ -1,6 +1,7 @@
-"""HouseLensAPI - 社區領域模型 (Community Domain Models)
+"""HouseLensAPI - 社區核心統一數據規範 (Canonical Community Specifications)
 
-定義社區清單摘要 (CommunitySummary)、社區極致詳情 (CommunityDetail) 與檢索條件 (CommunitySearchQuery)。
+核心層僅定義純淨強型別規格。所有數值皆為純 int / float / bool。
+Provider 模組必須自行將外部各平台之字串與特化格式清洗正規化為此規格。
 """
 
 from typing import List, Optional
@@ -9,65 +10,85 @@ from pydantic import BaseModel, Field
 from src.domain.common import GeoPoint
 
 
-class CommunitySummary(BaseModel):
-    """社區清單摘要物件 (由多元搜尋與瀏覽端點產出)"""
-    community_id: str = Field(..., description="社區唯一識別碼 (字串)")
-    hid: Optional[int] = Field(None, description="社區/建案關聯 HID")
+class NormalizedCommunitySummary(BaseModel):
+    """跨平台統一社區清單摘要規格"""
+
+    community_id: str = Field(..., description="社區唯一代碼")
     community_name: str = Field(..., description="社區名稱")
-    build_purpose_simple: Optional[str] = Field(None, description="建物用途分類 (例如: 住宅)")
-    building_type_str: Optional[str] = Field(None, description="建物型態 (例如: 新成屋、預售屋、電梯大樓)")
-    region_name: str = Field(..., description="縣市名稱 (例如: 台北市)")
-    section_name: str = Field(..., description="行政區名稱 (例如: 松山區)")
-    simple_address: Optional[str] = Field(None, description="簡短街道地址")
-    full_address: str = Field(..., description="完整地理地址")
-    coordinates: Optional[GeoPoint] = Field(None, description="社區經緯度座標")
-    avg_unit_price: Optional[float] = Field(None, description="社區均價 (萬元/坪)")
-    unit_price_unit: Optional[str] = Field(None, description="均價單位 (例如: 萬/坪)")
-    living_circle_name: Optional[str] = Field(None, description="所屬生活圈/商圈名稱")
-    nearest_station: Optional[str] = Field(None, description="鄰近捷運/鐵路站點名稱")
-    cover_image_url: Optional[str] = Field(None, description="社區封面圖片網址")
+    region_name: str = Field(..., description="縣市名稱")
+    section_name: str = Field(..., description="行政區名稱")
+    full_address: str = Field(..., description="完整地址")
+    coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
+    avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="平均單價 (萬元/坪)")
+    building_age_years: Optional[float] = Field(None, ge=0.0, description="屋齡 (年)")
+    building_type: Optional[str] = Field(None, description="建物型態")
+    build_purpose: Optional[str] = Field(None, description="主要用途")
+    living_circle_name: Optional[str] = Field(None, description="生活圈商圈名稱")
+    nearest_station: Optional[str] = Field(None, description="鄰近捷運站點")
+    cover_image_url: Optional[str] = Field(None, description="封面圖片網址")
+
+    @property
+    def address(self) -> str:
+        return self.full_address
+
+    @property
+    def shopping_district(self) -> Optional[str]:
+        return self.living_circle_name
+
+    @property
+    def transport(self) -> Optional[str]:
+        return self.nearest_station
 
 
-class CommunityDetail(BaseModel):
-    """社區完整詳情物件 (涵蓋規格、建商營造團隊、公設與特色)"""
+class NormalizedCommunityDetail(BaseModel):
+    """跨平台統一社區完整規格 (純數值化)"""
+
     community_id: str = Field(..., description="社區唯一代號")
     community_name: str = Field(..., description="社區名稱")
-    build_type_str: Optional[str] = Field(None, description="建物型態")
-    purpose_str: Optional[str] = Field(None, description="法定主要用途")
-    transport: Optional[str] = Field(None, description="大眾運輸交通說明")
     address: str = Field(..., description="社區完整地址")
     region_name: str = Field(..., description="縣市名稱")
     section_name: str = Field(..., description="行政區名稱")
-    shopping_district: Optional[str] = Field(None, description="生活圈商圈名稱")
+    coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
 
-    # 建築硬體與規劃規格 (build_info)
-    park_rate: Optional[str] = Field(None, description="車位配比 (例如: 1:1.07)")
-    direction_rule: Optional[str] = Field(None, description="基地座向規則 (例如: 朝北、朝南)")
-    build_intro: Optional[str] = Field(None, description="建案特色、設備與工法說明")
-    landscape_name: Optional[str] = Field(None, description="景觀設計公司")
-    postulate_name: Optional[str] = Field(None, description="公設設計公司")
-    park_type_str: Optional[str] = Field(None, description="車位型態 (例如: 平面式)")
-    age: Optional[str] = Field(None, description="完工屋齡")
-    total_households: Optional[str] = Field(None, description="總戶數規劃")
-    floor_plan: Optional[str] = Field(None, description="地上與地下樓層規劃 (例如: 地上24層,地下4層)")
-    structure: Optional[str] = Field(None, description="建築結構工法 (例如: SRC造)")
-    base_area_ping: Optional[str] = Field(None, description="基地面積 (坪)")
-    public_ratio: Optional[str] = Field(None, description="公設比率")
-    parking_count: Optional[str] = Field(None, description="規劃車位總數")
-    facilities: List[str] = Field(default_factory=list, description="公共設施項目清單")
+    # 建築規劃規格 (純數值化)
+    avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="平均單價 (萬元/坪)")
+    total_households: Optional[int] = Field(None, ge=0, description="總戶數純整數 (例如: 290)")
+    parking_count: Optional[int] = Field(None, ge=0, description="規劃車位總數純整數 (例如: 152)")
+    parking_ratio_pct: Optional[float] = Field(None, ge=0.0, description="車位配比率 (例如: 1.07)")
+    public_ratio_pct: Optional[float] = Field(None, ge=0.0, le=100.0, description="公設比百分比 (例如: 30.0 代表 30%)")
+    manage_fee_per_pin: Optional[int] = Field(None, ge=0, description="管理費單價純整數 (單位: 元/坪/月, 例如: 100)")
+    base_area_pin: Optional[float] = Field(None, ge=0.0, description="基地總面積純浮點數 (單位: 坪)")
+    building_age_years: Optional[float] = Field(None, ge=0.0, description="完工屋齡純浮點數 (單位: 年)")
+
+    # 團隊與工法描述
+    building_type: Optional[str] = Field(None, description="建物型態")
+    build_purpose: Optional[str] = Field(None, description="主要用途")
+    structure: Optional[str] = Field(None, description="建築結構工法 (如: SRC造)")
+    direction_rule: Optional[str] = Field(None, description="座向規劃")
+    floor_plan_desc: Optional[str] = Field(None, description="樓層規劃描述 (如: 地上24層,地下4層)")
+    park_type_str: Optional[str] = Field(None, description="車位型態描述")
+    shopping_district: Optional[str] = Field(None, description="生活圈商圈")
+    transport: Optional[str] = Field(None, description="鄰近交通站點")
+    landscape_name: Optional[str] = Field(None, description="景觀設計")
+    postulate_name: Optional[str] = Field(None, description="公設設計")
+    facilities: List[str] = Field(default_factory=list, description="公共設施清單")
     developer_company: Optional[str] = Field(None, description="投資興建公司")
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")
-    management_fee: Optional[str] = Field(None, description="管理費單價 (例如: 100元/坪/月)")
+    build_intro: Optional[str] = Field(None, description="特色與工法詳細說明")
+
+    @property
+    def floor_plan(self) -> Optional[str]:
+        return self.floor_plan_desc
 
 
 class CommunitySearchQuery(BaseModel):
-    """社區檢索條件參數"""
-    region_id: Optional[int] = Field(None, description="縣市代碼 (1: 台北市...)")
-    section_id: Optional[int] = Field(None, description="行政區代碼")
-    keyword: Optional[str] = Field(None, description="搜尋關鍵字 (社區名稱/地址/生活圈)")
-    age_ranges: List[str] = Field(default_factory=list, description="屋齡區間代碼清單 (如: ['0_5', '5_10'])")
+    """跨平台統一社區檢索條件規範"""
+
+    region_id: Optional[int] = Field(None, description="標準縣市代碼")
+    section_id: Optional[int] = Field(None, description="標準行政區代碼")
+    keyword: Optional[str] = Field(None, description="社區名稱或路名關鍵字")
+    min_age_years: Optional[float] = Field(None, ge=0.0, description="最小屋齡 (年)")
+    max_age_years: Optional[float] = Field(None, ge=0.0, description="最大屋齡 (年)")
     page: int = Field(default=1, ge=1, description="頁碼")
     page_size: int = Field(default=20, ge=1, le=100, description="每頁筆數")
-    is_sale: Optional[int] = Field(default=0, description="是否僅篩選在售物件")
-    post_type: str = Field(default="8,2", description="刊登型態標籤")

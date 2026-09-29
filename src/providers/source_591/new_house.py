@@ -4,7 +4,11 @@ from typing import Any, Dict
 
 from src.core.interfaces.new_house import INewHouseProvider
 from src.domain.common import PageResult
-from src.domain.new_house import NewHouseDetail, NewHouseSearchQuery, NewHouseSummary
+from src.domain.new_house import (
+    NewHouseSearchQuery,
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
 from src.providers.source_591.client import Source591Client
 from src.providers.source_591.mappers.new_house_mapper import (
     map_new_house_detail,
@@ -13,12 +17,12 @@ from src.providers.source_591.mappers.new_house_mapper import (
 
 
 class Source591NewHouseProvider(INewHouseProvider):
-    """591 新建案領域提供者實作"""
+    """591 新建案領域提供者實作 (Anti-Corruption Layer)"""
 
     def __init__(self, client: Source591Client):
         self._client = client
 
-    async def search_new_houses(self, query: NewHouseSearchQuery) -> PageResult[NewHouseSummary]:
+    async def search_new_houses(self, query: NewHouseSearchQuery) -> PageResult[NormalizedNewHouseSummary]:
         """多元條件新建案搜尋"""
         params: Dict[str, Any] = {
             "searchtype": 1,
@@ -30,8 +34,15 @@ class Source591NewHouseProvider(INewHouseProvider):
             params["regionid"] = query.region_id
         if query.keywords:
             params["keywords"] = query.keywords
-        if query.build_status:
-            params["buildstatus"] = query.build_status
+
+        # 591 狀態對照 (1: 預售屋, 2: 新成屋)
+        statuses = []
+        if query.is_presale:
+            statuses.append("1")
+        if query.is_new_construction:
+            statuses.append("2")
+        if statuses:
+            params["buildstatus"] = ",".join(statuses)
 
         res = await self._client.get("newhouse", "/v1/list-search", params=params)
         data_block = res.get("data") or {}
@@ -50,7 +61,7 @@ class Source591NewHouseProvider(INewHouseProvider):
             page_size=query.page_size,
         )
 
-    async def get_new_house_detail(self, new_house_id: str) -> NewHouseDetail:
+    async def get_new_house_detail(self, new_house_id: str) -> NormalizedNewHouseDetail:
         """根據建案 HID 取得完整新建案詳情"""
         params = {
             "id": new_house_id,

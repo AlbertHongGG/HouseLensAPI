@@ -107,5 +107,6 @@ def test_cli_sale_house_age_filtering():
     data = json.loads(res.output)
     assert isinstance(data, list)
     for item in data:
-        if item.get("building_age") is not None:
-            assert 0.0 <= item["building_age"] <= 10.0
+        if item.get("building_age_years") is not None:
+            assert 0.0 <= item["building_age_years"] <= 10.0
+

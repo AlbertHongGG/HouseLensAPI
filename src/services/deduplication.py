@@ -1,11 +1,18 @@
-"""HouseLensAPI - 房產物件去重與實體消歧服務 (Property Deduplication Service)"""
+"""HouseLensAPI - 房產物件去重與實體消歧服務 (Property Deduplication Service)
 
-from typing import List, Optional, Tuple, Union
+純數學與精確整數比對引擎：
+- 樓層：純整數相等性比對 O(1)
+- 房數：純整數相等性比對 O(1)
+- 坪數：浮點數誤差容許度百分比計算 (|area1 - area2| <= max(area1, area2) * tolerance)
+- 社區：字串完全相符
+零字串正則、零未清洗雜質！
+"""
+
+from typing import List, Optional, Union
 from pydantic import BaseModel, Field
 
-from src.domain.sale_house import SaleHouseDetail, SaleHouseSummary
+from src.domain.sale_house import NormalizedSaleListing, NormalizedSalePropertyDetail
 from src.storage.interfaces import IPropertyRepository
-from src.storage.models.property import PropertyTable
 
 
 class DeduplicationResult(BaseModel):
@@ -15,30 +22,6 @@ class DeduplicationResult(BaseModel):
     matched_property_id: Optional[str] = None
     confidence_score: float = 0.0
     match_reasons: List[str] = Field(default_factory=list)
-
-
-def normalize_floor(floor_str: Optional[str]) -> Optional[str]:
-    """正規化樓層，例如 '2F/24F'、'2樓'、'2' 轉為 '2'"""
-    if not floor_str:
-        return None
-    first = floor_str.split("/")[0].strip()
-    clean = first.upper().replace("F", "").replace("樓", "").strip()
-    return clean if clean else floor_str
-
-
-def is_layout_compatible(l1: Optional[str], l2: Optional[str]) -> bool:
-    """判斷兩種格局描述是否相容 (例如 '3房2廳2衛' 與 '3房2廳')"""
-    if not l1 or not l2:
-        return True
-    if l1 == l2:
-        return True
-    if l1.startswith(l2) or l2.startswith(l1):
-        return True
-    if "房" in l1 and "房" in l2:
-        r1 = l1.split("房")[0].strip()
-        r2 = l2.split("房")[0].strip()
-        return r1 == r2
-    return False
 
 
 def is_area_compatible(
@@ -53,36 +36,27 @@ def is_area_compatible(
 
 
 class PropertyDeduplicationService:
-    """跨平台房產物件實體去重服務"""
+    """跨平台房產物件實體去重服務 (純數值比對)"""
 
     def __init__(self, area_tolerance_pct: float = 0.02):
         self.area_tolerance_pct = area_tolerance_pct
 
     async def evaluate_candidate(
         self,
-        candidate: Union[SaleHouseSummary, SaleHouseDetail],
+        candidate: Union[NormalizedSaleListing, NormalizedSalePropertyDetail],
         repository: IPropertyRepository,
     ) -> DeduplicationResult:
         """評估傳入之中古屋清單或詳情是否在庫內已存在相同之物理實體"""
-        # 擷取特徵欄位
-        if isinstance(candidate, SaleHouseSummary):
-            community_name = candidate.community_name
-            floor = candidate.floor
-            total_area = candidate.total_area
-            layout = candidate.layout
-            address = candidate.address
-        else:
-            community_name = None  # Detail 通常從關聯或地址取得
-            floor = candidate.floor
-            total_area = candidate.total_area
-            layout = candidate.layout
-            address = candidate.address
+        community_name = candidate.community_name
+        floor_current = candidate.floor_current
+        rooms = candidate.rooms
+        total_area_pin = candidate.total_area_pin
 
         matched = await repository.find_duplicate_candidate(
             community_name=community_name,
-            floor=floor,
-            total_area=total_area,
-            layout=layout,
+            floor_current=floor_current,
+            rooms=rooms,
+            total_area_pin=total_area_pin,
             area_tolerance_pct=self.area_tolerance_pct,
         )
 
@@ -94,7 +68,7 @@ class PropertyDeduplicationService:
                 match_reasons=[],
             )
 
-        # 計算信心分數
+        # 純數值計算信心分數
         reasons = []
         score = 0.0
 
@@ -102,21 +76,23 @@ class PropertyDeduplicationService:
             score += 0.4
             reasons.append(f"社區名稱完全相符: {community_name}")
 
-        if floor and normalize_floor(floor) == normalize_floor(matched.floor):
+        if floor_current is not None and matched.floor_current is not None and floor_current == matched.floor_current:
             score += 0.3
-            reasons.append(f"所在樓層相符: {floor} ~ {matched.floor}")
+            reasons.append(f"所在樓層完全相符: {floor_current}F")
 
         if (
-            total_area is not None
-            and matched.total_area is not None
-            and is_area_compatible(total_area, matched.total_area, self.area_tolerance_pct)
+            total_area_pin is not None
+            and matched.total_area_pin is not None
+            and is_area_compatible(total_area_pin, matched.total_area_pin, self.area_tolerance_pct)
         ):
             score += 0.2
-            reasons.append(f"權狀坪數相符 (容差 {self.area_tolerance_pct*100}%): {total_area} vs {matched.total_area}")
+            reasons.append(
+                f"權狀坪數相符 (容差 {self.area_tolerance_pct * 100}%): {total_area_pin}坪 vs {matched.total_area_pin}坪"
+            )
 
-        if layout and is_layout_compatible(layout, matched.layout):
+        if rooms is not None and matched.rooms is not None and rooms == matched.rooms:
             score += 0.1
-            reasons.append(f"格局規劃相容: {layout} ~ {matched.layout}")
+            reasons.append(f"格局房數完全相符: {rooms}房")
 
         return DeduplicationResult(
             is_duplicate=score >= 0.7,

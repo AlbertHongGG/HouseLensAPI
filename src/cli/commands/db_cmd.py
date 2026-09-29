@@ -8,7 +8,7 @@ from src.cli.views.console import console, print_error, print_json_data, print_s
 from src.cli.views.db_views import render_db_stats_dashboard
 from src.storage.database import db_manager
 
-db_app = typer.Typer(help="💾 本地資料庫維護、統計儀表板與重整")
+db_app = typer.Typer(help="本地資料庫維護、統計儀表板與重整")
 
 
 @db_app.command("init")

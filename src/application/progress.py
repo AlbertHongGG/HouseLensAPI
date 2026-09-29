@@ -91,7 +91,7 @@ class RichProgressReporter:
 
     def on_start(self, domain: str, total: Optional[int] = None) -> None:
         self.task_id = self.progress.add_task(
-            f"🔄 正在同步 {domain} 資料...",
+            f"正在同步 {domain} 資料...",
             total=total or 100,
         )
 
@@ -101,14 +101,14 @@ class RichProgressReporter:
             self.progress.update(
                 self.task_id,
                 advance=1,
-                description=f"📥 擷取: {short_title}",
+                description=f"擷取: {short_title}",
             )
 
     def on_item_duplicate(self, title: str, matched_id: str) -> None:
         self.duplicates_count += 1
         short_title = title[:15] + "..." if len(title) > 15 else title
         self.progress.console.print(
-            f"  [bold magenta]⚡ 消歧去重合併[/bold magenta] ➜ [white]{short_title}[/white] "
+            f"  [bold magenta][去重合併][/bold magenta] -> [white]{short_title}[/white] "
             f"歸戶至實體 [dim]{matched_id[:8]}...[/dim]"
         )
 
@@ -116,14 +116,15 @@ class RichProgressReporter:
         self.details_count += 1
 
     def on_error(self, message: str) -> None:
-        self.progress.console.print(f"  [bold red]✘ 警告:[/bold red] {message}")
+        self.progress.console.print(f"  [bold red][警告]:[/bold red] {message}")
 
     def on_complete(self, summary_stats: Dict[str, Any]) -> None:
         total = summary_stats.get("total", 0)
         dups = summary_stats.get("duplicates", self.duplicates_count)
         details = summary_stats.get("details", self.details_count)
         self.progress.console.print(
-            f"[bold green]✔ 同步完成！[/bold green] 共入庫 [bold cyan]{total}[/bold cyan] 筆實體 "
+            f"[bold green][OK] 同步完成！[/bold green] 共入庫 [bold cyan]{total}[/bold cyan] 筆實體 "
             f"(其中 [bold magenta]{dups}[/bold magenta] 處刊登去重合併，"
             f"[bold yellow]{details}[/bold yellow] 筆豐富規格)"
         )
+

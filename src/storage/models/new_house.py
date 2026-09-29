@@ -1,4 +1,7 @@
-"""HouseLensAPI - 新建案持久化資料表模型 (New House Table Model)"""
+"""HouseLensAPI - 新建案持久化資料表模型 (New House Table Model)
+
+純淨強型別規格：所有數值皆以 int / float 存儲，禁止未解析字串與雜質入庫。
+"""
 
 import uuid
 from typing import Any, Dict, List, Optional
@@ -27,30 +30,32 @@ class NewHouseTable(Base, TimestampMixin):
     section: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     address: Mapped[str] = mapped_column(String(256), nullable=False)
 
-    price: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    area: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    # 開價與坪數純數值區間
+    min_unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 開價單價下限 (萬元/坪)
+    max_unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 開價單價上限 (萬元/坪)
+    min_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 坪數下限 (坪)
+    max_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 坪數上限 (坪)
+    room_summary: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 房型規劃概述
 
-    manage_cost: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    # 建築純數值規格
+    base_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積 (坪)
+    public_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 公設比 (%)
+    total_households: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 總戶數
+    manage_fee_per_pin: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 管理費 (元/坪/月)
+
+    # 結構化房型坪數矩陣
+    layouts: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True)
+
+    # 建築描述與工法
     structural_engine: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
-    park_planning: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     build_intro: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    park_ratio: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
 
-    # 結構化 layout_v2 房型坪數陣列
-    layout_v2: Mapped[Optional[List[Dict[str, str]]]] = mapped_column(JSON, nullable=True)
-
-    unit_price_str: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    parking_price_str: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    base_area_ping: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    public_ratio: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-    total_households: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
-
+    # 建商營造團隊
     developer_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     builder_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     architect_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     reception_address: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
-    community_id_ref: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     __table_args__ = (

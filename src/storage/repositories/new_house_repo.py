@@ -1,11 +1,17 @@
-"""HouseLensAPI - 新建案資料庫倉儲實作 (New House Repository Implementation)"""
+"""HouseLensAPI - 新建案資料庫倉儲實作 (New House Repository Implementation)
+
+純數值與純強型別入庫：零字串正則解析、零未清洗雜質！
+"""
 
 import uuid
 from typing import List, Optional
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.new_house import NewHouseDetail, NewHouseSummary
+from src.domain.new_house import (
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
 from src.storage.interfaces import INewHouseRepository
 from src.storage.models.new_house import NewHouseTable
 
@@ -17,9 +23,9 @@ class NewHouseRepository(INewHouseRepository):
         self.session = session
 
     async def upsert_from_summary(
-        self, summary: NewHouseSummary, provider_id: str
+        self, summary: NormalizedNewHouseSummary, provider_id: str
     ) -> NewHouseTable:
-        """從 NewHouseSummary 新增或更新新建案基本資料"""
+        """從 NormalizedNewHouseSummary 新增或更新新建案基本資料"""
         stmt = select(NewHouseTable).where(
             NewHouseTable.provider_id == provider_id,
             NewHouseTable.source_hid == summary.source_hid,
@@ -37,12 +43,13 @@ class NewHouseRepository(INewHouseRepository):
                 region=summary.region_name,
                 section=summary.section_name,
                 address=summary.address,
-                price=summary.price,
-                area=summary.area,
+                min_unit_price_wan=summary.min_unit_price_wan,
+                max_unit_price_wan=summary.max_unit_price_wan,
+                min_area_pin=summary.min_area_pin,
+                max_area_pin=summary.max_area_pin,
+                room_summary=summary.room_summary,
                 developer_company=summary.developer,
                 cover_image_url=summary.cover_image_url,
-                unit_price_str=None,
-                parking_price_str=None,
             )
             self.session.add(record)
         else:
@@ -51,10 +58,16 @@ class NewHouseRepository(INewHouseRepository):
             record.region = summary.region_name
             record.section = summary.section_name
             record.address = summary.address
-            if summary.price:
-                record.price = summary.price
-            if summary.area:
-                record.area = summary.area
+            if summary.min_unit_price_wan is not None:
+                record.min_unit_price_wan = summary.min_unit_price_wan
+            if summary.max_unit_price_wan is not None:
+                record.max_unit_price_wan = summary.max_unit_price_wan
+            if summary.min_area_pin is not None:
+                record.min_area_pin = summary.min_area_pin
+            if summary.max_area_pin is not None:
+                record.max_area_pin = summary.max_area_pin
+            if summary.room_summary:
+                record.room_summary = summary.room_summary
             if summary.developer:
                 record.developer_company = summary.developer
             if summary.cover_image_url:
@@ -64,9 +77,9 @@ class NewHouseRepository(INewHouseRepository):
         return record
 
     async def upsert_from_detail(
-        self, detail: NewHouseDetail, provider_id: str
+        self, detail: NormalizedNewHouseDetail, provider_id: str
     ) -> NewHouseTable:
-        """從 NewHouseDetail 新增或更新新建案完整規劃規格"""
+        """從 NormalizedNewHouseDetail 新增或更新新建案完整規劃規格"""
         stmt = select(NewHouseTable).where(
             NewHouseTable.provider_id == provider_id,
             NewHouseTable.source_hid == detail.hid,
@@ -74,7 +87,7 @@ class NewHouseRepository(INewHouseRepository):
         res = await self.session.execute(stmt)
         record = res.scalar_one_or_none()
 
-        layout_dump = [item.model_dump() for item in detail.layout_v2] if detail.layout_v2 else None
+        layouts_dump = [item.model_dump() for item in detail.layouts] if detail.layouts else None
 
         if record is None:
             record = NewHouseTable(
@@ -86,23 +99,20 @@ class NewHouseRepository(INewHouseRepository):
                 region=detail.region,
                 section=detail.section,
                 address=detail.address,
-                manage_cost=detail.manage_cost,
+                base_area_pin=detail.base_area_pin,
+                public_ratio_pct=detail.public_ratio_pct,
+                total_households=detail.total_households,
+                manage_fee_per_pin=detail.manage_fee_per_pin,
+                min_unit_price_wan=detail.min_unit_price_wan,
+                max_unit_price_wan=detail.max_unit_price_wan,
+                layouts=layouts_dump,
                 structural_engine=detail.structural_engine,
-                park_planning=detail.park_planning,
                 direction_rule=detail.direction_rule,
                 build_intro=detail.build_intro,
-                park_ratio=detail.park_ratio,
-                layout_v2=layout_dump,
-                unit_price_str=detail.unit_price_str,
-                parking_price_str=detail.parking_price_str,
-                base_area_ping=detail.base_area_ping,
-                public_ratio=detail.public_ratio,
-                total_households=detail.total_households,
                 developer_company=detail.developer_company,
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
                 reception_address=detail.reception_address,
-                community_id_ref=detail.community_id_ref,
             )
             self.session.add(record)
         else:
@@ -115,25 +125,39 @@ class NewHouseRepository(INewHouseRepository):
             if detail.address:
                 record.address = detail.address
 
-            record.manage_cost = detail.manage_cost or record.manage_cost
-            record.structural_engine = detail.structural_engine or record.structural_engine
-            record.park_planning = detail.park_planning or record.park_planning
-            record.direction_rule = detail.direction_rule or record.direction_rule
-            record.build_intro = detail.build_intro or record.build_intro
-            record.park_ratio = detail.park_ratio or record.park_ratio
-            if layout_dump:
-                record.layout_v2 = layout_dump
-            record.unit_price_str = detail.unit_price_str or record.unit_price_str
-            record.parking_price_str = detail.parking_price_str or record.parking_price_str
-            if detail.base_area_ping is not None:
-                record.base_area_ping = detail.base_area_ping
-            record.public_ratio = detail.public_ratio or record.public_ratio
-            record.total_households = detail.total_households or record.total_households
-            record.developer_company = detail.developer_company or record.developer_company
-            record.builder_company = detail.builder_company or record.builder_company
-            record.architect_company = detail.architect_company or record.architect_company
-            record.reception_address = detail.reception_address or record.reception_address
-            record.community_id_ref = detail.community_id_ref or record.community_id_ref
+            # 數值更新
+            if detail.base_area_pin is not None:
+                record.base_area_pin = detail.base_area_pin
+            if detail.public_ratio_pct is not None:
+                record.public_ratio_pct = detail.public_ratio_pct
+            if detail.total_households is not None:
+                record.total_households = detail.total_households
+            if detail.manage_fee_per_pin is not None:
+                record.manage_fee_per_pin = detail.manage_fee_per_pin
+            if detail.min_unit_price_wan is not None:
+                record.min_unit_price_wan = detail.min_unit_price_wan
+            if detail.max_unit_price_wan is not None:
+                record.max_unit_price_wan = detail.max_unit_price_wan
+
+            # 結構化房型
+            if layouts_dump is not None:
+                record.layouts = layouts_dump
+
+            # 描述更新
+            if detail.structural_engine:
+                record.structural_engine = detail.structural_engine
+            if detail.direction_rule:
+                record.direction_rule = detail.direction_rule
+            if detail.build_intro:
+                record.build_intro = detail.build_intro
+            if detail.developer_company:
+                record.developer_company = detail.developer_company
+            if detail.builder_company:
+                record.builder_company = detail.builder_company
+            if detail.architect_company:
+                record.architect_company = detail.architect_company
+            if detail.reception_address:
+                record.reception_address = detail.reception_address
 
         await self.session.flush()
         return record

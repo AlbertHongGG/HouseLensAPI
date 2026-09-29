@@ -33,8 +33,9 @@ def render_db_stats_dashboard(stats: Dict[str, Any]) -> Panel:
 
     panel = Panel(
         grid,
-        title="📊 HouseLens 資料庫健康度與統計儀表板",
+        title="HouseLens 資料庫健康度與統計儀表板",
         border_style="green",
         box=box.ROUNDED,
     )
     return panel
+

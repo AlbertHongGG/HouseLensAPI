@@ -1,64 +1,77 @@
-"""HouseLensAPI - 新建案領域模型 (New House Domain Models)
+"""HouseLensAPI - 新建案核心統一數據規範 (Canonical New House Specifications)
 
-定義新建案清單摘要 (NewHouseSummary)、規劃房型項目 (NewHouseLayoutItem)、建案完整詳情 (NewHouseDetail) 與檢索條件 (NewHouseSearchQuery)。
+核心層僅定義純淨強型別規格。所有數值皆為純 int / float / bool。
+Provider 模組必須自行將外部各平台之字串與特化格式清洗正規化為此規格。
 """
 
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
-class NewHouseLayoutItem(BaseModel):
-    """建案標準規劃房型與坪數項目 (對應 layout_v2)"""
-    room: str = Field(..., description="房型規格描述 (例如: 一房、二房、三房)")
-    area: str = Field(..., description="對應坪數區間 (例如: 14~17、18~26、30~41)")
+class NewHouseLayoutSpec(BaseModel):
+    """標準規劃房型與坪數區間項目"""
+
+    room_name: str = Field(..., description="房型名稱 (例如: 一房、二房、三房)")
+    rooms_count: Optional[int] = Field(None, ge=1, description="對應房數純整數 (例如: 1, 2, 3)")
+    min_area_pin: Optional[float] = Field(None, ge=0.0, description="最低坪數 (例如: 14.0)")
+    max_area_pin: Optional[float] = Field(None, ge=0.0, description="最高坪數 (例如: 17.0)")
 
 
-class NewHouseSummary(BaseModel):
-    """新建案清單摘要物件 (由新建案檢索列表產出)"""
-    source_hid: int = Field(..., description="建案唯一識別碼 (HID)")
+class NormalizedNewHouseSummary(BaseModel):
+    """跨平台統一新建案清單摘要規格"""
+
+    source_hid: int = Field(..., description="建案識別代碼")
     project_name: str = Field(..., description="建案名稱")
     project_status: str = Field(..., description="建案期程狀態 (預售屋/新成屋)")
-    region_name: str = Field(..., description="縣市名稱 (例如: 台北市)")
-    section_name: str = Field(..., description="行政區名稱 (例如: 萬華區)")
-    address: str = Field(..., description="基地或接待地址")
-    price: str = Field(..., description="單價區間字串 (例如: 79~90)")
-    area: str = Field(..., description="坪數區間字串 (例如: 28~41坪)")
-    room_layout_summary: Optional[str] = Field(None, description="房型概況 (例如: 2~4房)")
+    region_name: str = Field(..., description="縣市名稱")
+    section_name: str = Field(..., description="行政區名稱")
+    address: str = Field(..., description="接待會館或基地地址")
+    min_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價下限 (萬元/坪)")
+    max_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價上限 (萬元/坪)")
+    min_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數下限 (坪)")
+    max_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數上限 (坪)")
+    room_summary: Optional[str] = Field(None, description="房型規劃概述 (例如: 2~4房)")
     developer: Optional[str] = Field(None, description="投資興建公司")
-    cover_image_url: Optional[str] = Field(None, description="建案封面照片網址")
+    cover_image_url: Optional[str] = Field(None, description="封面照片網址")
 
 
-class NewHouseDetail(BaseModel):
-    """新建案完整詳情物件 (全量落實結構化 layout_v2 與完整建築規劃)"""
+class NormalizedNewHouseDetail(BaseModel):
+    """跨平台統一新建案完整規格 (純數值化)"""
+
     hid: int = Field(..., description="建案 HID")
     project_name: str = Field(..., description="建案名稱")
-    build_type: str = Field(..., description="建案狀態型態 (預售屋/新成屋)")
-    region: str = Field(..., description="縣市名稱 (例如: 台北市)")
-    section: str = Field(..., description="行政區名稱 (例如: 萬華區)")
+    build_type: str = Field(..., description="建案狀態 (預售屋/新成屋)")
+    region: str = Field(..., description="縣市名稱")
+    section: str = Field(..., description="行政區名稱")
     address: str = Field(..., description="基地位置地址")
-    manage_cost: Optional[str] = Field(None, description="管理費標準 (例如: 150 元/坪/月)")
-    structural_engine: Optional[str] = Field(None, description="建築結構工法 (例如: SRC鋼骨鋼筋混凝土結構)")
-    park_planning: Optional[str] = Field(None, description="車位規劃描述 (例如: 平面式111個、機械式41個)")
-    direction_rule: Optional[str] = Field(None, description="座向規劃 (例如: 朝西北)")
-    build_intro: Optional[str] = None
-    park_ratio: Optional[str] = Field(None, description="車位配比 (例如: 1:0.46)")
-    layout_v2: List[NewHouseLayoutItem] = Field(default_factory=list, description="結構化房型坪數規劃列表")
-    unit_price_str: Optional[str] = Field(None, description="開價單價區間 (例如: 100~110 萬/坪)")
-    parking_price_str: Optional[str] = Field(None, description="車位價格區間 (例如: 360~420萬)")
-    base_area_ping: Optional[float] = Field(None, description="基地總面積 (坪)")
-    public_ratio: Optional[str] = Field(None, description="公設比率 (例如: 34%)")
-    total_households: Optional[str] = Field(None, description="規劃總戶數 (例如: 290戶)")
-    developer_company: Optional[str] = Field(None, description="投資建設公司")
+
+    # 建築數值化規格
+    base_area_pin: Optional[float] = Field(None, ge=0.0, description="基地總面積 (坪)")
+    public_ratio_pct: Optional[float] = Field(None, ge=0.0, le=100.0, description="公設比百分比 (例如: 34.0)")
+    total_households: Optional[int] = Field(None, ge=0, description="規劃總戶數純整數 (例如: 290)")
+    manage_fee_per_pin: Optional[int] = Field(None, ge=0, description="管理費單價純整數 (元/坪/月, 例如: 150)")
+    min_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價下限 (萬元/坪)")
+    max_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價上限 (萬元/坪)")
+
+    # 房型坪數規劃矩陣 (純數值結構)
+    layouts: List[NewHouseLayoutSpec] = Field(default_factory=list, description="結構化房型坪數清單")
+
+    # 團隊與工法描述
+    structural_engine: Optional[str] = Field(None, description="建築結構工法")
+    direction_rule: Optional[str] = Field(None, description="座向規劃")
+    build_intro: Optional[str] = Field(None, description="特色介紹說明")
+    developer_company: Optional[str] = Field(None, description="投資興建公司")
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")
     reception_address: Optional[str] = Field(None, description="接待會館地址")
-    community_id_ref: Optional[int] = Field(None, description="關聯之社區 ID")
 
 
 class NewHouseSearchQuery(BaseModel):
-    """新建案檢索條件參數"""
-    region_id: Optional[int] = Field(None, description="縣市代碼")
+    """跨平台統一新建案檢索條件規範"""
+
+    region_id: Optional[int] = Field(None, description="標準縣市代碼")
     keywords: Optional[str] = Field(None, description="建案關鍵字")
-    build_status: Optional[str] = Field(default="1,2", description="建案狀態 (1: 預售屋, 2: 新成屋)")
+    is_presale: bool = Field(default=True, description="是否包含預售屋")
+    is_new_construction: bool = Field(default=True, description="是否包含新成屋")
     page: int = Field(default=1, ge=1, description="頁碼")
     page_size: int = Field(default=20, ge=1, le=100, description="每頁筆數")

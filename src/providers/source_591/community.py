@@ -4,8 +4,13 @@ from typing import Any, Dict
 
 from src.core.interfaces.community import ICommunityProvider
 from src.domain.common import PageResult
-from src.domain.community import CommunityDetail, CommunitySearchQuery, CommunitySummary
+from src.domain.community import (
+    CommunitySearchQuery,
+    NormalizedCommunityDetail,
+    NormalizedCommunitySummary,
+)
 from src.providers.source_591.client import Source591Client
+from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 from src.providers.source_591.mappers.community_mapper import (
     map_community_detail,
     map_community_summary,
@@ -13,18 +18,18 @@ from src.providers.source_591.mappers.community_mapper import (
 
 
 class Source591CommunityProvider(ICommunityProvider):
-    """591 社區領域提供者實作"""
+    """591 社區領域提供者實作 (內部全自理參數映射與資料正規化)"""
 
     def __init__(self, client: Source591Client):
         self._client = client
 
-    async def search_communities(self, query: CommunitySearchQuery) -> PageResult[CommunitySummary]:
+    async def search_communities(self, query: CommunitySearchQuery) -> PageResult[NormalizedCommunitySummary]:
         """多元條件社區檢索 (共用 /v1/search/list 端點)"""
         params: Dict[str, Any] = {
             "page": query.page,
             "page_size": query.page_size,
-            "is_sale": query.is_sale,
-            "post_type": query.post_type,
+            "is_sale": 0,
+            "post_type": "8,2",
             "cm91dGU": "L2NvbW11bml0eS9ob21l",
         }
         if query.region_id is not None:
@@ -33,8 +38,14 @@ class Source591CommunityProvider(ICommunityProvider):
             params["sectionid"] = query.section_id
         if query.keyword:
             params["keyword"] = query.keyword
-        if query.age_ranges:
-            params["age"] = ",".join(query.age_ranges)
+
+        # 591 專屬屋齡查詢代碼轉換由模組自理
+        if query.min_age_years is not None or query.max_age_years is not None:
+            min_a = int(query.min_age_years) if query.min_age_years is not None else None
+            max_a = int(query.max_age_years) if query.max_age_years is not None else None
+            age_str = Source591AgeMapper.to_age_str(min_age=min_a, max_age=max_a)
+            if age_str:
+                params["age"] = age_str
 
         res = await self._client.get("market", "/v1/search/list", params=params)
         data_block = res.get("data") or {}
@@ -49,8 +60,8 @@ class Source591CommunityProvider(ICommunityProvider):
             page_size=query.page_size,
         )
 
-    async def get_community_detail(self, community_id: str) -> CommunityDetail:
-        """根據社區 ID 取得完整詳情"""
+    async def get_community_detail(self, community_id: str) -> NormalizedCommunityDetail:
+        """根據社區 ID 取得完整正規化詳情"""
         params = {
             "id": community_id,
             "cm91dGU": "L2NvbW11bml0eS9kZXRhaWw=",

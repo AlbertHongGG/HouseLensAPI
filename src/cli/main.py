@@ -28,10 +28,11 @@ APP_VERSION = "0.1.0"
 
 app = typer.Typer(
     name="houselens",
-    help="🏠 HouseLens - 台灣全網房產數據終端管理系統 (Real Estate Terminal & CLI Engine)",
+    help="HouseLens - 台灣全網房產數據終端管理系統 (Real Estate Terminal & CLI Engine)",
     no_args_is_help=True,
     add_completion=False,
 )
+
 
 # 掛載五大子命令群組
 app.add_typer(provider_app, name="provider")

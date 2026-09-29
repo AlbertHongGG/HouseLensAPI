@@ -1,13 +1,21 @@
 """Unit Tests for 591 Mappers against Real Captured Data"""
 
 import json
-import os
 from pathlib import Path
 import pytest
 
-from src.domain.community import CommunityDetail, CommunitySummary
-from src.domain.new_house import NewHouseDetail, NewHouseSummary
-from src.domain.sale_house import SaleHouseDetail, SaleHouseSummary
+from src.domain.community import (
+    NormalizedCommunityDetail,
+    NormalizedCommunitySummary,
+)
+from src.domain.new_house import (
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
+from src.domain.sale_house import (
+    NormalizedSaleListing,
+    NormalizedSalePropertyDetail,
+)
 from src.providers.source_591.mappers.community_mapper import (
     map_community_detail,
     map_community_summary,
@@ -41,12 +49,11 @@ class Test591CommunityMappers:
         assert len(items) > 0
 
         summary = map_community_summary(items[0])
-        assert isinstance(summary, CommunitySummary)
+        assert isinstance(summary, NormalizedCommunitySummary)
         assert summary.community_id == str(items[0]["id"])
         assert summary.community_name == items[0]["name"]
-        assert summary.build_purpose_simple == items[0]["build_purpose_simple"]
         assert summary.region_name == "台北市"
-        assert summary.avg_unit_price is not None
+        assert summary.avg_unit_price_wan is not None
         assert summary.coordinates is not None
 
     def test_map_community_detail_from_capture(self):
@@ -54,11 +61,11 @@ class Test591CommunityMappers:
         data_block = data.get("data", {})
         detail = map_community_detail(data_block)
 
-        assert isinstance(detail, CommunityDetail)
+        assert isinstance(detail, NormalizedCommunityDetail)
         assert detail.community_id == "5855864"
         assert detail.community_name == "鳴森大苑-碧硯閣"
         assert detail.direction_rule == "朝北、朝南"
-        assert detail.park_rate == "1:1.07"
+        assert detail.parking_ratio_pct == 1.07
         assert detail.structure == "SRC造"
         assert len(detail.facilities) > 0
 
@@ -76,14 +83,14 @@ class Test591SaleHouseMappers:
 
         # Item 1 is a real property
         real_mapped = map_sale_house_summary(items[1])
-        assert isinstance(real_mapped, SaleHouseSummary)
+        assert isinstance(real_mapped, NormalizedSaleListing)
         assert real_mapped.house_id == "S20604856"
-        assert real_mapped.price == "5,258萬元"
-        assert real_mapped.total_area == 46.3
-        assert real_mapped.layout == "3房2廳"
+        assert real_mapped.price_wan == 5258
+        assert abs(real_mapped.total_area_pin - 46.29) < 0.1
+        assert real_mapped.rooms == 3
+        assert real_mapped.living_rooms == 2
         assert real_mapped.building_type == "住宅"
         assert real_mapped.has_parking is True
-        # Verify no linkman or browse_count
         assert not hasattr(real_mapped, "linkman")
         assert not hasattr(real_mapped, "browse_count")
 
@@ -92,30 +99,32 @@ class Test591SaleHouseMappers:
         data_block = data.get("data", {})
         detail = map_sale_house_detail(data_block)
 
-        assert isinstance(detail, SaleHouseDetail)
+        assert isinstance(detail, NormalizedSalePropertyDetail)
         assert detail.house_id == "20604856"
-        assert detail.price == 5258
-        assert isinstance(detail.price, int)
-        assert detail.layout == "3房2廳2衛"
-        assert detail.total_area == 46.29
+        assert detail.price_wan == 5258
+        assert isinstance(detail.price_wan, int)
+        assert detail.rooms == 3
+        assert detail.living_rooms == 2
+        assert detail.bathrooms == 2
+        assert detail.total_area_pin == 46.29
         assert detail.building_type == "住宅"
         assert detail.building_structure == "電梯大樓"
 
-        # 10 specs
-        assert detail.floor == "2F/24F"
-        assert detail.age == "1年"
-        assert detail.building_age == 1.0
+        # Pure numeric specs
+        assert detail.floor_current == 2
+        assert detail.floor_total == 24
+        assert detail.building_age_years == 1.0
         assert detail.orientation == "坐南朝北"
-        assert detail.management_fee == "4200元/月"
-        assert detail.public_ratio == "30%"
-        assert detail.has_lease == "否"
+        assert detail.management_fee_monthly == 4200
+        assert detail.public_ratio_pct == 30.0
+        assert detail.has_lease is False
 
         # Area breakdown
-        assert detail.main_building_area == "23.10坪"
-        assert detail.auxiliary_area == "2.78坪"
-        assert detail.common_area == "11.17坪"
-        assert detail.land_area == "5.06坪"
-        assert detail.parking_area == "9.24坪"
+        assert detail.main_area_pin == 23.10
+        assert detail.auxiliary_area_pin == 2.78
+        assert detail.common_area_pin == 11.17
+        assert detail.land_area_pin == 5.06
+        assert detail.parking_area_pin == 9.24
 
         # Coordinates
         assert detail.lat == 25.056119
@@ -126,21 +135,13 @@ class Test591AgeMapper:
     def test_age_str_mapping_single_and_combinations(self):
         from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 
-        # (None, 5) -> 5年以下
         assert Source591AgeMapper.to_age_str(None, 5) == "_5"
-        # (None, 10) -> 10年以下
         assert Source591AgeMapper.to_age_str(None, 10) == "_5,5_10"
-        # (5, 10) -> 5-10年
         assert Source591AgeMapper.to_age_str(5, 10) == "5_10"
-        # (10, 30) -> 10-20年, 20-30年
         assert Source591AgeMapper.to_age_str(10, 30) == "10_20,20_30"
-        # (30, None) -> 30-40年, 40年以上
         assert Source591AgeMapper.to_age_str(30, None) == "30_40,40_"
-        # (40, None) -> 40年以上
         assert Source591AgeMapper.to_age_str(40, None) == "40_"
-        # None, None -> None (無篩選)
         assert Source591AgeMapper.to_age_str(None, None) is None
-        # 全選涵蓋全區間 -> None (無過濾)
         assert Source591AgeMapper.to_age_str(0, 100) is None
 
     def test_age_str_mapping_validation_error(self):
@@ -168,24 +169,27 @@ class Test591NewHouseMappers:
         assert len(items) > 0
 
         summary = map_new_house_summary(items[0])
-        assert isinstance(summary, NewHouseSummary)
+        assert isinstance(summary, NormalizedNewHouseSummary)
         assert summary.source_hid == items[0]["hid"]
         assert summary.project_name == items[0]["build_name"]
-        assert summary.price == "79~90"
-        assert summary.area == "28~41坪"
-        assert not hasattr(summary, "price_unit")
+        assert summary.min_unit_price_wan == 79.0
+        assert summary.max_unit_price_wan == 90.0
+        assert summary.min_area_pin == 28.0
+        assert summary.max_area_pin == 41.0
 
     def test_map_new_house_detail_from_capture(self):
         data = load_captured_json("新建案物件詳情資訊 Respond.json")
         data_block = data.get("data", {})
         detail = map_new_house_detail(data_block)
 
-        assert isinstance(detail, NewHouseDetail)
+        assert isinstance(detail, NormalizedNewHouseDetail)
         assert detail.hid == 138045
         assert detail.project_name == "長虹MVP"
         assert detail.region == "台北市"
         assert detail.section == "萬華區"
         assert detail.structural_engine == "SRC鋼骨鋼筋混凝土結構"
-        assert len(detail.layout_v2) > 0
-        assert detail.layout_v2[0].room == "一房"
-        assert detail.layout_v2[0].area == "14~17"
+        assert len(detail.layouts) > 0
+        assert detail.layouts[0].room_name == "一房"
+        assert detail.layouts[0].rooms_count == 1
+        assert detail.layouts[0].min_area_pin == 14.0
+        assert detail.layouts[0].max_area_pin == 17.0
