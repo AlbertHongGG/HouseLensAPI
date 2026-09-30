@@ -7,6 +7,7 @@
 from abc import ABC, abstractmethod
 
 from src.core.interfaces.community import ICommunityProvider
+from src.core.interfaces.diagnostics import IProviderDiagnostics
 from src.core.interfaces.new_house import INewHouseProvider
 from src.core.interfaces.sale_house import ISaleHouseProvider
 
@@ -42,6 +43,12 @@ class IHouseSourceProvider(ABC):
     @abstractmethod
     def new_house(self) -> INewHouseProvider:
         """新建案領域服務接口"""
+        pass
+
+    @property
+    @abstractmethod
+    def diagnostics(self) -> IProviderDiagnostics:
+        """API 診斷與探針服務接口"""
         pass
 
     @abstractmethod

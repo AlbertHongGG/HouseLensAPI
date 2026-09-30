@@ -7,6 +7,7 @@ from src.core.interfaces import (
     ICommunityProvider,
     IHouseSourceProvider,
     INewHouseProvider,
+    IProviderDiagnostics,
     ISaleHouseProvider,
 )
 from src.core.registry import ProviderRegistry
@@ -70,6 +71,19 @@ class MockNewHouseProvider(INewHouseProvider):
         )
 
 
+class MockDiagnostics(IProviderDiagnostics):
+    @property
+    def provider_id(self) -> str:
+        return "mock_src"
+
+    @property
+    def provider_name(self) -> str:
+        return "Mock Source Provider"
+
+    def get_probes(self, domain=None):
+        return []
+
+
 class MockSourceProvider(IHouseSourceProvider):
     @property
     def provider_id(self) -> str:
@@ -90,6 +104,10 @@ class MockSourceProvider(IHouseSourceProvider):
     @property
     def new_house(self) -> INewHouseProvider:
         return MockNewHouseProvider()
+
+    @property
+    def diagnostics(self) -> IProviderDiagnostics:
+        return MockDiagnostics()
 
     async def health_check(self) -> bool:
         return True

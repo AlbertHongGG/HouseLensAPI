@@ -5,6 +5,7 @@ from src.cli.commands.get_cmd import get_app
 from src.cli.commands.list_cmd import list_app
 from src.cli.commands.provider_cmd import provider_app
 from src.cli.commands.sync_cmd import sync_app
+from src.cli.commands.test_cmd import run_api_diagnostics_cmd
 
 __all__ = [
     "provider_app",
@@ -12,4 +13,5 @@ __all__ = [
     "sync_app",
     "list_app",
     "get_app",
+    "run_api_diagnostics_cmd",
 ]

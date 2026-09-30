@@ -20,6 +20,7 @@ from src.cli.commands.get_cmd import get_app
 from src.cli.commands.list_cmd import list_app
 from src.cli.commands.provider_cmd import provider_app
 from src.cli.commands.sync_cmd import sync_app
+from src.cli.commands.test_cmd import run_api_diagnostics_cmd
 from src.cli.views.console import print_error
 from src.config import settings
 from src.storage.database import db_manager
@@ -34,12 +35,18 @@ app = typer.Typer(
 )
 
 
-# 掛載五大子命令群組
+# 掛載子命令群組
 app.add_typer(provider_app, name="provider")
 app.add_typer(db_app, name="db")
 app.add_typer(sync_app, name="sync")
 app.add_typer(list_app, name="list")
 app.add_typer(get_app, name="get")
+
+# 掛載單一指令: test
+app.command(
+    "test",
+    help="測試各來源 Provider 之 API 端點健康度並錄製完整網路流量至 .tmp",
+)(run_api_diagnostics_cmd)
 
 
 def version_callback(value: bool):

@@ -10,8 +10,9 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
 )
+from rich.console import Console
 
-from src.cli.views.console import console
+_default_console = Console()
 
 
 class IProgressReporter(Protocol):
@@ -67,7 +68,8 @@ class SilentProgressReporter:
 class RichProgressReporter:
     """Rich 互動式彩色進度條實作"""
 
-    def __init__(self):
+    def __init__(self, console: Optional[Console] = None):
+        target_console = console or _default_console
         self.progress = Progress(
             SpinnerColumn(),
             TextColumn("[bold cyan]{task.description}[/bold cyan]"),
@@ -75,7 +77,7 @@ class RichProgressReporter:
             MofNCompleteColumn(),
             TextColumn("[yellow]•[/yellow]"),
             TimeElapsedColumn(),
-            console=console,
+            console=target_console,
             transient=False,
         )
         self.task_id: Optional[TaskID] = None

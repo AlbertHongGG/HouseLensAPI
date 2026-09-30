@@ -74,9 +74,24 @@ class ProviderRegistry:
             self._instances[primary_id] = cls()
         return self._instances[primary_id]
 
+    def get(self, provider_id: str) -> Optional[IHouseSourceProvider]:
+        """安全取得指定 Provider 實例，若不存在傳回 None"""
+        try:
+            return self.get_provider(provider_id)
+        except ProviderNotFoundError:
+            return None
+
+    def get_all(self) -> List[IHouseSourceProvider]:
+        """取得所有已註冊 Provider 實例"""
+        return [self.get_provider(pid) for pid in self.list_providers()]
+
     def list_providers(self) -> List[str]:
         """列出所有已註冊的來源代碼"""
         return list(self._provider_classes.keys())
+
+    def list_available(self) -> List[str]:
+        """列出所有已註冊的來源代碼 (別名)"""
+        return self.list_providers()
 
     def unregister(self, provider_id: str):
         """註銷指定的來源提供者"""

@@ -7,12 +7,14 @@ import logging
 from typing import Optional
 
 from src.core.interfaces.community import ICommunityProvider
+from src.core.interfaces.diagnostics import IProviderDiagnostics
 from src.core.interfaces.new_house import INewHouseProvider
 from src.core.interfaces.provider import IHouseSourceProvider
 from src.core.interfaces.sale_house import ISaleHouseProvider
 from src.core.registry import registry
 from src.providers.source_591.client import Source591Client
 from src.providers.source_591.community import Source591CommunityProvider
+from src.providers.source_591.diagnostics import Source591Diagnostics
 from src.providers.source_591.new_house import Source591NewHouseProvider
 from src.providers.source_591.sale_house import Source591SaleHouseProvider
 
@@ -27,6 +29,7 @@ class Source591Provider(IHouseSourceProvider):
         self._community = Source591CommunityProvider(self._client)
         self._sale_house = Source591SaleHouseProvider(self._client)
         self._new_house = Source591NewHouseProvider(self._client)
+        self._diagnostics = Source591Diagnostics()
 
     @property
     def provider_id(self) -> str:
@@ -47,6 +50,10 @@ class Source591Provider(IHouseSourceProvider):
     @property
     def new_house(self) -> INewHouseProvider:
         return self._new_house
+
+    @property
+    def diagnostics(self) -> IProviderDiagnostics:
+        return self._diagnostics
 
     async def health_check(self) -> bool:
         """發送極輕量請求檢查 591 API 通道健康度"""

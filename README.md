@@ -13,7 +13,7 @@ uv sync
 ```
 
 ### 2. 執行自動化測試
-全套 44 項單元與整合測試（含 591 即時 API 整合測試）：
+全套 51 項單元與整合測試（含 591 即時 API 整合測試與診斷套件）：
 ```bash
 uv run pytest tests/ -v
 ```
@@ -181,6 +181,55 @@ uv run houselens get sale S20604856
 
 # 依 HID 以 JSON 格式輸出新建案詳情
 uv run houselens get newhouse 138045 --format json
+```
+
+---
+
+### 6. 來源 API 診斷與全流量錄製 (test)
+
+依序測試目標房產來源之全部 API 探針，非侵入式雙向攔截 HTTP 請求與回應封包，並將完整快照（包含 Request、Response 與 Metadata）結構化持久化至專案根目錄 `.tmp/` 資料夾中。
+
+#### 參數選項
+
+| 參數 / 選項 | 簡寫 | 類型 | 預設值 | 說明 |
+| :--- | :--- | :--- | :--- | :--- |
+| `provider_id` | - | Argument | None | 目標來源外掛代碼（例如 `591`），留空則依序測試所有已註冊來源 |
+| `--domain` | `-d` | Option | None | 業務領域過濾：`community`, `sale`, `newhouse`, `system` |
+| `--delay` | - | Option | `1.0` | 各端點調用間冷卻秒數（0.0 至 30.0，防止觸發平台風控） |
+| `--format` | `-f` | Option | `text` | 輸出格式：彩色終端表格 (`text`) 或 JSON 總結 (`json`) |
+
+#### 落盤目錄架構
+
+測試執行時會自動於專案根目錄建立如下結構之 JSON 檔案（已納入 `.gitignore`）：
+```
+.tmp/
+└── api_diagnostics/
+    └── 591/
+        └── 2026-09-29T18-50-53_683777_08-00/
+            ├── summary.json          # 批次執行總結報告
+            ├── health_ping.json       # 平台連線檢測端點全流量快照
+            ├── community_list.json    # 社區清單 API 快照
+            ├── community_detail.json  # 社區詳細資訊 API 快照
+            ├── sale_list.json         # 中古屋清單 API 快照
+            ├── sale_detail.json       # 中古屋詳細資訊 API 快照
+            ├── new_house_list.json    # 新建案清單 API 快照
+            └── new_house_detail.json  # 新建案詳細資訊 API 快照
+```
+
+#### 常用範例
+
+```bash
+# 測試 591 全端點並錄製封包（預設間隔 1.0 秒）
+uv run houselens test 591
+
+# 加快步調測試 591 全端點（間隔 0.5 秒）
+uv run houselens test 591 --delay 0.5
+
+# 僅針對 591 中古屋相關 API 進行健康檢測
+uv run houselens test 591 --domain sale
+
+# 輸出純 JSON 總結資料（供 CI/CD 流程自動化判定）
+uv run houselens test 591 --format json
 ```
 
 ---

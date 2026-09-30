@@ -28,6 +28,16 @@ from src.domain.new_house import (
     NewHouseSearchQuery,
 )
 
+from src.domain.diagnostics import (
+    DiagnosticStatus,
+    DiagnosticDomain,
+    DiagnosticMetadata,
+    DiagnosticRequestSnapshot,
+    DiagnosticResponseSnapshot,
+    DiagnosticArtifact,
+    DiagnosticRunSummary,
+)
+
 __all__ = [
     "Region",
     "BuildingType",
@@ -46,5 +56,12 @@ __all__ = [
     "NormalizedNewHouseSummary",
     "NormalizedNewHouseDetail",
     "NewHouseSearchQuery",
+    "DiagnosticStatus",
+    "DiagnosticDomain",
+    "DiagnosticMetadata",
+    "DiagnosticRequestSnapshot",
+    "DiagnosticResponseSnapshot",
+    "DiagnosticArtifact",
+    "DiagnosticRunSummary",
 ]
 

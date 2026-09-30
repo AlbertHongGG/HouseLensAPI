@@ -85,4 +85,5 @@ $RECYCLE.BIN/
 *.log
 logs/
 *.tmp
+.tmp/
 scratch/

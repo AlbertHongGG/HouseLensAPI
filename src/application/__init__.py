@@ -1,6 +1,10 @@
 """HouseLensAPI - 應用協調層套件 (Application Layer Package)"""
 
 from src.application.db_usecase import DbMaintenanceUseCase
+from src.application.diagnostics_usecase import (
+    DiagnosticsUseCase,
+    JsonArtifactWriter,
+)
 from src.application.inspect_usecase import InspectUseCase
 from src.application.progress import (
     IProgressReporter,
@@ -18,4 +22,6 @@ __all__ = [
     "QueryUseCase",
     "InspectUseCase",
     "DbMaintenanceUseCase",
+    "DiagnosticsUseCase",
+    "JsonArtifactWriter",
 ]
