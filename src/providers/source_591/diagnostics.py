@@ -31,6 +31,15 @@ DEFAULT_591_HEADERS: Dict[str, str] = {
     "deviceid": DEFAULT_DEVICE_ID,
     "mobile_id": DEFAULT_DEVICE_ID,
     "version": "8.13.0.975",
+    "loginvalid": "0",
+}
+
+DEFAULT_591_QUERY_PARAMS: Dict[str, Any] = {
+    "mobile_id": DEFAULT_DEVICE_ID,
+    "deviceid": DEFAULT_DEVICE_ID,
+    "device_id": DEFAULT_DEVICE_ID,
+    "version": "8.13.0.975",
+    "device": "android",
 }
 
 # 預設種子 ID (回退用)
@@ -90,6 +99,7 @@ class CommunityListProbe(Base591Probe):
             "is_sale": 0,
             "post_type": "8,2",
             "cm91dGU": "L2NvbW11bml0eS9ob21l",
+            **DEFAULT_591_QUERY_PARAMS,
         }
         metadata = self._create_metadata_template()
         artifact = await DiagnosticTransportRecorder.capture(
@@ -143,7 +153,10 @@ class CommunityDetailProbe(Base591Probe):
         params = {
             "id": target_id,
             "cm91dGU": "L2NvbW11bml0eS9kZXRhaWw=",
+            **DEFAULT_591_QUERY_PARAMS,
         }
+        headers = dict(DEFAULT_591_HEADERS)
+        headers["cm91dgu"] = "L2NvbW11bml0eS9kZXRhaWw="
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -151,7 +164,7 @@ class CommunityDetailProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
 
@@ -177,13 +190,23 @@ class SaleHouseListProbe(Base591Probe):
     async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
         url = f"{CANONICAL_DOMAINS['house']}/v1/app/gateway/sale/list"
         params = {
+            "searchtype": "1",
+            "type": "sale",
+            "news": "3",
+            "newlist": "1",
+            "flutter_page": "1",
+            "category": "1",
+            "module": "iphone",
+            "action": "houseRsList",
             "regionid": 1,
             "p": 1,
-            "newlist": 1,
             "kind": 0,
             "o": "90",
             "cm91dGU": "L3NhbGVob3VzZS9saXN0",
+            **DEFAULT_591_QUERY_PARAMS,
         }
+        headers = dict(DEFAULT_591_HEADERS)
+        headers["cm91dgu"] = "L3NhbGVob3VzZS9saXN0"
         metadata = self._create_metadata_template()
         artifact = await DiagnosticTransportRecorder.capture(
             client=client,
@@ -191,7 +214,7 @@ class SaleHouseListProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
         # 動態提取中古屋 ID 供詳情探針使用
@@ -203,9 +226,9 @@ class SaleHouseListProbe(Base591Probe):
             )
             for item in items:
                 if isinstance(item, dict):
-                    raw_id = item.get("id") or item.get("house_id")
+                    raw_id = item.get("houseid") or item.get("id") or item.get("house_id")
                     if raw_id:
-                        clean_id = str(raw_id).lstrip("S")
+                        clean_id = str(raw_id).lstrip("S").lstrip("H")
                         self._context["sale_id"] = clean_id
                         break
 
@@ -237,7 +260,10 @@ class SaleHouseDetailProbe(Base591Probe):
         params = {
             "id": target_id,
             "cm91dGU": "L3NhbGVob3VzZS9kZXRhaWw=",
+            **DEFAULT_591_QUERY_PARAMS,
         }
+        headers = dict(DEFAULT_591_HEADERS)
+        headers["cm91dgu"] = "L3NhbGVob3VzZS9kZXRhaWw="
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -245,7 +271,7 @@ class SaleHouseDetailProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
 
@@ -276,7 +302,10 @@ class NewHouseListProbe(Base591Probe):
             "p": 1,
             "limit": 5,
             "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdsaXN0",
+            **DEFAULT_591_QUERY_PARAMS,
         }
+        headers = dict(DEFAULT_591_HEADERS)
+        headers["cm91dgu"] = "L25ld2hvdXNlL2hvdXNpbmdsaXN0"
         metadata = self._create_metadata_template()
         artifact = await DiagnosticTransportRecorder.capture(
             client=client,
@@ -284,7 +313,7 @@ class NewHouseListProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
         # 動態提取新建案 HID 供詳情探針使用
@@ -330,7 +359,10 @@ class NewHouseDetailProbe(Base591Probe):
             "id": target_id,
             "short_video": 1,
             "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw=",
+            **DEFAULT_591_QUERY_PARAMS,
         }
+        headers = dict(DEFAULT_591_HEADERS)
+        headers["cm91dgu"] = "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw="
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -338,7 +370,7 @@ class NewHouseDetailProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
 

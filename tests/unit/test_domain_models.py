@@ -99,7 +99,6 @@ class TestCommunityModels:
             section_name="松山區",
             parking_ratio_pct=1.07,
             direction_rule="朝北、朝南",
-            build_intro="SRC雙制震，戶戶三面採光",
             facilities=["接待大廳", "空中花園"],
             manage_fee_per_pin=150,
             total_households=290,
@@ -198,7 +197,6 @@ class TestNewHouseModels:
             max_unit_price_wan=90.0,
             min_area_pin=28.0,
             max_area_pin=41.0,
-            room_summary="2~4房",
             developer="長虹建設",
             cover_image_url="https://example.com/project.jpg",
         )
@@ -218,7 +216,6 @@ class TestNewHouseModels:
             manage_fee_per_pin=150,
             structural_engine="SRC鋼骨鋼筋混凝土結構",
             direction_rule="朝西北",
-            build_intro="廚具:林內，衛浴:INAX",
             layouts=[
                 NewHouseLayoutSpec(room_name="二房", rooms_count=2, min_area_pin=28.0, max_area_pin=31.0),
                 NewHouseLayoutSpec(room_name="三房", rooms_count=3, min_area_pin=35.0, max_area_pin=41.0),

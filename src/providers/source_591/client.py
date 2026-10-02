@@ -21,6 +21,14 @@ DEFAULT_APP_UA = (
 )
 DEFAULT_DEVICE_ID = "675ad1fc-ebc4-4310-8df7-7e8dd5b0c051"
 
+DEFAULT_591_QUERY_PARAMS: Dict[str, Any] = {
+    "mobile_id": DEFAULT_DEVICE_ID,
+    "deviceid": DEFAULT_DEVICE_ID,
+    "device_id": DEFAULT_DEVICE_ID,
+    "version": "8.13.0.975",
+    "device": "android",
+}
+
 # 依實測驗證之官方 Canonical Domains
 CANONICAL_DOMAINS = {
     "house": "https://bff-house.591.com.tw",
@@ -53,6 +61,7 @@ class Source591Client:
                 "deviceid": DEFAULT_DEVICE_ID,
                 "mobile_id": DEFAULT_DEVICE_ID,
                 "version": "8.13.0.975",
+                "loginvalid": "0",
             }
             self._loop = current_loop
             self._client = httpx.AsyncClient(
@@ -77,8 +86,12 @@ class Source591Client:
         url = f"{base_url}{path}"
         client = await self.get_client()
 
+        merged_params = dict(DEFAULT_591_QUERY_PARAMS)
+        if params:
+            merged_params.update(params)
+
         try:
-            response = await client.get(url, params=params, headers=headers)
+            response = await client.get(url, params=merged_params, headers=headers)
         except httpx.ConnectTimeout as e:
             raise ProviderConnectionError("591", f"連線至 591 逾時: {url}") from e
         except httpx.NetworkError as e:

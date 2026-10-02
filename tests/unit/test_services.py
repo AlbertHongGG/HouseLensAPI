@@ -117,12 +117,11 @@ async def test_aggregator_service_sync_and_search_flow(service_test_db: Database
         database=service_test_db,
     )
 
-    # 1. 同步社區 (限定 2 筆，含詳情)
+    # 1. 同步社區 (限定 2 筆，標準兩階段)
     comm_query = CommunitySearchQuery(region_id=1, page=1, page_size=2)
     synced_comms = await service.sync_communities(
         provider_id="591",
         query=comm_query,
-        sync_details=True,
         max_items=2,
     )
     assert len(synced_comms) == 2
@@ -134,12 +133,11 @@ async def test_aggregator_service_sync_and_search_flow(service_test_db: Database
     found_comms = await service.search_communities(region="台北市")
     assert len(found_comms) >= 2
 
-    # 2. 同步中古屋 (限定 2 筆，含詳情與去重)
+    # 2. 同步中古屋 (限定 2 筆，標準兩階段與去重)
     sh_query = SaleHouseSearchQuery(region_id=1, page=1)
     synced_props = await service.sync_sale_houses(
         provider_id="591",
         query=sh_query,
-        sync_details=True,
         max_items=2,
     )
     assert len(synced_props) == 2
@@ -151,12 +149,11 @@ async def test_aggregator_service_sync_and_search_flow(service_test_db: Database
     found_props = await service.search_properties(region="台北市")
     assert len(found_props) >= 2
 
-    # 3. 同步新建案 (限定 2 筆，含詳情)
+    # 3. 同步新建案 (限定 2 筆，標準兩階段)
     nh_query = NewHouseSearchQuery(region_id=1, page=1, page_size=2)
     synced_nhs = await service.sync_new_houses(
         provider_id="591",
         query=nh_query,
-        sync_details=True,
         max_items=2,
     )
     assert len(synced_nhs) == 2

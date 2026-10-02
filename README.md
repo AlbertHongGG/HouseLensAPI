@@ -90,7 +90,7 @@ uv run houselens db vacuum
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 全部 | `--provider` | `-p` | string | `591` | 來源外掛代碼 |
 | 全部 | `--region-id` | `-r` | int | `1` | 縣市代碼（1: 台北市, 3: 新北市...） |
-| 全部 | `--details` | `-d` | flag | `False` | 深入爬取規格詳情（公設、主建坪拆解、建商團隊） |
+| 全部 | `--concurrency` | `-c` | int | `3` | 併發詳情補齊請求數 (Semaphore 控制) |
 | 全部 | `--limit` | `-l` | int | None | 同步筆數上限 |
 | 全部 | `--format` | `-f` | string | `text` | 輸出格式：`text` 或 `json` |
 | `community`, `sale`, `newhouse` | `--keyword` | `-k` | string | None | 名稱、社區或路名關鍵字 |
@@ -101,22 +101,22 @@ uv run houselens db vacuum
 | `sale` | `--rooms` | - | int | None | 格局房數篩選（純整數） |
 | `newhouse` | `--status` | `-s` | string | `1,2` | 銷售狀態（1: 預售屋, 2: 新成屋） |
 
-子指令涵蓋：`community`（社區）、`sale`（中古屋）、`newhouse`（新建案）、`all`（一鍵同步全領域）。
+子指令涵蓋：`community`（社區）、`sale`（中古屋）、`newhouse`（新建案）、`all`（一鍵同步全領域）。本專案預設採用兩階段完整同步（清單探索 + 併發詳情補齊 + 消歧入庫）。
 
 #### 常用範例
 
 ```bash
-# 依總價、屋齡（10年以下）與房數（3房）同步台北市中古屋（自動去重合併，並深入拆解產權坪數）
-uv run houselens sync sale -r 1 --max-age 10 --rooms 3 --min-price 2000 --max-price 5000 --details -l 20
+# 依總價、屋齡（10年以下）與房數（3房）同步台北市中古屋（自動去重合併，並自動拆解產權五大面積）
+uv run houselens sync sale -r 1 --max-age 10 --rooms 3 --min-price 2000 --max-price 5000 -l 20
 
-# 依屋齡區間與關鍵字搜尋社區並同步完整公設清單與建商詳情
-uv run houselens sync community -r 1 -k "鳴森大苑" --max-age 5 --details
+# 依屋齡區間與關鍵字搜尋社區並同步完整公設清單與建商團隊
+uv run houselens sync community -r 1 -k "鳴森大苑" --max-age 5
 
 # 同步預售屋建案及其 layout_v2 結構化房型坪數規劃
-uv run houselens sync newhouse -r 1 -s 1 --details -l 10
+uv run houselens sync newhouse -r 1 -s 1 -l 10
 
-# 一鍵同步指定縣市三大領域資料
-uv run houselens sync all -r 1 -l 10 --details
+# 一鍵兩階段同步指定縣市三大領域資料 (併發數 5)
+uv run houselens sync all -r 1 -l 10 -c 5
 ```
 
 ---
@@ -292,7 +292,6 @@ uv run houselens test 591 --format json
 | `structure` | String(64) | 結構工法 | 詳情 `build_info.structural_engine` | 如「SRC造」 |
 | `park_type_str` | String(64) | 車位型態 | 詳情 `build_info.park_type_str` | 如「坡道平面」 |
 | `direction_rule` | String(64) | 座向規劃 | 詳情 `build_info.direction_rule` | 如「朝北、朝南」 |
-| `build_intro` | Text | 特色說明 | 詳情 `build_info.build_intro` | 介紹長文字 |
 | `landscape_name` | String(128) | 景觀設計 | 詳情 `build_info.landscape_name` | - |
 | `postulate_name` | String(128) | 公設設計 | 詳情 `build_info.postulate_name` | - |
 | `facilities` | JSON | 公設清單 | 詳情 `build_info.facility` | 字串陣列 `["健身房", ...]` |
@@ -385,7 +384,6 @@ uv run houselens test 591 --format json
 | `max_unit_price_wan` | Float | 開價上限 (萬/坪) | 清單 `items[].price`<br>詳情 `housing.price` | 區間拆解 (如 `90.0`) |
 | `min_area_pin` | Float | 規劃坪數下限 (坪) | 清單 `items[].area` | 區間拆解 (如 `28.0`) |
 | `max_area_pin` | Float | 規劃坪數上限 (坪) | 清單 `items[].area` | 區間拆解 (如 `41.0`) |
-| `room_summary` | String(64) | 房型簡述 | 清單 `items[].room` | 如「2房、3房」 |
 | `base_area_pin` | Float | 基地面積 (坪) | 詳情 `housing.base_area.area` | 轉 float |
 | `public_ratio_pct` | Float | 公設比 (%) | 詳情 `housing.ratio` | 如 `34.5%` $\to$ `34.5` |
 | `total_households` | Int | 規劃戶數 | 詳情 `housing.households` | 轉 int (如 `120`) |
@@ -393,7 +391,6 @@ uv run houselens test 591 --format json
 | `layouts` | JSON | 房型坪數矩陣 | 詳情 `housing.layout_v2[]` | `[{"room_name":"一房","rooms_count":1,"min_area_pin":14.0,"max_area_pin":17.0}]` |
 | `structural_engine` | String(128) | 結構工法 | 詳情 `housing.structural_engine` | 如「SRC鋼骨鋼筋混凝土」 |
 | `direction_rule` | String(64) | 座向規劃 | 詳情 `housing.direction_rule` | 如「朝南、朝東」 |
-| `build_intro` | Text | 特色說明 | 詳情 `housing.build_intro` | - |
 | `developer_company` | String(128) | 建商 | 清單 `items[].company`<br>詳情 `housing.company` | - |
 | `builder_company` | String(128) | 營造廠 | 詳情 `housing.build_company` | - |
 | `architect_company` | String(128) | 建築師 | 詳情 `housing.construction_company` | - |

@@ -100,15 +100,12 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     specs_table.add_row("建案 HID:", str(nh.source_hid), "來源平台:", f"[{nh.provider_id.upper()}]")
     specs_table.add_row("建案名稱:", f"[bold yellow]{nh.project_name}[/bold yellow]", "建案狀態:", nh.build_type)
     specs_table.add_row("基地地址:", nh.address, "接待會館:", nh.reception_address or "-")
-    specs_table.add_row("開價區間:", f"[bold green]{price_str}[/bold green]", "房型概述:", nh.room_summary or "-")
+    specs_table.add_row("開價區間:", f"[bold green]{price_str}[/bold green]", "行政區域:", f"{nh.region}{nh.section}")
     specs_table.add_row("坪數範圍:", area_str, "基地總坪:", base_str)
     specs_table.add_row("公設比率:", pub_str, "規劃總戶數:", hh_str)
     specs_table.add_row("管理費單價:", mgmt_fee_str, "座向規則:", nh.direction_rule or "-")
     specs_table.add_row("結構工法:", nh.structural_engine or "-", "投資建設:", nh.developer_company or "-")
     specs_table.add_row("營造公司:", nh.builder_company or "-", "建築設計:", nh.architect_company or "-")
-
-    intro_text = nh.build_intro or "暫無建案特色說明"
-    specs_table.add_row("建材與特色:", f"[dim]{intro_text[:120]}...[/dim]" if len(intro_text) > 120 else intro_text, "", "")
 
     base_panel = Panel(
         specs_table,
@@ -162,7 +159,6 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
         "max_unit_price_wan": nh.max_unit_price_wan,
         "min_area_pin": nh.min_area_pin,
         "max_area_pin": nh.max_area_pin,
-        "room_summary": nh.room_summary,
         "base_area_pin": nh.base_area_pin,
         "public_ratio_pct": nh.public_ratio_pct,
         "total_households": nh.total_households,
@@ -170,7 +166,6 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
         "layouts": nh.layouts,
         "structural_engine": nh.structural_engine,
         "direction_rule": nh.direction_rule,
-        "build_intro": nh.build_intro,
         "developer_company": nh.developer_company,
         "builder_company": nh.builder_company,
         "architect_company": nh.architect_company,

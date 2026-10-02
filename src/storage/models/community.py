@@ -52,7 +52,6 @@ class CommunityTable(Base, TimestampMixin):
     structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     park_type_str: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    build_intro: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     landscape_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     postulate_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     facilities: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)

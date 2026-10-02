@@ -1,5 +1,4 @@
-"""HouseLensAPI - 房產多源聚合與同步管理服務 (House Aggregator Service)"""
-
+import asyncio
 import logging
 from typing import List, Optional
 
@@ -37,10 +36,10 @@ class HouseAggregatorService:
         self,
         provider_id: str,
         query: CommunitySearchQuery,
-        sync_details: bool = False,
         max_items: Optional[int] = None,
+        concurrency: int = 3,
     ) -> List[CommunityTable]:
-        """從指定 Provider 同步社區資料並持久化至資料庫"""
+        """兩階段社區資料同步管線 (清單探索 + 併發詳情補齊 + 入庫)"""
         provider = self.registry.get_provider(provider_id)
         search_res = await provider.community.search_communities(query)
 
@@ -48,21 +47,31 @@ class HouseAggregatorService:
         if max_items is not None:
             items_to_sync = items_to_sync[:max_items]
 
+        # Stage 2: 併發爬取詳情補齊規格
+        sem = asyncio.Semaphore(concurrency)
+
+        async def fetch_community_detail(summary):
+            async with sem:
+                try:
+                    detail = await provider.community.get_community_detail(summary.community_id)
+                    return (summary, detail)
+                except Exception as e:
+                    logger.warning(f"獲取社區 {summary.community_id} 詳情失敗: {e}")
+                    return (summary, None)
+
+        enriched_pairs = await asyncio.gather(
+            *(fetch_community_detail(item) for item in items_to_sync)
+        )
+
+        # Stage 3: 持久化入庫
         synced_records: List[CommunityTable] = []
         async with self.db.session() as session:
             repo = CommunityRepository(session)
-            for summary in items_to_sync:
-                record = await repo.upsert_from_summary(summary, provider_id=provider_id)
-
-                if sync_details:
-                    try:
-                        detail = await provider.community.get_community_detail(summary.community_id)
-                        record = await repo.upsert_from_detail(detail, provider_id=provider_id)
-                    except Exception as e:
-                        logger.warning(
-                            f"獲取社區 {summary.community_id} 詳情失敗，保留基本資料: {e}"
-                        )
-
+            for summary, detail in enriched_pairs:
+                if detail is not None:
+                    record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+                else:
+                    record = await repo.upsert_from_summary(summary, provider_id=provider_id)
                 synced_records.append(record)
 
         return synced_records
@@ -71,10 +80,10 @@ class HouseAggregatorService:
         self,
         provider_id: str,
         query: SaleHouseSearchQuery,
-        sync_details: bool = False,
         max_items: Optional[int] = None,
+        concurrency: int = 3,
     ) -> List[PropertyTable]:
-        """從指定 Provider 同步中古屋資料，自動透過消歧服務進行去重合併"""
+        """兩階段中古屋資料同步管線 (清單探索 + 併發詳情補齊 + 純數值去重消歧與刊登合併)"""
         provider = self.registry.get_provider(provider_id)
         search_res = await provider.sale_house.search_sale_houses(query)
 
@@ -82,34 +91,41 @@ class HouseAggregatorService:
         if max_items is not None:
             items_to_sync = items_to_sync[:max_items]
 
+        # Stage 2: 併發爬取詳情補齊五大面積與建築規格
+        sem = asyncio.Semaphore(concurrency)
+
+        async def fetch_house_detail(summary):
+            async with sem:
+                try:
+                    detail = await provider.sale_house.get_sale_house_detail(summary.house_id)
+                    return (summary, detail)
+                except Exception as e:
+                    logger.warning(f"獲取房屋 {summary.house_id} 詳情失敗: {e}")
+                    return (summary, None)
+
+        enriched_pairs = await asyncio.gather(
+            *(fetch_house_detail(item) for item in items_to_sync)
+        )
+
+        # Stage 3: 去重消歧與刊登關係原子化入庫
         synced_properties: List[PropertyTable] = []
         async with self.db.session() as session:
             repo = PropertyRepository(session)
-            for summary in items_to_sync:
-                # 評估去重候選
-                eval_res = await self.dedup.evaluate_candidate(summary, repo)
-                candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
-
-                prop = await repo.upsert_from_summary(
-                    summary,
-                    provider_id=provider_id,
-                    candidate_property_id=candidate_id,
-                )
-
-                if sync_details:
-                    try:
-                        detail = await provider.sale_house.get_sale_house_detail(summary.house_id)
-                        prop = await repo.upsert_property_with_listing(
-                            detail=detail,
-                            provider_id=provider_id,
-                            summary=summary,
-                            candidate_property_id=prop.id,
-                        )
-                    except Exception as e:
-                        logger.warning(
-                            f"獲取房屋 {summary.house_id} 詳情失敗，保留清單紀錄: {e}"
-                        )
-
+            for summary, detail in enriched_pairs:
+                if detail is not None:
+                    prop = await repo.upsert_property_with_listing(
+                        detail=detail,
+                        provider_id=provider_id,
+                        summary=summary,
+                    )
+                else:
+                    eval_res = await self.dedup.evaluate_candidate(summary, repo)
+                    candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
+                    prop = await repo.upsert_from_summary(
+                        summary,
+                        provider_id=provider_id,
+                        candidate_property_id=candidate_id,
+                    )
                 synced_properties.append(prop)
 
         return synced_properties
@@ -118,10 +134,10 @@ class HouseAggregatorService:
         self,
         provider_id: str,
         query: NewHouseSearchQuery,
-        sync_details: bool = False,
         max_items: Optional[int] = None,
+        concurrency: int = 3,
     ) -> List[NewHouseTable]:
-        """從指定 Provider 同步新建案資料 (含 layout_v2 房型規劃)"""
+        """兩階段新建案資料同步管線 (清單探索 + 併發詳情補齊 + layout_v2 房型規格入庫)"""
         provider = self.registry.get_provider(provider_id)
         search_res = await provider.new_house.search_new_houses(query)
 
@@ -129,24 +145,35 @@ class HouseAggregatorService:
         if max_items is not None:
             items_to_sync = items_to_sync[:max_items]
 
+        # Stage 2: 併發爬取詳情補齊格局與工程規格
+        sem = asyncio.Semaphore(concurrency)
+
+        async def fetch_new_house_detail(summary):
+            async with sem:
+                try:
+                    detail = await provider.new_house.get_new_house_detail(str(summary.source_hid))
+                    return (summary, detail)
+                except Exception as e:
+                    logger.warning(f"獲取新建案 {summary.source_hid} 詳情失敗: {e}")
+                    return (summary, None)
+
+        enriched_pairs = await asyncio.gather(
+            *(fetch_new_house_detail(item) for item in items_to_sync)
+        )
+
+        # Stage 3: 持久化入庫
         synced_records: List[NewHouseTable] = []
         async with self.db.session() as session:
             repo = NewHouseRepository(session)
-            for summary in items_to_sync:
-                record = await repo.upsert_from_summary(summary, provider_id=provider_id)
-
-                if sync_details:
-                    try:
-                        detail = await provider.new_house.get_new_house_detail(str(summary.source_hid))
-                        record = await repo.upsert_from_detail(detail, provider_id=provider_id)
-                    except Exception as e:
-                        logger.warning(
-                            f"獲取新建案 {summary.source_hid} 詳情失敗，保留基本資料: {e}"
-                        )
-
+            for summary, detail in enriched_pairs:
+                if detail is not None:
+                    record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+                else:
+                    record = await repo.upsert_from_summary(summary, provider_id=provider_id)
                 synced_records.append(record)
 
         return synced_records
+
 
     async def search_communities(
         self,

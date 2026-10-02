@@ -89,9 +89,6 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     facility_str = "、".join(c.facilities) if c.facilities else "無公設資料"
     details_table.add_row("公設項目:", facility_str, "", "")
 
-    intro = c.build_intro or "暫無建案特色簡介"
-    details_table.add_row("特色介紹:", f"[dim]{intro[:120]}...[/dim]" if len(intro) > 120 else intro, "", "")
-
     return Panel(
         details_table,
         title=f"社區詳情 - {c.name}",
@@ -126,7 +123,6 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
         "park_type_str": c.park_type_str,
         "direction_rule": c.direction_rule,
         "manage_fee_per_pin": c.manage_fee_per_pin,
-        "build_intro": c.build_intro,
         "facilities": c.facilities,
         "developer_company": c.developer_company,
         "builder_company": c.builder_company,

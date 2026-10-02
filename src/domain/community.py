@@ -75,7 +75,6 @@ class NormalizedCommunityDetail(BaseModel):
     developer_company: Optional[str] = Field(None, description="投資興建公司")
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")
-    build_intro: Optional[str] = Field(None, description="特色與工法詳細說明")
 
     @property
     def floor_plan(self) -> Optional[str]:

@@ -144,5 +144,4 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
         developer_company=build_info.get("company"),
         builder_company=build_info.get("build_company"),
         architect_company=build_info.get("construction_company"),
-        build_intro=build_info.get("build_intro"),
     )

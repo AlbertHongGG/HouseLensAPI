@@ -1,5 +1,4 @@
-"""HouseLensAPI - 資料同步使用案例 (Sync Use Case)"""
-
+import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 
@@ -37,11 +36,11 @@ class SyncUseCase:
         self,
         provider_id: str,
         query: CommunitySearchQuery,
-        sync_details: bool = False,
         max_items: Optional[int] = None,
+        concurrency: int = 3,
         reporter: Optional[IProgressReporter] = None,
     ) -> List[CommunityTable]:
-        """同步社區領域資料並驅動進度回報"""
+        """兩階段同步社區領域資料 (清單探索 + 併發詳情補齊 + 入庫)"""
         rep = reporter or SilentProgressReporter()
         provider = self.registry.get_provider(provider_id)
 
@@ -49,24 +48,33 @@ class SyncUseCase:
         items = search_res.items[:max_items] if max_items else search_res.items
         rep.on_start(domain="社區", total=len(items))
 
+        # Stage 2: 併發爬取詳情補齊規格
+        sem = asyncio.Semaphore(concurrency)
+
+        async def fetch_detail(item):
+            async with sem:
+                rep.on_item_fetched(item.community_name)
+                try:
+                    detail = await provider.community.get_community_detail(item.community_id)
+                    rep.on_item_detail_enriched(item.community_name)
+                    return (item, detail)
+                except Exception as e:
+                    rep.on_error(f"獲取社區 {item.community_name} 詳情失敗: {e}")
+                    return (item, None)
+
+        enriched_pairs = await asyncio.gather(*(fetch_detail(it) for it in items))
+
+        # Stage 3: 持久化入庫
         synced: List[CommunityTable] = []
         details_count = 0
-
         async with self.db.session() as session:
             repo = CommunityRepository(session)
-            for item in items:
-                record = await repo.upsert_from_summary(item, provider_id=provider_id)
-                rep.on_item_fetched(item.community_name)
-
-                if sync_details:
-                    try:
-                        detail = await provider.community.get_community_detail(item.community_id)
-                        record = await repo.upsert_from_detail(detail, provider_id=provider_id)
-                        details_count += 1
-                        rep.on_item_detail_enriched(item.community_name)
-                    except Exception as e:
-                        rep.on_error(f"獲取社區 {item.community_name} 詳情失敗: {e}")
-
+            for item, detail in enriched_pairs:
+                if detail is not None:
+                    record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+                    details_count += 1
+                else:
+                    record = await repo.upsert_from_summary(item, provider_id=provider_id)
                 synced.append(record)
 
         rep.on_complete({"total": len(synced), "details": details_count, "duplicates": 0})
@@ -76,11 +84,11 @@ class SyncUseCase:
         self,
         provider_id: str,
         query: SaleHouseSearchQuery,
-        sync_details: bool = False,
         max_items: Optional[int] = None,
+        concurrency: int = 3,
         reporter: Optional[IProgressReporter] = None,
     ) -> List[PropertyTable]:
-        """同步中古屋資料 (含跨來源去重消歧與刊登合併)"""
+        """兩階段同步中古屋資料 (清單探索 + 併發詳情補齊 + 跨來源去重消歧與刊登合併)"""
         rep = reporter or SilentProgressReporter()
         provider = self.registry.get_provider(provider_id)
 
@@ -88,42 +96,56 @@ class SyncUseCase:
         items = search_res.items[:max_items] if max_items else search_res.items
         rep.on_start(domain="中古屋", total=len(items))
 
+        # Stage 2: 併發爬取詳情補齊五大面積與規格
+        sem = asyncio.Semaphore(concurrency)
+
+        async def fetch_detail(item):
+            async with sem:
+                rep.on_item_fetched(item.title)
+                try:
+                    detail = await provider.sale_house.get_sale_house_detail(item.house_id)
+                    rep.on_item_detail_enriched(item.title)
+                    return (item, detail)
+                except Exception as e:
+                    rep.on_error(f"獲取房屋 {item.title} 詳情失敗: {e}")
+                    return (item, None)
+
+        enriched_pairs = await asyncio.gather(*(fetch_detail(it) for it in items))
+
+        # Stage 3: 去重消歧與刊登關係原子化入庫
         synced: List[PropertyTable] = []
         dups_count = 0
         details_count = 0
 
         async with self.db.session() as session:
             repo = PropertyRepository(session)
-            for item in items:
-                # 執行消歧去重評估
-                eval_res = await self.dedup.evaluate_candidate(item, repo)
-                candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
+            for item, detail in enriched_pairs:
+                if detail is not None:
+                    eval_res = await self.dedup.evaluate_candidate(detail, repo)
+                    candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
+                    if eval_res.is_duplicate and candidate_id:
+                        dups_count += 1
+                        rep.on_item_duplicate(item.title, candidate_id)
 
-                if eval_res.is_duplicate and candidate_id:
-                    dups_count += 1
-                    rep.on_item_duplicate(item.title, candidate_id)
+                    prop = await repo.upsert_property_with_listing(
+                        detail=detail,
+                        provider_id=provider_id,
+                        summary=item,
+                        candidate_property_id=candidate_id,
+                    )
+                    details_count += 1
+                else:
+                    eval_res = await self.dedup.evaluate_candidate(item, repo)
+                    candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
+                    if eval_res.is_duplicate and candidate_id:
+                        dups_count += 1
+                        rep.on_item_duplicate(item.title, candidate_id)
 
-                prop = await repo.upsert_from_summary(
-                    item,
-                    provider_id=provider_id,
-                    candidate_property_id=candidate_id,
-                )
-                rep.on_item_fetched(item.title)
-
-                if sync_details:
-                    try:
-                        detail = await provider.sale_house.get_sale_house_detail(item.house_id)
-                        prop = await repo.upsert_property_with_listing(
-                            detail=detail,
-                            provider_id=provider_id,
-                            summary=item,
-                            candidate_property_id=prop.id,
-                        )
-                        details_count += 1
-                        rep.on_item_detail_enriched(item.title)
-                    except Exception as e:
-                        rep.on_error(f"獲取房屋 {item.title} 詳情失敗: {e}")
-
+                    prop = await repo.upsert_from_summary(
+                        item,
+                        provider_id=provider_id,
+                        candidate_property_id=candidate_id,
+                    )
                 synced.append(prop)
 
         rep.on_complete({"total": len(synced), "duplicates": dups_count, "details": details_count})
@@ -133,11 +155,11 @@ class SyncUseCase:
         self,
         provider_id: str,
         query: NewHouseSearchQuery,
-        sync_details: bool = False,
         max_items: Optional[int] = None,
+        concurrency: int = 3,
         reporter: Optional[IProgressReporter] = None,
     ) -> List[NewHouseTable]:
-        """同步新建案資料 (含 layout_v2 房型規劃)"""
+        """兩階段同步新建案資料 (清單探索 + 併發詳情補齊 + layout_v2 房型規劃)"""
         rep = reporter or SilentProgressReporter()
         provider = self.registry.get_provider(provider_id)
 
@@ -145,24 +167,34 @@ class SyncUseCase:
         items = search_res.items[:max_items] if max_items else search_res.items
         rep.on_start(domain="新建案", total=len(items))
 
+        # Stage 2: 併發爬取詳情補齊格局與工程規格
+        sem = asyncio.Semaphore(concurrency)
+
+        async def fetch_detail(item):
+            async with sem:
+                rep.on_item_fetched(item.project_name)
+                try:
+                    detail = await provider.new_house.get_new_house_detail(str(item.source_hid))
+                    rep.on_item_detail_enriched(item.project_name)
+                    return (item, detail)
+                except Exception as e:
+                    rep.on_error(f"獲取新建案 {item.project_name} 詳情失敗: {e}")
+                    return (item, None)
+
+        enriched_pairs = await asyncio.gather(*(fetch_detail(it) for it in items))
+
+        # Stage 3: 持久化入庫
         synced: List[NewHouseTable] = []
         details_count = 0
 
         async with self.db.session() as session:
             repo = NewHouseRepository(session)
-            for item in items:
-                record = await repo.upsert_from_summary(item, provider_id=provider_id)
-                rep.on_item_fetched(item.project_name)
-
-                if sync_details:
-                    try:
-                        detail = await provider.new_house.get_new_house_detail(str(item.source_hid))
-                        record = await repo.upsert_from_detail(detail, provider_id=provider_id)
-                        details_count += 1
-                        rep.on_item_detail_enriched(item.project_name)
-                    except Exception as e:
-                        rep.on_error(f"獲取新建案 {item.project_name} 詳情失敗: {e}")
-
+            for item, detail in enriched_pairs:
+                if detail is not None:
+                    record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+                    details_count += 1
+                else:
+                    record = await repo.upsert_from_summary(item, provider_id=provider_id)
                 synced.append(record)
 
         rep.on_complete({"total": len(synced), "details": details_count, "duplicates": 0})

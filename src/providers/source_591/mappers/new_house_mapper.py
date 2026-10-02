@@ -37,7 +37,6 @@ def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
         max_unit_price_wan=max_unit_price,
         min_area_pin=min_area,
         max_area_pin=max_area,
-        room_summary=item.get("room"),
         developer=item.get("company"),
         cover_image_url=item.get("photo_src"),
     )
@@ -107,7 +106,6 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
         layouts=layouts,
         structural_engine=housing.get("structural_engine"),
         direction_rule=housing.get("direction_rule"),
-        build_intro=housing.get("build_intro"),
         developer_company=housing.get("company"),
         builder_company=housing.get("build_company"),
         architect_company=housing.get("construction_company"),

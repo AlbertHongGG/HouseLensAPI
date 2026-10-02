@@ -96,8 +96,8 @@ class PropertyRepository(IPropertyRepository):
                     total_area_pin=detail.total_area_pin,
                 )
 
-        lat = detail.coordinates.lat if detail.coordinates else None
-        lng = detail.coordinates.lng if detail.coordinates else None
+        lat = (detail.coordinates.lat if detail.coordinates else None) or detail.lat
+        lng = (detail.coordinates.lng if detail.coordinates else None) or detail.lng
         comm_name = summary.community_name if summary else detail.community_name
 
         # 3. 若仍無既有物件，建立全新物件實體

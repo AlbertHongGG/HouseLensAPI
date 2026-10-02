@@ -47,7 +47,6 @@ class NewHouseRepository(INewHouseRepository):
                 max_unit_price_wan=summary.max_unit_price_wan,
                 min_area_pin=summary.min_area_pin,
                 max_area_pin=summary.max_area_pin,
-                room_summary=summary.room_summary,
                 developer_company=summary.developer,
                 cover_image_url=summary.cover_image_url,
             )
@@ -66,8 +65,6 @@ class NewHouseRepository(INewHouseRepository):
                 record.min_area_pin = summary.min_area_pin
             if summary.max_area_pin is not None:
                 record.max_area_pin = summary.max_area_pin
-            if summary.room_summary:
-                record.room_summary = summary.room_summary
             if summary.developer:
                 record.developer_company = summary.developer
             if summary.cover_image_url:
@@ -108,7 +105,6 @@ class NewHouseRepository(INewHouseRepository):
                 layouts=layouts_dump,
                 structural_engine=detail.structural_engine,
                 direction_rule=detail.direction_rule,
-                build_intro=detail.build_intro,
                 developer_company=detail.developer_company,
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
@@ -148,8 +144,6 @@ class NewHouseRepository(INewHouseRepository):
                 record.structural_engine = detail.structural_engine
             if detail.direction_rule:
                 record.direction_rule = detail.direction_rule
-            if detail.build_intro:
-                record.build_intro = detail.build_intro
             if detail.developer_company:
                 record.developer_company = detail.developer_company
             if detail.builder_company:

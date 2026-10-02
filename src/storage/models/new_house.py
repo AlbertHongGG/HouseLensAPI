@@ -35,7 +35,6 @@ class NewHouseTable(Base, TimestampMixin):
     max_unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 開價單價上限 (萬元/坪)
     min_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 坪數下限 (坪)
     max_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 坪數上限 (坪)
-    room_summary: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 房型規劃概述
 
     # 建築純數值規格
     base_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積 (坪)
@@ -49,7 +48,6 @@ class NewHouseTable(Base, TimestampMixin):
     # 建築描述與工法
     structural_engine: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    build_intro: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # 建商營造團隊
     developer_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)

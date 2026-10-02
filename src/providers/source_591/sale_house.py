@@ -26,13 +26,19 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
     async def search_sale_houses(self, query: SaleHouseSearchQuery) -> PageResult[NormalizedSaleListing]:
         """多元條件中古屋搜尋 (自動過濾廣告並轉換為標準 NormalizedSaleListing)"""
         params: Dict[str, Any] = {
+            "searchtype": "1",
+            "type": "sale",
+            "news": "3",
+            "newlist": "1",
+            "flutter_page": "1",
+            "category": "1",
+            "module": "iphone",
+            "action": "houseRsList",
             "p": query.page,
             "version": "8.13.0.975",
-            "newlist": "1",
             "kind": getattr(query, "kind", 0) or 0,
             "o": query.sort_order or "90",
-
-            "cm91dGU": "L2hvdXNlL2xpc3Q=",
+            "cm91dGU": "L3NhbGVob3VzZS9saXN0",
         }
 
         # 591 專屬查詢參數映射
@@ -57,7 +63,8 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
             if age_str:
                 params["age_str"] = age_str
 
-        res = await self._client.get("house", "/v1/app/gateway/sale/list", params=params)
+        headers = {"cm91dgu": "L3NhbGVob3VzZS9saXN0"}
+        res = await self._client.get("house", "/v1/app/gateway/sale/list", params=params, headers=headers)
         data_block = res.get("data") or {}
         items_raw = data_block.get("items") or []
 
@@ -86,7 +93,8 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
             "id": clean_id,
             "cm91dGU": "L3NhbGVob3VzZS9kZXRhaWw=",
         }
+        headers = {"cm91dgu": "L3NhbGVob3VzZS9kZXRhaWw="}
 
-        res = await self._client.get("house", "/v1/app/gateway/sale/detail", params=params)
+        res = await self._client.get("house", "/v1/app/gateway/sale/detail", params=params, headers=headers)
         data_block = res.get("data") or {}
         return map_sale_house_detail(data_block)

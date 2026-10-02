@@ -233,7 +233,6 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
             manage_fee_per_pin=150,
             structural_engine="SRC鋼骨鋼筋混凝土結構",
             direction_rule="朝西北",
-            build_intro="精工耐震SRC結構",
             layouts=[
                 NewHouseLayoutSpec(room_name="二房", rooms_count=2, min_area_pin=28.0, max_area_pin=30.0),
                 NewHouseLayoutSpec(room_name="三房", rooms_count=3, min_area_pin=35.0, max_area_pin=41.0),

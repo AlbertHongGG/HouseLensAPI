@@ -30,7 +30,6 @@ class NormalizedNewHouseSummary(BaseModel):
     max_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價上限 (萬元/坪)")
     min_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數下限 (坪)")
     max_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數上限 (坪)")
-    room_summary: Optional[str] = Field(None, description="房型規劃概述 (例如: 2~4房)")
     developer: Optional[str] = Field(None, description="投資興建公司")
     cover_image_url: Optional[str] = Field(None, description="封面照片網址")
 
@@ -59,7 +58,6 @@ class NormalizedNewHouseDetail(BaseModel):
     # 團隊與工法描述
     structural_engine: Optional[str] = Field(None, description="建築結構工法")
     direction_rule: Optional[str] = Field(None, description="座向規劃")
-    build_intro: Optional[str] = Field(None, description="特色介紹說明")
     developer_company: Optional[str] = Field(None, description="投資興建公司")
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")

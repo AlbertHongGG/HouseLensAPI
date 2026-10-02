@@ -6,6 +6,7 @@ NormalizedSaleListing 與 NormalizedSalePropertyDetail。
 
 from typing import Any, Dict, Optional
 
+from src.domain.common import GeoPoint
 from src.domain.sale_house import (
     NormalizedSaleListing,
     NormalizedSalePropertyDetail,
@@ -188,6 +189,7 @@ def map_sale_house_detail(data: Dict[str, Any]) -> NormalizedSalePropertyDetail:
         section=section_str or None,
         street=street_str or None,
         address=full_address or None,
+        coordinates=GeoPoint(lat=lat, lng=lng) if lat is not None and lng is not None else None,
         lat=lat,
         lng=lng,
     )

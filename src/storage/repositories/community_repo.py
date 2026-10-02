@@ -126,7 +126,6 @@ class CommunityRepository(ICommunityRepository):
                 structure=detail.structure,
                 park_type_str=detail.park_type_str,
                 direction_rule=detail.direction_rule,
-                build_intro=detail.build_intro,
                 landscape_name=detail.landscape_name,
                 postulate_name=detail.postulate_name,
                 facilities=detail.facilities,
@@ -182,8 +181,6 @@ class CommunityRepository(ICommunityRepository):
                 record.park_type_str = detail.park_type_str
             if detail.direction_rule:
                 record.direction_rule = detail.direction_rule
-            if detail.build_intro:
-                record.build_intro = detail.build_intro
             if detail.landscape_name:
                 record.landscape_name = detail.landscape_name
             if detail.postulate_name:
