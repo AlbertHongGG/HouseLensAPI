@@ -98,7 +98,6 @@ uv run houselens db vacuum
 | `community`, `sale` | `--max-age` | - | float | None | 最大屋齡（年） |
 | `sale` | `--min-price` | - | int | None | 最低總價（萬元） |
 | `sale` | `--max-price` | - | int | None | 最高總價（萬元） |
-| `sale` | `--rooms` | - | int | None | 格局房數篩選（純整數） |
 | `newhouse` | `--status` | `-s` | string | `1,2` | 銷售狀態（1: 預售屋, 2: 新成屋） |
 
 子指令涵蓋：`community`（社區）、`sale`（中古屋）、`newhouse`（新建案）、`all`（一鍵同步全領域）。本專案預設採用兩階段完整同步（清單探索 + 併發詳情補齊 + 消歧入庫）。
@@ -106,8 +105,8 @@ uv run houselens db vacuum
 #### 常用範例
 
 ```bash
-# 依總價、屋齡（10年以下）與房數（3房）同步台北市中古屋（自動去重合併，並自動拆解產權五大面積）
-uv run houselens sync sale -r 1 --max-age 10 --rooms 3 --min-price 2000 --max-price 5000 -l 20
+# 依總價與屋齡（10年以下）同步台北市中古屋（自動去重合併，並自動拆解產權五大面積）
+uv run houselens sync sale -r 1 --max-age 10 --min-price 2000 --max-price 5000 -l 20
 
 # 依屋齡區間與關鍵字搜尋社區並同步完整公設清單與建商團隊
 uv run houselens sync community -r 1 -k "鳴森大苑" --max-age 5

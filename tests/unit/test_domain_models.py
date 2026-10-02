@@ -183,6 +183,12 @@ class TestSaleHouseModels:
         assert detail.total_area_pin == 46.29
         assert not hasattr(detail, "remark")
 
+    def test_sale_house_search_query_no_rooms(self):
+        """驗證 SaleHouseSearchQuery 規格合約已無 rooms 欄位"""
+        query = SaleHouseSearchQuery(region_id=1, min_price_wan=1000)
+        assert not hasattr(query, "rooms")
+        assert "rooms" not in SaleHouseSearchQuery.model_fields
+
 
 class TestNewHouseModels:
     def test_new_house_summary(self):

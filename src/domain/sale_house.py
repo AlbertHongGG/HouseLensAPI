@@ -110,7 +110,6 @@ class SaleHouseSearchQuery(BaseModel):
     max_price_wan: Optional[int] = Field(None, ge=0, description="最高總價 (萬元)")
     min_age_years: Optional[float] = Field(None, ge=0.0, description="最小屋齡 (年)")
     max_age_years: Optional[float] = Field(None, ge=0.0, description="最大屋齡 (年)")
-    rooms: Optional[int] = Field(None, ge=1, description="指定房數")
     page: int = Field(default=1, ge=1, description="頁碼")
     page_size: int = Field(default=20, ge=1, le=100, description="每頁筆數")
     sort_order: Optional[str] = Field(default=None, description="排序選項")

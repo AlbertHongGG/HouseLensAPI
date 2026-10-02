@@ -76,7 +76,6 @@ def sync_sale_houses_cmd(
     max_price: Optional[int] = typer.Option(None, "--max-price", help="最高總價 (萬元)"),
     min_age: Optional[float] = typer.Option(None, "--min-age", help="最小屋齡 (年)"),
     max_age: Optional[float] = typer.Option(None, "--max-age", help="最大屋齡 (年)"),
-    rooms: Optional[int] = typer.Option(None, "--rooms", help="格局房數篩選"),
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help="同步筆數上限 (留空則同步整頁)"),
     concurrency: int = typer.Option(3, "--concurrency", "-c", help="併發詳情補齊請求數 (預設 3)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
@@ -90,7 +89,6 @@ def sync_sale_houses_cmd(
         max_price_wan=max_price,
         min_age_years=min_age,
         max_age_years=max_age,
-        rooms=rooms,
         page_size=limit or 20,
     )
 

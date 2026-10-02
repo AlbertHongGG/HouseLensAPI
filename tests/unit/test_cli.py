@@ -110,3 +110,15 @@ def test_cli_sale_house_age_filtering():
         if item.get("building_age_years") is not None:
             assert 0.0 <= item["building_age_years"] <= 10.0
 
+
+def test_cli_sync_sale_no_rooms_option():
+    """驗證 sync sale 指令已徹底移除 --rooms 參數"""
+    res_help = runner.invoke(app, ["sync", "sale", "--help"])
+    assert res_help.exit_code == 0
+    assert "--rooms" not in res_help.output
+
+    # 傳入 --rooms 應直接失敗
+    res_invalid = runner.invoke(app, ["sync", "sale", "--rooms", "3"])
+    assert res_invalid.exit_code != 0
+
+

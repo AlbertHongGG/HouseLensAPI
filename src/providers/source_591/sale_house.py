@@ -52,8 +52,6 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
             params["min_price"] = query.min_price_wan
         if query.max_price_wan is not None:
             params["max_price"] = query.max_price_wan
-        if query.rooms is not None:
-            params["room"] = query.rooms
 
         # 屋齡區間轉換由模組內部 Mapper 自理
         if query.min_age_years is not None or query.max_age_years is not None:
