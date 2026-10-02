@@ -1,6 +1,11 @@
-"""HouseLensAPI - 同步進度回報器抽象與 Rich 實作 (Progress Reporters)"""
+"""HouseLensAPI - 同步進度回報器抽象與 Rich 實作 (Progress Reporters)
+
+規範階段劃分 (清單探索 -> 併發詳情 -> 消歧入庫)，保證進度條生命週期嚴格閉環，
+杜絕終端輸出倒置問題，並透過 sanitize_terminal_text 確保零 Emoji 與 Windows 編碼穩定性。
+"""
 
 from typing import Any, Dict, Optional, Protocol
+from rich.console import Console
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -10,66 +15,136 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
 )
-from rich.console import Console
+
+from src.application.text_sanitizer import sanitize_terminal_text
 
 _default_console = Console()
 
 
-class IProgressReporter(Protocol):
-    """進度回報器抽象合約"""
+class IEnrichmentTracker(Protocol):
+    """併發詳情規格補齊追蹤器協定"""
 
-    def on_start(self, domain: str, total: Optional[int] = None) -> None:
-        """同步作業啟動"""
+    def advance(self, title: str) -> None:
+        """單筆項目詳情擷取推進"""
         ...
 
-    def on_item_fetched(self, title: str) -> None:
-        """單筆資料擷取成功"""
-        ...
-
-    def on_item_duplicate(self, title: str, matched_id: str) -> None:
-        """偵測到重複物件並自動歸戶合併"""
-        ...
-
-    def on_item_detail_enriched(self, title: str) -> None:
-        """單筆詳細規格補充成功"""
+    def enriched(self, title: str) -> None:
+        """單筆項目詳細規格補齊成功"""
         ...
 
     def on_error(self, message: str) -> None:
-        """發生警告或非致命錯誤"""
+        """單筆項目擷取發生錯誤"""
         ...
 
-    def on_complete(self, summary_stats: Dict[str, Any]) -> None:
-        """作業完成"""
+    def close(self) -> None:
+        """完成並銷毀進度條生命週期"""
         ...
+
+
+class IProgressReporter(Protocol):
+    """同步進度回報器抽象合約"""
+
+    def on_domain_start(self, domain: str, current_domain: int = 1, total_domains: int = 1) -> None:
+        """領域同步啟動標識"""
+        ...
+
+    def on_discovery_start(self, target_count: Optional[int] = None) -> None:
+        """階段 1: 開始清單探索"""
+        ...
+
+    def on_discovery_page(
+        self,
+        page: int,
+        page_items_count: int,
+        accumulated_count: int,
+        target_count: Optional[int] = None,
+    ) -> None:
+        """階段 1: 取得單頁清單回報"""
+        ...
+
+    def on_discovery_complete(self, total_discovered: int) -> None:
+        """階段 1: 清單探索完成"""
+        ...
+
+    def start_enrichment(self, total: int, description: str = "詳情規格補齊") -> IEnrichmentTracker:
+        """階段 2: 啟動併發詳情補齊追蹤器"""
+        ...
+
+    def on_persistence_start(self) -> None:
+        """階段 3: 開始消歧入庫"""
+        ...
+
+    def on_item_duplicate(self, title: str, matched_id: str) -> None:
+        """階段 3: 偵測到重複刊登並自動歸戶合併"""
+        ...
+
+    def on_domain_complete(self, summary_stats: Dict[str, Any]) -> None:
+        """領域同步作業完成統計面板"""
+        ...
+
+    def on_error(self, message: str) -> None:
+        """全域警告或非致命錯誤"""
+        ...
+
+
+class SilentEnrichmentTracker:
+    """靜音版詳情追蹤器"""
+
+    def advance(self, title: str) -> None:
+        pass
+
+    def enriched(self, title: str) -> None:
+        pass
+
+    def on_error(self, message: str) -> None:
+        pass
+
+    def close(self) -> None:
+        pass
 
 
 class SilentProgressReporter:
     """靜音進度回報器 (供 JSON 模式、腳本模式或測試使用)"""
 
-    def on_start(self, domain: str, total: Optional[int] = None) -> None:
+    def on_domain_start(self, domain: str, current_domain: int = 1, total_domains: int = 1) -> None:
         pass
 
-    def on_item_fetched(self, title: str) -> None:
+    def on_discovery_start(self, target_count: Optional[int] = None) -> None:
+        pass
+
+    def on_discovery_page(
+        self,
+        page: int,
+        page_items_count: int,
+        accumulated_count: int,
+        target_count: Optional[int] = None,
+    ) -> None:
+        pass
+
+    def on_discovery_complete(self, total_discovered: int) -> None:
+        pass
+
+    def start_enrichment(self, total: int, description: str = "詳情規格補齊") -> IEnrichmentTracker:
+        return SilentEnrichmentTracker()
+
+    def on_persistence_start(self) -> None:
         pass
 
     def on_item_duplicate(self, title: str, matched_id: str) -> None:
         pass
 
-    def on_item_detail_enriched(self, title: str) -> None:
+    def on_domain_complete(self, summary_stats: Dict[str, Any]) -> None:
         pass
 
     def on_error(self, message: str) -> None:
         pass
 
-    def on_complete(self, summary_stats: Dict[str, Any]) -> None:
-        pass
 
+class RichEnrichmentTracker:
+    """Rich 詳情併發進度條追蹤器 (生命週期僅存活於階段 2)"""
 
-class RichProgressReporter:
-    """Rich 互動式彩色進度條實作"""
-
-    def __init__(self, console: Optional[Console] = None):
-        target_console = console or _default_console
+    def __init__(self, console: Console, total: int, description: str = "擷取詳情"):
+        self.console = console
         self.progress = Progress(
             SpinnerColumn(),
             TextColumn("[bold cyan]{task.description}[/bold cyan]"),
@@ -77,56 +152,105 @@ class RichProgressReporter:
             MofNCompleteColumn(),
             TextColumn("[yellow]•[/yellow]"),
             TimeElapsedColumn(),
-            console=target_console,
+            console=console,
             transient=False,
         )
-        self.task_id: Optional[TaskID] = None
-        self.duplicates_count = 0
-        self.details_count = 0
+        self.progress.start()
+        self.task_id: TaskID = self.progress.add_task(description, total=total)
+
+    def advance(self, title: str) -> None:
+        clean_title = sanitize_terminal_text(title, max_len=24)
+        self.progress.update(
+            self.task_id,
+            advance=1,
+            description=f"擷取: {clean_title}",
+        )
+
+    def enriched(self, title: str) -> None:
+        pass
+
+    def on_error(self, message: str) -> None:
+        clean_msg = sanitize_terminal_text(message)
+        self.progress.console.print(f"    [bold red][警告]:[/bold red] {clean_msg}")
+
+    def close(self) -> None:
+        """詳情階段結束，立即關閉並銷毀進度條"""
+        self.progress.stop()
+
+
+class RichProgressReporter:
+    """Rich 結構化互動式終端日誌回報器"""
+
+    def __init__(self, console: Optional[Console] = None):
+        self.console = console or _default_console
+        self.current_domain: str = ""
+        self.duplicates_count: int = 0
+        self.details_count: int = 0
 
     def __enter__(self):
-        self.progress.start()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.progress.stop()
+        pass
 
-    def on_start(self, domain: str, total: Optional[int] = None) -> None:
-        self.task_id = self.progress.add_task(
-            f"正在同步 {domain} 資料...",
-            total=total or 100,
+    def on_domain_start(self, domain: str, current_domain: int = 1, total_domains: int = 1) -> None:
+        self.current_domain = domain
+        self.duplicates_count = 0
+        self.details_count = 0
+        self.console.print(
+            f"\n[bold cyan]--------------------------------------------------------------------------------[/bold cyan]\n"
+            f"[bold cyan][領域 {current_domain}/{total_domains}: {domain}領域同步作業][/bold cyan]"
         )
 
-    def on_item_fetched(self, title: str) -> None:
-        if self.task_id is not None:
-            short_title = title[:20] + "..." if len(title) > 20 else title
-            self.progress.update(
-                self.task_id,
-                advance=1,
-                description=f"擷取: {short_title}",
-            )
+    def on_discovery_start(self, target_count: Optional[int] = None) -> None:
+        target_desc = f"{target_count} 筆" if target_count is not None else "全量同步 (直至來源耗盡)"
+        self.console.print(f"  [bold yellow][階段 1/3: 清單探索][/bold yellow] 開始分頁巡訪 (目標: {target_desc})...")
+
+    def on_discovery_page(
+        self,
+        page: int,
+        page_items_count: int,
+        accumulated_count: int,
+        target_count: Optional[int] = None,
+    ) -> None:
+        progress_str = f"{accumulated_count}/{target_count}" if target_count is not None else f"{accumulated_count}"
+        self.console.print(
+            f"    -> 第 [bold white]{page}[/bold white] 頁取得 [bold cyan]{page_items_count}[/bold cyan] 筆 "
+            f"| 目前累積有效物件: [bold green]{progress_str}[/bold green] 筆"
+        )
+
+    def on_discovery_complete(self, total_discovered: int) -> None:
+        self.console.print(
+            f"  [bold yellow][階段 1/3: 清單探索][/bold yellow] 探索完成，共取得 [bold cyan]{total_discovered}[/bold cyan] 筆標準物件清單。"
+        )
+
+    def start_enrichment(self, total: int, description: str = "詳情規格補齊") -> IEnrichmentTracker:
+        self.console.print(f"  [bold yellow][階段 2/3: 併發詳情][/bold yellow] 啟動併發詳情補齊 (共 [bold cyan]{total}[/bold cyan] 筆)...")
+        return RichEnrichmentTracker(console=self.console, total=total, description=description)
+
+    def on_persistence_start(self) -> None:
+        self.console.print("  [bold yellow][階段 3/3: 消歧入庫][/bold yellow] 正在進行跨來源去重消歧與資料庫原子寫入...")
 
     def on_item_duplicate(self, title: str, matched_id: str) -> None:
         self.duplicates_count += 1
-        short_title = title[:15] + "..." if len(title) > 15 else title
-        self.progress.console.print(
-            f"  [bold magenta][去重合併][/bold magenta] -> [white]{short_title}[/white] "
-            f"歸戶至實體 [dim]{matched_id[:8]}...[/dim]"
+        clean_title = sanitize_terminal_text(title, max_len=20)
+        self.console.print(
+            f"    [bold magenta][去重合併][/bold magenta] -> [white]{clean_title}[/white] "
+            f"歸戶至既有實體 [dim]{matched_id[:8]}...[/dim]"
         )
 
-    def on_item_detail_enriched(self, title: str) -> None:
-        self.details_count += 1
-
-    def on_error(self, message: str) -> None:
-        self.progress.console.print(f"  [bold red][警告]:[/bold red] {message}")
-
-    def on_complete(self, summary_stats: Dict[str, Any]) -> None:
+    def on_domain_complete(self, summary_stats: Dict[str, Any]) -> None:
         total = summary_stats.get("total", 0)
         dups = summary_stats.get("duplicates", self.duplicates_count)
         details = summary_stats.get("details", self.details_count)
-        self.progress.console.print(
-            f"[bold green][OK] 同步完成！[/bold green] 共入庫 [bold cyan]{total}[/bold cyan] 筆實體 "
+        domain_name = summary_stats.get("domain", self.current_domain or "資料")
+        self.console.print(
+            f"  [bold green][OK] {domain_name}領域同步完成！[/bold green] "
+            f"共入庫 [bold cyan]{total}[/bold cyan] 筆實體 "
             f"(其中 [bold magenta]{dups}[/bold magenta] 處刊登去重合併，"
             f"[bold yellow]{details}[/bold yellow] 筆豐富規格)"
         )
 
+    def on_error(self, message: str) -> None:
+        clean_msg = sanitize_terminal_text(message)
+        self.console.print(f"  [bold red][警告]:[/bold red] {clean_msg}")

@@ -50,7 +50,9 @@ class Source591CommunityProvider(ICommunityProvider):
         res = await self._client.get("market", "/v1/search/list", params=params)
         data_block = res.get("data") or {}
         items_raw = data_block.get("items") or []
-        total_records = int(data_block.get("total") or len(items_raw))
+        paginate = data_block.get("paginate") or {}
+        raw_total = paginate.get("total") or data_block.get("total")
+        total_records = int(raw_total) if raw_total is not None else len(items_raw)
 
         items = [map_community_summary(it) for it in items_raw if isinstance(it, dict)]
         return PageResult.create(
