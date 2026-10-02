@@ -32,11 +32,37 @@ from src.storage.database import DatabaseManager, db_manager
 from src.storage.models.community import CommunityTable
 from src.storage.models.new_house import NewHouseTable
 from src.storage.models.property import PropertyTable
+from pydantic import BaseModel, Field, computed_field
+
 from src.storage.repositories.community_repo import CommunityRepository
 from src.storage.repositories.new_house_repo import NewHouseRepository
 from src.storage.repositories.property_repo import PropertyRepository
 
 logger = logging.getLogger(__name__)
+
+
+class SyncOptions(BaseModel):
+    """跨領域全域同步參數規格 (純淨封裝 CLI/API 發起之同步請求規格)"""
+
+    provider_id: str = Field(default="591", description="來源平台代碼")
+    region_id: int = Field(default=1, description="縣市代碼")
+    section_id: Optional[int] = Field(default=None, description="行政區代碼")
+    keywords: Optional[str] = Field(default=None, description="搜尋關鍵字")
+    min_age_years: Optional[float] = Field(default=None, ge=0.0, description="最小屋齡 (年)")
+    max_age_years: Optional[float] = Field(default=None, ge=0.0, description="最大屋齡 (年)")
+    min_price_wan: Optional[int] = Field(default=None, ge=0, description="最低總價 (萬元)")
+    max_price_wan: Optional[int] = Field(default=None, ge=0, description="最高總價 (萬元)")
+    is_presale: bool = Field(default=True, description="是否包含預售屋")
+    is_new_construction: bool = Field(default=True, description="是否包含新成屋")
+    limit: Optional[int] = Field(default=10, description="各領域同步目標筆數 (留空則全量同步)")
+    concurrency: int = Field(default=3, ge=1, le=20, description="併發詳情補齊請求數")
+
+    @computed_field
+    @property
+    def page_size(self) -> int:
+        if self.limit and self.limit < 20:
+            return self.limit
+        return 20
 
 
 class SyncUseCase:
@@ -284,3 +310,53 @@ class SyncUseCase:
         except (asyncio.CancelledError, KeyboardInterrupt):
             rep.on_interrupted(accumulated_count=len(synced), domain_name="新建案")
             return synced
+
+    async def sync_all(
+        self,
+        options: SyncOptions,
+        reporter: Optional[IProgressReporter] = None,
+    ) -> Dict[str, Any]:
+        """一鍵串流同步所有領域 (各領域自省吸納自身支援之參數，完全解耦)"""
+        rep = reporter or SilentProgressReporter()
+
+        # 1. 社區領域：自省吸納 keywords, min_age_years, max_age_years 等
+        comm_query = CommunitySearchQuery.from_options(options)
+        communities = await self.sync_communities(
+            provider_id=options.provider_id,
+            query=comm_query,
+            max_items=options.limit,
+            concurrency=options.concurrency,
+            reporter=rep,
+            domain_step=1,
+            domain_total=3,
+        )
+
+        # 2. 中古屋領域：自省吸納 keywords, min_price_wan, max_price_wan, min_age_years, max_age_years 等
+        sale_query = SaleHouseSearchQuery.from_options(options)
+        sale_houses = await self.sync_sale_houses(
+            provider_id=options.provider_id,
+            query=sale_query,
+            max_items=options.limit,
+            concurrency=options.concurrency,
+            reporter=rep,
+            domain_step=2,
+            domain_total=3,
+        )
+
+        # 3. 新建案領域：自省吸納 keywords, is_presale, is_new_construction 等 (自然忽略 age 與 price)
+        new_query = NewHouseSearchQuery.from_options(options)
+        new_houses = await self.sync_new_houses(
+            provider_id=options.provider_id,
+            query=new_query,
+            max_items=options.limit,
+            concurrency=options.concurrency,
+            reporter=rep,
+            domain_step=3,
+            domain_total=3,
+        )
+
+        return {
+            "communities": communities,
+            "sale_houses": sale_houses,
+            "new_houses": new_houses,
+        }

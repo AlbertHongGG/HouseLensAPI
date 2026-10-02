@@ -7,7 +7,7 @@ Provider 模組必須自行將外部各平台之字串與特化格式清洗正�
 from typing import Optional
 from pydantic import BaseModel, Field
 
-from src.domain.common import GeoPoint
+from src.domain.common import BaseSearchQuery, GeoPoint
 
 
 class NormalizedSaleListing(BaseModel):
@@ -100,16 +100,11 @@ SaleListingSpec = NormalizedSaleListing
 SalePropertyDetailSpec = NormalizedSalePropertyDetail
 
 
-class SaleHouseSearchQuery(BaseModel):
+class SaleHouseSearchQuery(BaseSearchQuery):
     """跨平台統一中古屋檢索條件規範"""
 
-    region_id: Optional[int] = Field(None, description="標準縣市代碼")
-    section_id: Optional[int] = Field(None, description="標準行政區代碼")
-    keywords: Optional[str] = Field(None, description="搜尋關鍵字")
     min_price_wan: Optional[int] = Field(None, ge=0, description="最低總價 (萬元)")
     max_price_wan: Optional[int] = Field(None, ge=0, description="最高總價 (萬元)")
     min_age_years: Optional[float] = Field(None, ge=0.0, description="最小屋齡 (年)")
     max_age_years: Optional[float] = Field(None, ge=0.0, description="最大屋齡 (年)")
-    page: int = Field(default=1, ge=1, description="頁碼")
-    page_size: int = Field(default=20, ge=1, le=100, description="每頁筆數")
     sort_order: Optional[str] = Field(default=None, description="排序選項")

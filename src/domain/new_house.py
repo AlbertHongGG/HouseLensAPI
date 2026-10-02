@@ -7,6 +7,8 @@ Provider 模組必須自行將外部各平台之字串與特化格式清洗正�
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
+from src.domain.common import BaseSearchQuery
+
 
 class NewHouseLayoutSpec(BaseModel):
     """標準規劃房型與坪數區間項目"""
@@ -64,12 +66,8 @@ class NormalizedNewHouseDetail(BaseModel):
     reception_address: Optional[str] = Field(None, description="接待會館地址")
 
 
-class NewHouseSearchQuery(BaseModel):
+class NewHouseSearchQuery(BaseSearchQuery):
     """跨平台統一新建案檢索條件規範"""
 
-    region_id: Optional[int] = Field(None, description="標準縣市代碼")
-    keywords: Optional[str] = Field(None, description="建案關鍵字")
     is_presale: bool = Field(default=True, description="是否包含預售屋")
     is_new_construction: bool = Field(default=True, description="是否包含新成屋")
-    page: int = Field(default=1, ge=1, description="頁碼")
-    page_size: int = Field(default=20, ge=1, le=100, description="每頁筆數")

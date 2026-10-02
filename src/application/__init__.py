@@ -5,6 +5,7 @@ from src.application.diagnostics_usecase import (
     DiagnosticsUseCase,
     JsonArtifactWriter,
 )
+from src.application.inspect_usecase import InspectUseCase
 from src.application.progress import (
     IProgressReporter,
     RichProgressReporter,
@@ -15,7 +16,7 @@ from src.application.streaming_pipeline import (
     PageProcessStats,
     StreamingSyncPipeline,
 )
-from src.application.sync_usecase import SyncUseCase
+from src.application.sync_usecase import SyncOptions, SyncUseCase
 from src.application.text_sanitizer import sanitize_terminal_text
 
 __all__ = [
@@ -25,6 +26,7 @@ __all__ = [
     "StreamingSyncPipeline",
     "PageProcessStats",
     "sanitize_terminal_text",
+    "SyncOptions",
     "SyncUseCase",
     "QueryUseCase",
     "InspectUseCase",

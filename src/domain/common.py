@@ -3,8 +3,8 @@
 定義座標系統、結構化地址與標準泛型分頁查詢/結果模型。
 """
 
-from typing import Generic, List, Optional, TypeVar
-from pydantic import BaseModel, Field
+from typing import Any, Dict, Generic, List, Optional, Self, TypeVar, Union
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
@@ -31,6 +31,27 @@ class PageQuery(BaseModel):
     """通用分頁查詢參數"""
     page: int = Field(default=1, ge=1, description="頁碼，由 1 開始")
     page_size: int = Field(default=20, ge=1, le=100, description="每頁筆數")
+
+
+class BaseSearchQuery(PageQuery):
+    """跨領域搜尋檢索抽象基底規格 (提供自省抽取與安全欄位過濾能力)"""
+
+    model_config = ConfigDict(extra="ignore")
+
+    region_id: Optional[int] = Field(None, description="標準縣市代碼")
+    section_id: Optional[int] = Field(None, description="標準行政區代碼")
+    keywords: Optional[str] = Field(None, description="搜尋關鍵字")
+
+    @classmethod
+    def from_options(cls, options: Union[BaseModel, Dict[str, Any], Any]) -> Self:
+        """從統一條件物件、字典或模型中自省提取本模型宣告之有效欄位，未宣告欄位原生忽略"""
+        if isinstance(options, BaseModel):
+            data = options.model_dump(exclude_none=True)
+        elif isinstance(options, dict):
+            data = {k: v for k, v in options.items() if v is not None}
+        else:
+            data = {k: v for k, v in vars(options).items() if v is not None}
+        return cls.model_validate(data)
 
 
 class PageResult(BaseModel, Generic[T]):

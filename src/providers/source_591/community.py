@@ -36,8 +36,8 @@ class Source591CommunityProvider(ICommunityProvider):
             params["regionid"] = query.region_id
         if query.section_id is not None:
             params["sectionid"] = query.section_id
-        if query.keyword:
-            params["keyword"] = query.keyword
+        if query.keywords:
+            params["keyword"] = query.keywords
 
         # 591 專屬屋齡查詢代碼轉換由模組自理
         if query.min_age_years is not None or query.max_age_years is not None:

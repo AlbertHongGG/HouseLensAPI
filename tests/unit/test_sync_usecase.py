@@ -5,7 +5,7 @@ import pytest_asyncio
 from unittest.mock import AsyncMock, MagicMock
 
 from src.application.progress import SilentProgressReporter
-from src.application.sync_usecase import SyncUseCase
+from src.application.sync_usecase import SyncOptions, SyncUseCase
 from src.core.interfaces.provider import IHouseSourceProvider
 from src.core.registry import ProviderRegistry
 from src.domain.common import PageResult
@@ -243,3 +243,132 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
     assert len(synced) == 22
     assert mock_new_service.search_new_houses.call_count == 3
     assert mock_new_service.get_new_house_detail.call_count == 22
+
+
+@pytest.mark.asyncio
+async def test_sync_all_with_unified_options(sync_test_db):
+    """驗證 sync_all 能透過 SyncOptions 解耦分派查詢物件並順利同步三大領域"""
+    # 1. Mock Community Service
+    mock_comm = MagicMock()
+    async def mock_search_comm(q: CommunitySearchQuery):
+        assert q.region_id == 1
+        assert q.keywords == "精選"
+        assert q.max_age_years == 10.0
+        items = [
+            NormalizedCommunitySummary(
+                community_id=f"C_{i}",
+                community_name=f"社區_{i}",
+                region_name="台北市",
+                section_name="信義區",
+                full_address="台北市信義區信義路",
+            )
+            for i in range(5)
+        ]
+        return PageResult.create(items=items, total_records=5, page=q.page, page_size=q.page_size)
+
+    async def mock_detail_comm(cid: str):
+        return NormalizedCommunityDetail(
+            community_id=cid,
+            community_name=f"社區_{cid}",
+            address="台北市信義區信義路",
+            region_name="台北市",
+            section_name="信義區",
+        )
+
+    mock_comm.search_communities = AsyncMock(side_effect=mock_search_comm)
+    mock_comm.get_community_detail = AsyncMock(side_effect=mock_detail_comm)
+
+    # 2. Mock Sale House Service
+    mock_sale = MagicMock()
+    async def mock_search_sale(q: SaleHouseSearchQuery):
+        assert q.region_id == 1
+        assert q.keywords == "精選"
+        assert q.max_age_years == 10.0
+        assert q.min_price_wan == 2000
+        items = [
+            NormalizedSaleListing(
+                provider_id="mock_591",
+                external_house_id=f"S_{i}",
+                title=f"中古屋_{i}",
+                price_wan=2500,
+                unit_price_wan=80.0,
+                total_area_pin=31.25,
+                region="台北市",
+                section="大安區",
+            )
+            for i in range(5)
+        ]
+        return PageResult.create(items=items, total_records=5, page=q.page, page_size=q.page_size)
+
+    async def mock_detail_sale(hid: str):
+        return NormalizedSalePropertyDetail(
+            external_house_id=hid,
+            provider_id="mock_591",
+            title=f"中古屋_{hid}",
+            price_wan=2500,
+            region_name="台北市",
+            section_name="大安區",
+            full_address="台北市大安區和平東路",
+            building_age_years=6.0,
+        )
+
+    mock_sale.search_sale_houses = AsyncMock(side_effect=mock_search_sale)
+    mock_sale.get_sale_property_detail = AsyncMock(side_effect=mock_detail_sale)
+
+    # 3. Mock New House Service
+    mock_new = MagicMock()
+    async def mock_search_new(q: NewHouseSearchQuery):
+        assert q.region_id == 1
+        assert q.keywords == "精選"
+        # 關鍵驗證：NewHouseSearchQuery 不具備 max_age_years 與 min_price_wan，已自然解耦忽略
+        assert not hasattr(q, "max_age_years")
+        assert not hasattr(q, "min_price_wan")
+        items = [
+            NormalizedNewHouseSummary(
+                source_hid=9000 + i,
+                project_name=f"建案_{i}",
+                project_status="新成屋",
+                region_name="台北市",
+                section_name="中山區",
+                address="台北市中山區民生東路",
+            )
+            for i in range(5)
+        ]
+        return PageResult.create(items=items, total_records=5, page=q.page, page_size=q.page_size)
+
+    async def mock_detail_new(hid: str):
+        return NormalizedNewHouseDetail(
+            hid=int(hid),
+            project_name=f"建案_{hid}",
+            build_type="新成屋",
+            region="台北市",
+            section="中山區",
+            address="台北市中山區民生東路",
+        )
+
+    mock_new.search_new_houses = AsyncMock(side_effect=mock_search_new)
+    mock_new.get_new_house_detail = AsyncMock(side_effect=mock_detail_new)
+
+    reg = ProviderRegistry()
+    reg.register_instance(DummyProvider(comm=mock_comm, sale=mock_sale, new_h=mock_new))
+
+    uc = SyncUseCase(provider_registry=reg, database=sync_test_db)
+
+    # 呼叫 sync_all 帶入包含屋齡、關鍵字、價格等全域參數
+    options = SyncOptions(
+        provider_id="mock_591",
+        region_id=1,
+        keywords="精選",
+        max_age_years=10.0,
+        min_price_wan=2000,
+        limit=5,
+        concurrency=2,
+    )
+    result = await uc.sync_all(options=options, reporter=SilentProgressReporter())
+
+    assert len(result["communities"]) == 5
+    assert len(result["sale_houses"]) == 5
+    assert len(result["new_houses"]) == 5
+    assert mock_comm.search_communities.call_count == 1
+    assert mock_sale.search_sale_houses.call_count == 1
+    assert mock_new.search_new_houses.call_count == 1

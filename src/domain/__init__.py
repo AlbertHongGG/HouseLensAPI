@@ -7,9 +7,11 @@ from src.domain.enums import (
     AgeRange,
 )
 from src.domain.common import (
+    BaseSearchQuery,
     GeoPoint,
-    StructuredAddress,
+    PageQuery,
     PageResult,
+    StructuredAddress,
 )
 from src.domain.community import (
     NormalizedCommunitySummary,
@@ -45,7 +47,9 @@ __all__ = [
     "AgeRange",
     "GeoPoint",
     "StructuredAddress",
+    "PageQuery",
     "PageResult",
+    "BaseSearchQuery",
     "NormalizedCommunitySummary",
     "NormalizedCommunityDetail",
     "CommunitySearchQuery",

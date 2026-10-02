@@ -122,3 +122,15 @@ def test_cli_sync_sale_no_rooms_option():
     assert res_invalid.exit_code != 0
 
 
+def test_cli_sync_all_options():
+    """驗證 sync all 指令支援所有跨領域檢索參數"""
+    res_help = runner.invoke(app, ["sync", "all", "--help"])
+    assert res_help.exit_code == 0
+    assert "--max-age" in res_help.output
+    assert "--min-age" in res_help.output
+    assert "--keyword" in res_help.output
+    assert "--min-price" in res_help.output
+    assert "--max-price" in res_help.output
+    assert "--status" in res_help.output
+
+
