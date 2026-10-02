@@ -257,3 +257,57 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
         found = await repo.get_by_source_hid("591", 138045)
         assert found is not None
         assert found.project_name == "長虹MVP"
+
+
+@pytest.mark.asyncio
+async def test_repository_filter_existing_external_ids(test_db: DatabaseManager):
+    """測試三大領域 Repository 的批次外部 ID 快篩功能"""
+    async with test_db.session() as session:
+        comm_repo = CommunityRepository(session)
+        prop_repo = PropertyRepository(session)
+        nh_repo = NewHouseRepository(session)
+
+        # 1. 寫入社區資料
+        await comm_repo.upsert_from_summary(
+            NormalizedCommunitySummary(
+                community_id="C100",
+                community_name="測試社區A",
+                region_name="台北市",
+                section_name="大安區",
+                full_address="台北市大安區新生南路",
+            ),
+            provider_id="591",
+        )
+        existing_comm = await comm_repo.filter_existing_external_ids("591", ["C100", "C101", "C102"])
+        assert existing_comm == {"C100"}
+
+        # 2. 寫入中古屋刊登資料
+        await prop_repo.upsert_from_summary(
+            NormalizedSaleListing(
+                provider_id="591",
+                external_house_id="S500",
+                title="測試房屋A",
+                price_wan=3000,
+                total_area_pin=35.0,
+                region="台北市",
+                section="信義區",
+            ),
+            provider_id="591",
+        )
+        existing_prop = await prop_repo.filter_existing_external_ids("591", ["S500", "S501", "S502"])
+        assert existing_prop == {"S500"}
+
+        # 3. 寫入新建案資料
+        await nh_repo.upsert_from_summary(
+            NormalizedNewHouseSummary(
+                source_hid=900,
+                project_name="測試建案A",
+                project_status="預售屋",
+                region_name="台北市",
+                section_name="南港區",
+                address="台北市南港區重陽路",
+            ),
+            provider_id="591",
+        )
+        existing_nh = await nh_repo.filter_existing_external_ids("591", ["900", "901", "902"])
+        assert existing_nh == {"900"}

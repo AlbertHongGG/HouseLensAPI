@@ -4,7 +4,6 @@ import pytest
 import pytest_asyncio
 from unittest.mock import AsyncMock, MagicMock
 
-from src.application.pagination import PaginationAccumulator
 from src.application.progress import SilentProgressReporter
 from src.application.sync_usecase import SyncUseCase
 from src.core.interfaces.provider import IHouseSourceProvider
@@ -119,7 +118,6 @@ async def test_sync_sale_houses_multi_page_accumulation(sync_test_db: DatabaseMa
     uc = SyncUseCase(
         provider_registry=reg,
         database=sync_test_db,
-        accumulator=PaginationAccumulator(default_page_size=10),
     )
 
     # 測試要求 25 筆 (需跨越第 1 頁 10 筆、第 2 頁 10 筆、第 3 頁前 5 筆)
@@ -174,7 +172,6 @@ async def test_sync_communities_multi_page_accumulation(sync_test_db: DatabaseMa
     uc = SyncUseCase(
         provider_registry=reg,
         database=sync_test_db,
-        accumulator=PaginationAccumulator(default_page_size=10),
     )
 
     # 抓取 15 筆 (第 1 頁 10 筆 + 第 2 頁前 5 筆)
@@ -231,7 +228,6 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
     uc = SyncUseCase(
         provider_registry=reg,
         database=sync_test_db,
-        accumulator=PaginationAccumulator(default_page_size=10),
     )
 
     # 抓取 22 筆 (第 1 頁 10 筆 + 第 2 頁 10 筆 + 第 3 頁前 2 筆)

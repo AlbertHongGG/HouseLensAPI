@@ -4,7 +4,7 @@
 """
 
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Set
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -22,6 +22,19 @@ class PropertyRepository(IPropertyRepository):
 
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def filter_existing_external_ids(
+        self, provider_id: str, external_ids: List[str]
+    ) -> Set[str]:
+        """批次查詢傳入的外部房源刊登 ID 中已存在於資料庫者"""
+        if not external_ids:
+            return set()
+        stmt = select(PropertyListingTable.external_house_id).where(
+            PropertyListingTable.provider_id == provider_id,
+            PropertyListingTable.external_house_id.in_(external_ids),
+        )
+        res = await self.session.execute(stmt)
+        return set(res.scalars().all())
 
     async def find_duplicate_candidate(
         self,

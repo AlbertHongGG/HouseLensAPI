@@ -238,7 +238,10 @@ def sync_all_cmd(
             )
         )
 
-        print_success("全域三大領域三階段同步作業全部順利完成！")
+        print_success("全域三大領域串流同步作業全部順利完成！")
+    except KeyboardInterrupt:
+        print_success("同步作業已由使用者手動終止，已處理頁面已安全儲存。")
+        raise typer.Exit(code=0)
     except Exception as e:
         print_error(f"全域同步作業遭遇非預期錯誤中止: {e}")
         raise typer.Exit(code=1)

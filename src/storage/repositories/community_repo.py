@@ -4,7 +4,7 @@
 """
 
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Set
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +21,19 @@ class CommunityRepository(ICommunityRepository):
 
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def filter_existing_external_ids(
+        self, provider_id: str, external_ids: List[str]
+    ) -> Set[str]:
+        """批次查詢傳入的外部社區 ID 中已存在於資料庫者"""
+        if not external_ids:
+            return set()
+        stmt = select(CommunityTable.source_id).where(
+            CommunityTable.source_provider == provider_id,
+            CommunityTable.source_id.in_(external_ids),
+        )
+        res = await self.session.execute(stmt)
+        return set(res.scalars().all())
 
     async def upsert_from_summary(
         self, summary: NormalizedCommunitySummary, provider_id: str

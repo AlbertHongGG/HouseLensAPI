@@ -4,7 +4,7 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from src.domain.community import (
     NormalizedCommunityDetail,
@@ -25,6 +25,13 @@ from src.storage.models.property import PropertyTable
 
 class ICommunityRepository(ABC):
     """社區持久化倉儲抽象介面"""
+
+    @abstractmethod
+    async def filter_existing_external_ids(
+        self, provider_id: str, external_ids: List[str]
+    ) -> Set[str]:
+        """批次查詢傳入的外部社區 ID 中已存在於資料庫者"""
+        pass
 
     @abstractmethod
     async def upsert_from_summary(
@@ -69,6 +76,13 @@ class ICommunityRepository(ABC):
 
 class IPropertyRepository(ABC):
     """中古屋物件與來源刊登倉儲抽象介面"""
+
+    @abstractmethod
+    async def filter_existing_external_ids(
+        self, provider_id: str, external_ids: List[str]
+    ) -> Set[str]:
+        """批次查詢傳入的外部房源刊登 ID 中已存在於資料庫者"""
+        pass
 
     @abstractmethod
     async def upsert_property_with_listing(
@@ -135,6 +149,13 @@ class IPropertyRepository(ABC):
 
 class INewHouseRepository(ABC):
     """新建案持久化倉儲抽象介面"""
+
+    @abstractmethod
+    async def filter_existing_external_ids(
+        self, provider_id: str, external_ids: List[str]
+    ) -> Set[str]:
+        """批次查詢傳入的外部新建案 HID 中已存在於資料庫者"""
+        pass
 
     @abstractmethod
     async def upsert_from_summary(

@@ -4,7 +4,7 @@
 """
 
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Set
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +21,22 @@ class NewHouseRepository(INewHouseRepository):
 
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def filter_existing_external_ids(
+        self, provider_id: str, external_ids: List[str]
+    ) -> Set[str]:
+        """批次查詢傳入的外部新建案 HID 中已存在於資料庫者"""
+        if not external_ids:
+            return set()
+        int_ids = [int(i) for i in external_ids if str(i).isdigit()]
+        if not int_ids:
+            return set()
+        stmt = select(NewHouseTable.source_hid).where(
+            NewHouseTable.provider_id == provider_id,
+            NewHouseTable.source_hid.in_(int_ids),
+        )
+        res = await self.session.execute(stmt)
+        return {str(x) for x in res.scalars().all()}
 
     async def upsert_from_summary(
         self, summary: NormalizedNewHouseSummary, provider_id: str
