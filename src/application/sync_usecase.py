@@ -104,7 +104,7 @@ class SyncUseCase:
                 return await repo.filter_existing_external_ids(provider_id, ids)
 
         async def fetch_detail(summary: NormalizedCommunitySummary) -> Optional[NormalizedCommunityDetail]:
-            return await provider.community.get_community_detail(summary.community_id)
+            return await provider.community.get_community_detail(summary.community_id, summary=summary)
 
         async def persist_batch(
             pairs: List[Tuple[NormalizedCommunitySummary, Optional[NormalizedCommunityDetail]]]

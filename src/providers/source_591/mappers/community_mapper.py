@@ -20,42 +20,9 @@ from src.providers.source_591.normalizers import (
 )
 
 
-def _extract_cover_image_from_banners(banners: Any) -> Optional[str]:
-    """從 591 詳情 banners.community_images 中擷取封面圖片網址"""
-    if not isinstance(banners, dict):
-        return None
-    imgs = banners.get("community_images") or []
-    if not isinstance(imgs, list):
-        return None
-
-    first_img: Optional[str] = None
-    for group in imgs:
-        if not isinstance(group, dict):
-            continue
-        g_imgs = group.get("images") or []
-        for item in g_imgs:
-            if isinstance(item, dict):
-                if "photo" in item or "bigphoto" in item:
-                    url = item.get("photo") or item.get("bigphoto") or item.get("maxphoto")
-                    if url and not first_img:
-                        first_img = url
-                elif "images" in item:
-                    nested_imgs = item.get("images") or []
-                    for n_item in nested_imgs:
-                        url = n_item.get("photo") or n_item.get("bigphoto") or n_item.get("maxphoto")
-                        if url:
-                            if item.get("type") == "logo" or item.get("name") == "封面":
-                                return url
-                            if not first_img:
-                                first_img = url
-    return first_img
-
-
-
-
 def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
-    """將 591 search/list 原始項目轉換為標準 NormalizedCommunitySummary"""
-    # 座標解析
+    """將 591 search/list 原始項目轉換為標準 NormalizedCommunitySummary (基礎識別與地理唯一來源)"""
+    # 座標解析 (唯一正規來源：清單 API)
     lat = item.get("lat")
     lng = item.get("lng")
     coords: Optional[GeoPoint] = None
@@ -71,7 +38,7 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
     if isinstance(price_obj, dict):
         avg_price = parse_unit_price(price_obj.get("price"))
 
-    # 封面圖解析
+    # 封面圖解析 (唯一正規來源：清單 API)
     photo_obj = item.get("photo_src") or {}
     cover_url: Optional[str] = None
     if isinstance(photo_obj, dict):
@@ -100,11 +67,17 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
     )
 
 
-def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
-    """將 591 community/info 原始資料清洗為強型別 NormalizedCommunityDetail"""
-    base_info = data.get("base_info") or {}
+def map_community_detail(
+    summary: NormalizedCommunitySummary,
+    data: Dict[str, Any],
+) -> NormalizedCommunityDetail:
+    """將 591 社區封包組裝為強型別 NormalizedCommunityDetail。
+
+    職責邊界：
+    - 基礎身分與地理資訊：100% 來自清單 API (summary)。
+    - 建築規劃與深層規格：100% 來自詳情 API build_info 單一區塊，絕不跨區塊抓取。
+    """
     build_info = data.get("build_info") or {}
-    banners = data.get("banners") or {}
 
     # 屋齡解析為浮點數
     age_obj = build_info.get("age")
@@ -118,6 +91,20 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
 
     park_num_raw = build_info.get("all_park_num")
     parking_count = parse_int_count(park_num_raw)
+
+    # 車位價格描述 (如: {"price": "290~330", "unit": "萬"} -> "290~330萬")
+    park_price_obj = build_info.get("park_price")
+    park_price: Optional[str] = None
+    if isinstance(park_price_obj, dict):
+        p_val = park_price_obj.get("price")
+        p_unit = park_price_obj.get("unit") or "萬"
+        if p_val:
+            park_price = f"{p_val}{p_unit}"
+    elif park_price_obj:
+        park_price = str(park_price_obj).strip() or None
+
+    # 車位型態
+    park_type_str = build_info.get("park_type_str")
 
     # 車位配比與公設比解析
     park_rate_raw = build_info.get("park_rate")
@@ -139,66 +126,57 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
     manage_fee = parse_currency_amount(manage_raw)
 
     # 基地面積純浮點數 (坪)
-    base_area = parse_pin(build_info.get("base_area_num"))
+    base_area_num = parse_pin(build_info.get("base_area_num"))
 
-    # 公設清單
-    facility_list = build_info.get("facility") or []
-    if isinstance(facility_list, str):
-        facility_list = [f.strip() for f in facility_list.split(",") if f.strip()]
-
-    # 座標解析：優先從 banners 取得，次由 base_info 取得
-    lat = banners.get("lat") or base_info.get("lat")
-    lng = banners.get("lng") or base_info.get("lng")
-    coords: Optional[GeoPoint] = None
-    if lat and lng:
-        try:
-            coords = GeoPoint(lat=float(lat), lng=float(lng))
-        except (ValueError, TypeError):
-            coords = None
+    # 土地使用分區
+    land_division = build_info.get("land_division")
 
     # 單價數值化解析 (直取 build_info.price)
     price_obj = build_info.get("price")
     price_raw = price_obj.get("price") if isinstance(price_obj, dict) else (str(price_obj) if price_obj else None)
     avg_price = parse_unit_price(price_raw)
 
-    # 封面圖片解析
-    cover_image_url = _extract_cover_image_from_banners(banners)
+    # 建物型態與法定用途 (直取 build_info)
+    build_type = build_info.get("build_type_str")
+    build_purpose = build_info.get("purpose_str")
 
-    # 用途
-    build_purpose = base_info.get("purpose_str") or build_info.get("purpose_str")
-
-    # 交通與生活圈商圈
-    transport = base_info.get("transport") or build_info.get("subway")
-    shopping_district = base_info.get("shopping_district")
+    # 公設清單
+    facility_list = build_info.get("facility") or []
+    if isinstance(facility_list, str):
+        facility_list = [f.strip() for f in facility_list.split(",") if f.strip()]
 
     return NormalizedCommunityDetail(
-        community_id=str(base_info.get("community_id")),
-        community_name=str(base_info.get("community_name") or ""),
-        address=str(base_info.get("address") or ""),
-        region_name=str(base_info.get("region_name") or ""),
-        section_name=str(base_info.get("section_name") or ""),
-        coordinates=coords,
+        # --- 基礎識別與地理資訊：100% 取自清單 (summary) ---
+        community_id=summary.community_id,
+        community_name=summary.community_name,
+        region_name=summary.region_name,
+        section_name=summary.section_name,
+        address=summary.full_address,
+        coordinates=summary.coordinates,
+        cover_image_url=summary.cover_image_url,
+        shopping_district=summary.shopping_district,
+        transport=summary.transport,
+        # --- 建築規格與規劃：100% 取自詳情 build_info 單一區塊 ---
+        build_type=build_type,
+        build_purpose=build_purpose,
         avg_unit_price_wan=avg_price,
         total_households=total_households,
         parking_count=parking_count,
+        park_price=park_price,
+        park_type_str=park_type_str,
         parking_ratio_pct=park_ratio,
         public_ratio_pct=public_ratio,
         manage_fee_per_pin=manage_fee,
-        base_area_pin=base_area,
+        base_area_num=base_area_num,
+        land_division=land_division,
         building_age_years=building_age,
-        building_type=base_info.get("build_type_str") or build_info.get("build_type_str"),
-        build_purpose=build_purpose,
         structure=build_info.get("structural_engine"),
         direction_rule=build_info.get("direction_rule"),
         floor_plan_desc=build_info.get("floor"),
-        park_type_str=build_info.get("park_type_str"),
-        shopping_district=shopping_district,
-        transport=transport,
-        landscape_name=build_info.get("landscape_name"),
-        postulate_name=build_info.get("postulate_name"),
-        cover_image_url=cover_image_url,
         facilities=facility_list,
         developer_company=build_info.get("company"),
         builder_company=build_info.get("build_company"),
         architect_company=build_info.get("construction_company"),
+        landscape_name=build_info.get("landscape_name"),
+        postulate_name=build_info.get("postulate_name"),
     )

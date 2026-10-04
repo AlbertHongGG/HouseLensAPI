@@ -46,10 +46,13 @@ async def test_591_community_live_flow():
     assert first_comm.community_name != ""
 
     # 2. 獲取第一筆社區的詳情
-    detail = await provider.community.get_community_detail(first_comm.community_id)
+    detail = await provider.community.get_community_detail(first_comm.community_id, summary=first_comm)
     assert isinstance(detail, NormalizedCommunityDetail)
     assert detail.community_id == first_comm.community_id
     assert detail.community_name != ""
+    assert detail.address == first_comm.full_address
+    assert detail.region_name == first_comm.region_name
+    assert detail.coordinates == first_comm.coordinates
 
 
 @pytest.mark.asyncio

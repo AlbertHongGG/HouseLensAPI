@@ -60,28 +60,42 @@ class Test591CommunityMappers:
         assert summary.cover_image_url is not None
 
     def test_map_community_detail_from_capture(self):
-        data = load_captured_json("社區詳情資訊 Respond.json")
-        data_block = data.get("data", {})
-        detail = map_community_detail(data_block)
+        summary_data = load_captured_json("社區清單 Respond.json")
+        summary_items = summary_data.get("data", {}).get("items", [])
+        summary = map_community_summary(summary_items[0])
+
+        detail_data = load_captured_json("社區詳情資訊 Respond.json")
+        data_block = detail_data.get("data", {})
+        detail = map_community_detail(summary, data_block)
 
         assert isinstance(detail, NormalizedCommunityDetail)
-        assert detail.community_id == "5855864"
-        assert detail.community_name == "鳴森大苑-碧硯閣"
+        # 地理與身分資訊 100% 來自 summary
+        assert detail.community_id == summary.community_id
+        assert detail.community_name == summary.community_name
+        assert detail.address == summary.full_address
+        assert detail.region_name == summary.region_name
+        assert detail.section_name == summary.section_name
+        assert detail.coordinates == summary.coordinates
+        assert detail.shopping_district == summary.shopping_district
+        assert detail.transport == summary.transport
+        assert detail.cover_image_url == summary.cover_image_url
+
+        # 詳細建築與硬體規格 100% 直取自 detail 的 build_info
         assert detail.direction_rule == "朝北、朝南"
         assert detail.parking_ratio_pct == 1.07
         assert detail.structure == "SRC造"
         assert len(detail.facilities) > 0
-        assert detail.build_purpose == "住宅"
-        assert detail.coordinates is not None
-        assert abs(detail.coordinates.lat - 25.05699) < 0.001
-        assert abs(detail.coordinates.lng - 121.56489) < 0.001
+        assert detail.build_purpose == "住宅大樓"
+        assert detail.building_type == "新成屋"
+        assert detail.build_type == "新成屋"
         assert detail.avg_unit_price_wan == 160.0
-        assert detail.shopping_district == "民生社區"
-        assert detail.transport == "南京三民"
         assert detail.park_type_str == "平面式"
+        assert detail.park_price == "360~420萬"
+        assert detail.base_area_num == 1446.0
+        assert detail.base_area_pin == 1446.0
+        assert detail.land_division == "第三種住宅區"
         assert detail.landscape_name == "境業設計工程有限公司"
         assert detail.postulate_name == "境業設計工程有限公司"
-        assert detail.cover_image_url is not None
 
 
 class Test591SaleHouseMappers:

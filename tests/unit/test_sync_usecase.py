@@ -2,6 +2,7 @@
 
 import pytest
 import pytest_asyncio
+from typing import Optional
 from unittest.mock import AsyncMock, MagicMock
 
 from src.application.progress import SilentProgressReporter
@@ -153,7 +154,7 @@ async def test_sync_communities_multi_page_accumulation(sync_test_db: DatabaseMa
         ]
         return PageResult.create(items=items, total_records=40, page=query.page, page_size=10)
 
-    async def mock_detail(comm_id: str) -> NormalizedCommunityDetail:
+    async def mock_detail(comm_id: str, summary: Optional[NormalizedCommunitySummary] = None) -> NormalizedCommunityDetail:
         return NormalizedCommunityDetail(
             community_id=comm_id,
             community_name=f"詳情_{comm_id}",
@@ -266,7 +267,7 @@ async def test_sync_all_with_unified_options(sync_test_db):
         ]
         return PageResult.create(items=items, total_records=5, page=q.page, page_size=q.page_size)
 
-    async def mock_detail_comm(cid: str):
+    async def mock_detail_comm(cid: str, summary: Optional[NormalizedCommunitySummary] = None):
         return NormalizedCommunityDetail(
             community_id=cid,
             community_name=f"社區_{cid}",

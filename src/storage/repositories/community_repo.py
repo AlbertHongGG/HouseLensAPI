@@ -138,6 +138,8 @@ class CommunityRepository(ICommunityRepository):
                 floor_plan=detail.floor_plan,
                 structure=detail.structure,
                 park_type_str=detail.park_type_str,
+                park_price=detail.park_price,
+                land_division=detail.land_division,
                 direction_rule=detail.direction_rule,
                 landscape_name=detail.landscape_name,
                 postulate_name=detail.postulate_name,
@@ -146,6 +148,7 @@ class CommunityRepository(ICommunityRepository):
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
                 cover_image_url=detail.cover_image_url,
+                base_area_num=detail.base_area_num,
             )
             self.session.add(record)
         else:
@@ -175,8 +178,12 @@ class CommunityRepository(ICommunityRepository):
                 record.building_age_years = detail.building_age_years
             if detail.total_households is not None:
                 record.total_households = detail.total_households
-            if detail.base_area_pin is not None:
+            if detail.base_area_num is not None:
+                record.base_area_num = detail.base_area_num
+                record.base_area_pin = detail.base_area_num
+            elif detail.base_area_pin is not None:
                 record.base_area_pin = detail.base_area_pin
+                record.base_area_num = detail.base_area_pin
             if detail.public_ratio_pct is not None:
                 record.public_ratio_pct = detail.public_ratio_pct
             if detail.parking_count is not None:
@@ -193,6 +200,10 @@ class CommunityRepository(ICommunityRepository):
                 record.structure = detail.structure
             if detail.park_type_str:
                 record.park_type_str = detail.park_type_str
+            if detail.park_price:
+                record.park_price = detail.park_price
+            if detail.land_division:
+                record.land_division = detail.land_division
             if detail.direction_rule:
                 record.direction_rule = detail.direction_rule
             if detail.landscape_name:

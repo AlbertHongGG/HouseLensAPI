@@ -5,7 +5,7 @@ Provider 模組必須自行將外部各平台之字串與特化格式清洗正�
 """
 
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.domain.common import BaseSearchQuery, GeoPoint
 
@@ -43,6 +43,8 @@ class NormalizedCommunitySummary(BaseModel):
 class NormalizedCommunityDetail(BaseModel):
     """跨平台統一社區完整規格 (純數值化)"""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     community_id: str = Field(..., description="社區唯一代號")
     community_name: str = Field(..., description="社區名稱")
     address: str = Field(..., description="社區完整地址")
@@ -57,16 +59,18 @@ class NormalizedCommunityDetail(BaseModel):
     parking_ratio_pct: Optional[float] = Field(None, ge=0.0, description="車位配比率 (例如: 1.07)")
     public_ratio_pct: Optional[float] = Field(None, ge=0.0, le=100.0, description="公設比百分比 (例如: 30.0 代表 30%)")
     manage_fee_per_pin: Optional[int] = Field(None, ge=0, description="管理費單價純整數 (單位: 元/坪/月, 例如: 100)")
-    base_area_pin: Optional[float] = Field(None, ge=0.0, description="基地總面積純浮點數 (單位: 坪)")
+    base_area_num: Optional[float] = Field(None, ge=0.0, description="基地總面積純浮點數 (單位: 坪)")
     building_age_years: Optional[float] = Field(None, ge=0.0, description="完工屋齡純浮點數 (單位: 年)")
 
     # 團隊與工法描述
-    building_type: Optional[str] = Field(None, description="建物型態")
+    building_type: Optional[str] = Field(None, alias="build_type", description="建物型態")
     build_purpose: Optional[str] = Field(None, description="主要用途")
     structure: Optional[str] = Field(None, description="建築結構工法 (如: SRC造)")
     direction_rule: Optional[str] = Field(None, description="座向規劃")
     floor_plan_desc: Optional[str] = Field(None, description="樓層規劃描述 (如: 地上24層,地下4層)")
     park_type_str: Optional[str] = Field(None, description="車位型態描述")
+    park_price: Optional[str] = Field(None, description="車位價格描述 (如: 290~330萬)")
+    land_division: Optional[str] = Field(None, description="土地使用分區 (如: 第三種住宅區)")
     shopping_district: Optional[str] = Field(None, description="生活圈商圈")
     transport: Optional[str] = Field(None, description="鄰近交通站點")
     landscape_name: Optional[str] = Field(None, description="景觀設計")
@@ -76,6 +80,14 @@ class NormalizedCommunityDetail(BaseModel):
     developer_company: Optional[str] = Field(None, description="投資興建公司")
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")
+
+    @property
+    def build_type(self) -> Optional[str]:
+        return self.building_type
+
+    @property
+    def base_area_pin(self) -> Optional[float]:
+        return self.base_area_num
 
     @property
     def floor_plan(self) -> Optional[str]:

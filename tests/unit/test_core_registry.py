@@ -1,5 +1,7 @@
 """Unit Tests for Core Interfaces and ProviderRegistry"""
 
+from typing import Optional
+
 import pytest
 
 from src.core.exceptions import ProviderError, ProviderNotFoundError
@@ -33,7 +35,11 @@ class MockCommunityProvider(ICommunityProvider):
     async def search_communities(self, query: CommunitySearchQuery) -> PageResult[NormalizedCommunitySummary]:
         return PageResult.create(items=[], total_records=0, page=1, page_size=20)
 
-    async def get_community_detail(self, community_id: str) -> NormalizedCommunityDetail:
+    async def get_community_detail(
+        self,
+        community_id: str,
+        summary: Optional[NormalizedCommunitySummary] = None,
+    ) -> NormalizedCommunityDetail:
         return NormalizedCommunityDetail(
             community_id=community_id,
             community_name="測試社區",

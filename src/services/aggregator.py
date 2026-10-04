@@ -53,7 +53,7 @@ class HouseAggregatorService:
         async def fetch_community_detail(summary):
             async with sem:
                 try:
-                    detail = await provider.community.get_community_detail(summary.community_id)
+                    detail = await provider.community.get_community_detail(summary.community_id, summary=summary)
                     return (summary, detail)
                 except Exception as e:
                     logger.warning(f"獲取社區 {summary.community_id} 詳情失敗: {e}")

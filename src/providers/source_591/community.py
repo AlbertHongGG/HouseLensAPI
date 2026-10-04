@@ -1,6 +1,6 @@
 """HouseLensAPI - 591 社區領域服務實作 (591 Community Provider)"""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from src.core.interfaces.community import ICommunityProvider
 from src.domain.common import PageResult
@@ -62,12 +62,28 @@ class Source591CommunityProvider(ICommunityProvider):
             page_size=query.page_size,
         )
 
-    async def get_community_detail(self, community_id: str) -> NormalizedCommunityDetail:
-        """根據社區 ID 取得完整正規化詳情"""
+    async def get_community_detail(
+        self,
+        community_id: str,
+        summary: Optional[NormalizedCommunitySummary] = None,
+    ) -> NormalizedCommunityDetail:
+        """根據社區 ID 取得完整正規化詳情 (基礎地理自 summary，規格直取 build_info)"""
         params = {
             "id": community_id,
             "cm91dGU": "L2NvbW11bml0eS9kZXRhaWw=",
         }
         res = await self._client.get("market", "/v1/app/gateway/community/info", params=params)
         data_block = res.get("data") or {}
-        return map_community_detail(data_block)
+
+        # 若未提供 summary (例如單純依 ID 查詢)，建立保底基礎識別 summary
+        if summary is None:
+            build_info = data_block.get("build_info") or {}
+            summary = NormalizedCommunitySummary(
+                community_id=community_id,
+                community_name=str(build_info.get("community_name") or ""),
+                region_name="",
+                section_name="",
+                full_address="",
+            )
+
+        return map_community_detail(summary=summary, data=data_block)

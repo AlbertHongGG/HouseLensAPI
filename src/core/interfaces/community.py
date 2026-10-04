@@ -1,6 +1,7 @@
 """HouseLensAPI - 社區領域服務抽象合約 (ICommunityProvider)"""
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from src.domain.common import PageResult
 from src.domain.community import (
@@ -19,6 +20,10 @@ class ICommunityProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_community_detail(self, community_id: str) -> NormalizedCommunityDetail:
-        """根據社區唯一 ID 取得完整社區硬體規格、建商營造團隊與公設說明"""
+    async def get_community_detail(
+        self,
+        community_id: str,
+        summary: Optional[NormalizedCommunitySummary] = None,
+    ) -> NormalizedCommunityDetail:
+        """根據社區唯一 ID 與可選之清單摘要取得完整社區硬體規格 (基礎地理來自 summary，規格來自 detail)"""
         pass
