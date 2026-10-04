@@ -114,18 +114,9 @@ class PropertyRepository(IPropertyRepository):
             property_entity = await self.get_by_id(listing.property_id)
 
         if property_entity is None:
-            # 2. 刊登不存在，尋找是否有可合併之既有物件
+            # 2. 刊登不存在，依領域服務去重結果掛載至既有實體
             if candidate_property_id:
                 property_entity = await self.get_by_id(candidate_property_id)
-
-            if property_entity is None:
-                comm_name = summary.community_name if summary else detail.community_name
-                property_entity = await self.find_duplicate_candidate(
-                    community_name=comm_name,
-                    floor_current=detail.floor_current,
-                    rooms=detail.rooms,
-                    total_area_pin=detail.total_area_pin,
-                )
 
         lat = (detail.coordinates.lat if detail.coordinates else None) or detail.lat
         lng = (detail.coordinates.lng if detail.coordinates else None) or detail.lng
@@ -280,13 +271,6 @@ class PropertyRepository(IPropertyRepository):
         if property_entity is None:
             if candidate_property_id:
                 property_entity = await self.get_by_id(candidate_property_id)
-            if property_entity is None:
-                property_entity = await self.find_duplicate_candidate(
-                    community_name=summary.community_name,
-                    floor_current=summary.floor_current,
-                    rooms=summary.rooms,
-                    total_area_pin=summary.total_area_pin,
-                )
 
         if property_entity is None:
             property_entity = PropertyTable(

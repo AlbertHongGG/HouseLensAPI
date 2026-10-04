@@ -172,6 +172,7 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
         prop2 = await repo.upsert_from_summary(
             summary=sh_summary_sinyi,
             provider_id="sinyi",
+            candidate_property_id=prop1.id,
         )
 
         # 驗證自動合併至同一筆實體，但新增了第二筆刊登

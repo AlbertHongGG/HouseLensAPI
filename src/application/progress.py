@@ -156,10 +156,13 @@ class RichProgressReporter:
         pages = summary_stats.get("pages", self.total_pages)
         domain_name = summary_stats.get("domain", self.current_domain or "資料")
 
+        unit_name = "筆刊登" if domain_name == "中古屋" else "筆實體"
+        aggregation_info = f" (聚合為 [bold cyan]{total - dups}[/bold cyan] 戶客觀實體)" if dups > 0 else ""
+
         self.console.print(
             f"  [bold green][OK] {domain_name}領域同步完成！[/bold green] "
             f"共掃描 [bold white]{pages}[/bold white] 頁，"
-            f"新入庫 [bold cyan]{total}[/bold cyan] 筆實體 "
+            f"新入庫 [bold cyan]{total}[/bold cyan] {unit_name}{aggregation_info} "
             f"(跳過 [dim yellow]{skipped}[/dim yellow] 筆既有物件，"
             f"[bold magenta]{dups}[/bold magenta] 處刊登去重合併，"
             f"[bold yellow]{details}[/bold yellow] 筆豐富規格)"
