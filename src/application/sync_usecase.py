@@ -114,7 +114,6 @@ class SyncUseCase:
                 repo = CommunityRepository(session)
                 for item, detail in pairs:
                     if detail is not None:
-                        detail.enrich_from_summary(item)
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
                         saved.append(record)
                     else:
@@ -187,18 +186,15 @@ class SyncUseCase:
                 repo = PropertyRepository(session)
                 for item, detail in pairs:
                     if detail is not None:
-                        # 1. 執行領域實體上下文富化：自刊登摘要補齊詳情封包缺失之社區屬性
-                        enriched_detail = detail.enrich_from_listing(item)
-
-                        # 2. 由領域去重服務全權裁決是否為重複物件
-                        eval_res = await self.dedup.evaluate_candidate(enriched_detail, repo)
+                        # 1. 由領域去重服務全權裁決是否為重複物件
+                        eval_res = await self.dedup.evaluate_candidate(detail, repo)
                         candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
                         if eval_res.is_duplicate and candidate_id:
                             dups_count += 1
                             rep.on_item_duplicate(item.title, candidate_id)
 
                         prop = await repo.upsert_property_with_listing(
-                            detail=enriched_detail,
+                            detail=detail,
                             provider_id=provider_id,
                             summary=item,
                             candidate_property_id=candidate_id,

@@ -51,34 +51,6 @@ def _extract_cover_image_from_banners(banners: Any) -> Optional[str]:
     return first_img
 
 
-def _extract_avg_unit_price(data: Dict[str, Any]) -> Optional[float]:
-    """從 591 詳情封包中提取平均單價 (優先順序: 近一年均價 > 最新均價 > 一般價格)"""
-    price_trend = data.get("price_trend")
-    if isinstance(price_trend, dict):
-        year_obj = price_trend.get("year")
-        if isinstance(year_obj, dict) and year_obj.get("price"):
-            val = parse_unit_price(year_obj.get("price"))
-            if val is not None:
-                return val
-        new_obj = price_trend.get("new")
-        if isinstance(new_obj, dict) and new_obj.get("price"):
-            val = parse_unit_price(new_obj.get("price"))
-            if val is not None:
-                return val
-
-    price_obj = data.get("price")
-    if isinstance(price_obj, dict) and price_obj.get("price"):
-        val = parse_unit_price(price_obj.get("price"))
-        if val is not None:
-            return val
-
-    build_info = data.get("build_info") or {}
-    if build_info.get("price"):
-        val = parse_unit_price(build_info.get("price"))
-        if val is not None:
-            return val
-
-    return None
 
 
 def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
@@ -184,8 +156,10 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
         except (ValueError, TypeError):
             coords = None
 
-    # 單價解析
-    avg_price = _extract_avg_unit_price(data)
+    # 單價數值化解析 (直取 build_info.price)
+    price_obj = build_info.get("price")
+    price_raw = price_obj.get("price") if isinstance(price_obj, dict) else (str(price_obj) if price_obj else None)
+    avg_price = parse_unit_price(price_raw)
 
     # 封面圖片解析
     cover_image_url = _extract_cover_image_from_banners(banners)

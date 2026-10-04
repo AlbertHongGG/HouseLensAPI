@@ -77,28 +77,6 @@ class NormalizedCommunityDetail(BaseModel):
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")
 
-    def enrich_from_summary(self, summary: NormalizedCommunitySummary) -> "NormalizedCommunityDetail":
-        """使用清單摘要資訊富化詳情中的缺失欄位 (領域規則：詳情優先，摘要兜底)"""
-        if not self.coordinates and summary.coordinates:
-            self.coordinates = summary.coordinates
-        if self.avg_unit_price_wan is None and summary.avg_unit_price_wan is not None:
-            self.avg_unit_price_wan = summary.avg_unit_price_wan
-        if self.building_age_years is None and summary.building_age_years is not None:
-            self.building_age_years = summary.building_age_years
-        if not self.building_type and summary.building_type:
-            self.building_type = summary.building_type
-        if not self.build_purpose and summary.build_purpose:
-            self.build_purpose = summary.build_purpose
-        if not self.shopping_district and summary.shopping_district:
-            self.shopping_district = summary.shopping_district
-        if not self.transport and summary.transport:
-            self.transport = summary.transport
-        if not self.cover_image_url and summary.cover_image_url:
-            self.cover_image_url = summary.cover_image_url
-        if not self.address and summary.full_address:
-            self.address = summary.full_address
-        return self
-
     @property
     def floor_plan(self) -> Optional[str]:
         return self.floor_plan_desc

@@ -108,8 +108,23 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
         res_diff = await dedup.evaluate_candidate(cand_different_floor, repo)
         assert res_diff.is_duplicate is False
 
-        # 測試經由 enrich_from_listing 富化社區後之詳情物件去重評估
-        detail_raw = NormalizedSalePropertyDetail(
+        # 測試無社區之詳情物件去重評估
+        detail_no_community = NormalizedSalePropertyDetail(
+            external_house_id="B2002_detail_raw",
+            title="碧硯閣二樓三房優質釋出",
+            price_wan=5300,
+            total_area_pin=46.30,
+            floor_current=2,
+            floor_total=24,
+            rooms=3,
+            living_rooms=2,
+            community_name=None,
+        )
+        res_no_community = await dedup.evaluate_candidate(detail_no_community, repo)
+        assert res_no_community.is_duplicate is False
+
+        # 測試具備社區之詳情物件成功判定重複
+        detail_with_community = NormalizedSalePropertyDetail(
             external_house_id="B2002_detail",
             title="碧硯閣二樓三房優質釋出",
             price_wan=5300,
@@ -118,17 +133,11 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
             floor_total=24,
             rooms=3,
             living_rooms=2,
-            community_name=None,  # 原始詳情無社區
+            community_name="鳴森大苑-碧硯閣",
         )
-        # 未富化前：無社區，無法判定重複
-        res_unenriched = await dedup.evaluate_candidate(detail_raw, repo)
-        assert res_unenriched.is_duplicate is False
-
-        # 富化後：具備社區，成功判定重複！
-        detail_enriched = detail_raw.enrich_from_listing(cand_duplicate)
-        res_enriched = await dedup.evaluate_candidate(detail_enriched, repo)
-        assert res_enriched.is_duplicate is True
-        assert res_enriched.confidence_score >= 0.7
+        res_with_community = await dedup.evaluate_candidate(detail_with_community, repo)
+        assert res_with_community.is_duplicate is True
+        assert res_with_community.confidence_score >= 0.7
 
 
 @pytest.mark.asyncio

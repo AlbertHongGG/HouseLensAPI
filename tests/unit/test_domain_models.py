@@ -189,29 +189,6 @@ class TestSaleHouseModels:
         assert not hasattr(query, "rooms")
         assert "rooms" not in SaleHouseSearchQuery.model_fields
 
-    def test_enrich_from_listing(self):
-        """驗證從刊登清單摘要中富化補齊缺失之屬性"""
-        summary = NormalizedSaleListing(
-            provider_id="591",
-            external_house_id="S20604856",
-            title="碧硯閣三房",
-            price_wan=5258,
-            total_area_pin=46.29,
-            region="台北市",
-            section="松山區",
-            community_name="碧硯閣",
-        )
-        detail = NormalizedSalePropertyDetail(
-            external_house_id="S20604856",
-            title="碧硯閣三房",
-            price_wan=5258,
-            total_area_pin=46.29,
-            community_name=None,
-        )
-        enriched = detail.enrich_from_listing(summary)
-        assert enriched.community_name == "碧硯閣"
-        # 原物件保持不可變
-        assert detail.community_name is None
 
 
 class TestNewHouseModels:

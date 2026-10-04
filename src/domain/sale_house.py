@@ -94,15 +94,6 @@ class NormalizedSalePropertyDetail(BaseModel):
     def house_id(self) -> str:
         return self.external_house_id
 
-    def enrich_from_listing(self, listing: "NormalizedSaleListing") -> "NormalizedSalePropertyDetail":
-        """從刊登清單摘要中補齊詳情封包所缺失之屬性 (如: community_name)"""
-        update_dict = {}
-        if not self.community_name and listing.community_name:
-            update_dict["community_name"] = listing.community_name
-        if update_dict:
-            return self.model_copy(update=update_dict)
-        return self
-
 
 # 別名相容規範
 SaleListingSpec = NormalizedSaleListing
