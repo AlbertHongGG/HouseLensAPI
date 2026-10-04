@@ -277,8 +277,9 @@ uv run houselens test 591 --format json
 | `source_provider` | String(32) | 來源平台 | - | 固定 `"591"` |
 | `source_id` | String(64) | 來源社區 ID | 清單 `items[].id` | 轉字串（唯一索引） |
 | `name` | String(128) | 社區名稱 | 清單 `items[].name` | 去前後空白 |
-| `build_purpose` | String(64) | 主要用途 | 詳情 `build_info.purpose_str` | 如「住宅大樓」 |
-| `build_type` | String(64) | 建物型態 | 詳情 `build_info.build_type_str` | 如「新成屋」 |
+| `housing_status` | String(32) | 成屋/建案狀態 | 清單 `housing_text`<br>詳情 `build_info.build_type` 代碼 | 如「預售屋」、「新成屋」、「中古屋」 |
+| `building_type` | String(64) | 建物實體型態 | 詳情 `build_info.purpose_str` | 如「住宅大樓」、「華廈」、「透天」、「商辦」 |
+| `build_purpose` | String(64) | 法定使用用途 | 詳情 `build_info.purpose_other2` | 如「住家用」、「住商用」、「商業用」 |
 | `region_name` | String(32) | 縣市 | 清單 `items[].region` | 如「台北市」 |
 | `section_name` | String(32) | 行政區 | 清單 `items[].section` | 如「松山區」 |
 | `address` | String(256) | 地址 | 清單 `items[].simple_address` 組合 | 清單組合縣市與行政區 |

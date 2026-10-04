@@ -25,8 +25,9 @@ class CommunityTable(Base, TimestampMixin):
     source_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
 
     name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    building_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     build_purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    build_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    housing_status: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
 
     region_name: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
     section_name: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)

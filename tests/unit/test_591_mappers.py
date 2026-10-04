@@ -55,6 +55,7 @@ class Test591CommunityMappers:
         assert summary.avg_unit_price_wan is not None
         assert summary.coordinates is not None
         assert summary.build_purpose == "住宅"
+        assert summary.housing_status == "新成屋"
         assert summary.shopping_district == "石牌"
         assert summary.transport == "明德"
         assert summary.cover_image_url is not None
@@ -85,9 +86,9 @@ class Test591CommunityMappers:
         assert detail.parking_ratio_pct == 1.07
         assert detail.structure == "SRC造"
         assert len(detail.facilities) > 0
-        assert detail.build_purpose == "住宅大樓"
-        assert detail.building_type == "新成屋"
-        assert detail.build_type == "新成屋"
+        assert detail.building_type == "住宅大樓"
+        assert detail.build_purpose == "住商用"
+        assert detail.housing_status == "新成屋"
         assert detail.avg_unit_price_wan == 160.0
         assert detail.park_type_str == "平面式"
         assert detail.park_price == "360~420萬"

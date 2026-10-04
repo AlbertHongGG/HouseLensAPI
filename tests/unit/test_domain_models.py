@@ -80,7 +80,9 @@ class TestCommunityModels:
             coordinates=GeoPoint(lat=25.056, lng=121.564),
             avg_unit_price_wan=141.0,
             building_age_years=1.0,
-            building_type="新成屋",
+            building_type="住宅大樓",
+            build_purpose="住宅",
+            housing_status="新成屋",
             living_circle_name="民生社區",
             nearest_station="南京三民站",
             cover_image_url="https://example.com/cover.jpg",
@@ -89,6 +91,8 @@ class TestCommunityModels:
         assert summary.avg_unit_price_wan == 141.0
         assert summary.coordinates.lat == 25.056
         assert summary.address == "台北市松山區延壽街72巷..."
+        assert summary.housing_status == "新成屋"
+        assert summary.building_type == "住宅大樓"
 
     def test_community_detail_instantiation(self):
         detail = NormalizedCommunityDetail(
@@ -97,18 +101,24 @@ class TestCommunityModels:
             address="台北市松山區延壽街72巷",
             region_name="台北市",
             section_name="松山區",
+            building_type="住宅大樓",
+            build_purpose="住家用",
+            housing_status="新成屋",
             parking_ratio_pct=1.07,
             direction_rule="朝北、朝南",
             facilities=["接待大廳", "空中花園"],
             manage_fee_per_pin=150,
             total_households=290,
-            base_area_pin=450.0,
+            base_area_num=450.0,
             public_ratio_pct=32.0,
         )
         assert detail.community_id == "5934204"
         assert len(detail.facilities) == 2
         assert detail.direction_rule == "朝北、朝南"
         assert detail.manage_fee_per_pin == 150
+        assert detail.building_type == "住宅大樓"
+        assert detail.build_purpose == "住家用"
+        assert detail.housing_status == "新成屋"
 
 
 class TestSaleHouseModels:

@@ -59,8 +59,9 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
         full_address=full_addr,
         coordinates=coords,
         avg_unit_price_wan=avg_price,
-        building_type=item.get("housing_type_str") or item.get("build_type"),
+        building_type=None,
         build_purpose=item.get("build_purpose_simple"),
+        housing_status=item.get("housing_text"),
         living_circle_name=item.get("shop_name"),
         nearest_station=item.get("station_name"),
         cover_image_url=cover_url,
@@ -136,9 +137,26 @@ def map_community_detail(
     price_raw = price_obj.get("price") if isinstance(price_obj, dict) else (str(price_obj) if price_obj else None)
     avg_price = parse_unit_price(price_raw)
 
-    # 建物型態與法定用途 (直取 build_info)
-    build_type = build_info.get("build_type_str")
-    build_purpose = build_info.get("purpose_str")
+    # 三維正交解耦映射 (直取 build_info 單一區塊)
+    # 1. 建物實體型態 (如: 住宅大樓、華廈、透天、商辦)
+    building_type = build_info.get("purpose_str")
+
+    # 2. 法定使用用途 (如: 住家用、住商用、商業用)
+    build_purpose = build_info.get("purpose_other2") or summary.build_purpose
+
+    # 3. 成屋/建案狀態 (如: 預售屋、新成屋、中古屋)
+    raw_status_code = build_info.get("build_type")
+    raw_status_str = (build_info.get("build_type_str") or "").strip()
+    if raw_status_str:
+        housing_status = raw_status_str
+    elif raw_status_code == 1:
+        housing_status = "預售屋"
+    elif raw_status_code == 2:
+        housing_status = "新成屋"
+    elif raw_status_code == 5:
+        housing_status = "中古屋"
+    else:
+        housing_status = summary.housing_status
 
     # 公設清單
     facility_list = build_info.get("facility") or []
@@ -156,9 +174,10 @@ def map_community_detail(
         cover_image_url=summary.cover_image_url,
         shopping_district=summary.shopping_district,
         transport=summary.transport,
-        # --- 建築規格與規劃：100% 取自詳情 build_info 單一區塊 ---
-        build_type=build_type,
+        # --- 建築規格與規劃：100% 取自詳情 build_info 單一區塊 (三維解耦) ---
+        building_type=building_type,
         build_purpose=build_purpose,
+        housing_status=housing_status,
         avg_unit_price_wan=avg_price,
         total_households=total_households,
         parking_count=parking_count,

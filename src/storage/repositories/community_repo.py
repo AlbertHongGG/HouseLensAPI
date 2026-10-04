@@ -55,8 +55,9 @@ class CommunityRepository(ICommunityRepository):
                 source_provider=provider_id,
                 source_id=summary.community_id,
                 name=summary.community_name,
+                building_type=summary.building_type,
                 build_purpose=summary.build_purpose,
-                build_type=summary.building_type,
+                housing_status=summary.housing_status,
                 region_name=summary.region_name,
                 section_name=summary.section_name,
                 address=summary.address,
@@ -71,10 +72,12 @@ class CommunityRepository(ICommunityRepository):
             self.session.add(record)
         else:
             record.name = summary.community_name
+            if summary.building_type:
+                record.building_type = summary.building_type
             if summary.build_purpose:
                 record.build_purpose = summary.build_purpose
-            if summary.building_type:
-                record.build_type = summary.building_type
+            if summary.housing_status:
+                record.housing_status = summary.housing_status
             if summary.region_name:
                 record.region_name = summary.region_name
             if summary.section_name:
@@ -118,8 +121,9 @@ class CommunityRepository(ICommunityRepository):
                 source_provider=provider_id,
                 source_id=detail.community_id,
                 name=detail.community_name,
-                build_type=detail.building_type,
+                building_type=detail.building_type,
                 build_purpose=detail.build_purpose,
+                housing_status=detail.housing_status,
                 transport=detail.transport,
                 address=detail.address,
                 region_name=detail.region_name,
@@ -154,9 +158,11 @@ class CommunityRepository(ICommunityRepository):
         else:
             record.name = detail.community_name
             if detail.building_type:
-                record.build_type = detail.building_type
+                record.building_type = detail.building_type
             if detail.build_purpose:
                 record.build_purpose = detail.build_purpose
+            if detail.housing_status:
+                record.housing_status = detail.housing_status
             if detail.transport:
                 record.transport = detail.transport
             if detail.address:

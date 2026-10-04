@@ -21,8 +21,10 @@ class NormalizedCommunitySummary(BaseModel):
     coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
     avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="平均單價 (萬元/坪)")
     building_age_years: Optional[float] = Field(None, ge=0.0, description="屋齡 (年)")
-    building_type: Optional[str] = Field(None, description="建物型態")
-    build_purpose: Optional[str] = Field(None, description="主要用途")
+    # 三維正交解耦欄位
+    building_type: Optional[str] = Field(None, description="建物實體型態 (如: 住宅大樓、華廈、公寓、透天)")
+    build_purpose: Optional[str] = Field(None, description="主要用途 (如: 住宅、商辦)")
+    housing_status: Optional[str] = Field(None, description="成屋/建案狀態 (如: 預售屋、新成屋、中古屋)")
     living_circle_name: Optional[str] = Field(None, description="生活圈商圈名稱")
     nearest_station: Optional[str] = Field(None, description="鄰近捷運站點")
     cover_image_url: Optional[str] = Field(None, description="封面圖片網址")
@@ -43,8 +45,6 @@ class NormalizedCommunitySummary(BaseModel):
 class NormalizedCommunityDetail(BaseModel):
     """跨平台統一社區完整規格 (純數值化)"""
 
-    model_config = ConfigDict(populate_by_name=True)
-
     community_id: str = Field(..., description="社區唯一代號")
     community_name: str = Field(..., description="社區名稱")
     address: str = Field(..., description="社區完整地址")
@@ -62,9 +62,10 @@ class NormalizedCommunityDetail(BaseModel):
     base_area_num: Optional[float] = Field(None, ge=0.0, description="基地總面積純浮點數 (單位: 坪)")
     building_age_years: Optional[float] = Field(None, ge=0.0, description="完工屋齡純浮點數 (單位: 年)")
 
-    # 團隊與工法描述
-    building_type: Optional[str] = Field(None, alias="build_type", description="建物型態")
-    build_purpose: Optional[str] = Field(None, description="主要用途")
+    # 團隊與工法描述 (三維正交設計)
+    building_type: Optional[str] = Field(None, description="建物實體型態 (如: 住宅大樓、華廈、公寓、透天)")
+    build_purpose: Optional[str] = Field(None, description="法定使用用途 (如: 住家用、住商用、商業用)")
+    housing_status: Optional[str] = Field(None, description="成屋/建案狀態 (如: 預售屋、新成屋、中古屋)")
     structure: Optional[str] = Field(None, description="建築結構工法 (如: SRC造)")
     direction_rule: Optional[str] = Field(None, description="座向規劃")
     floor_plan_desc: Optional[str] = Field(None, description="樓層規劃描述 (如: 地上24層,地下4層)")
@@ -80,10 +81,6 @@ class NormalizedCommunityDetail(BaseModel):
     developer_company: Optional[str] = Field(None, description="投資興建公司")
     builder_company: Optional[str] = Field(None, description="營造公司")
     architect_company: Optional[str] = Field(None, description="建築設計事務所")
-
-    @property
-    def build_type(self) -> Optional[str]:
-        return self.building_type
 
     @property
     def base_area_pin(self) -> Optional[float]:

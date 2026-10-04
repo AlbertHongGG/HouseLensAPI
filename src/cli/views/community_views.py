@@ -24,7 +24,8 @@ def render_community_table(communities: List[CommunityTable]) -> Table:
     table.add_column("來源平台/ID", style="magenta", justify="center")
     table.add_column("社區名稱", style="bold white")
     table.add_column("區域", style="yellow")
-    table.add_column("類型", style="green")
+    table.add_column("狀態", style="cyan", justify="center")
+    table.add_column("型態", style="green")
     table.add_column("平均單價", justify="right", style="bold yellow")
     table.add_column("屋齡 / 戶數", justify="center")
     table.add_column("生活圈 / 捷運", style="dim")
@@ -45,7 +46,8 @@ def render_community_table(communities: List[CommunityTable]) -> Table:
             source_tag,
             c.name,
             region,
-            c.build_type or c.build_purpose or "-",
+            c.housing_status or "-",
+            c.building_type or "-",
             price_str,
             specs,
             trans,
@@ -76,11 +78,12 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     details_table.add_row("社區名稱:", f"[bold yellow]{c.name}[/bold yellow]", "均價行情:", price_str)
     details_table.add_row("地址描述:", c.address or "-", "地理座標:", coords_str)
     details_table.add_row("行政區域:", f"{c.region_name or ''} {c.section_name or ''}", "生活圈/捷運:", f"{c.shopping_district or '-'} / {c.transport or '-'}")
-    details_table.add_row("建物型態:", c.build_type or "-", "法定用途:", c.build_purpose or "-")
+    details_table.add_row("狀態/型態:", f"{c.housing_status or '-'} / {c.building_type or '-'}", "法定用途:", c.build_purpose or "-")
     details_table.add_row("屋齡規格:", age_str, "規劃總戶數:", hh_str)
     details_table.add_row("樓層規劃:", c.floor_plan or "-", "建築結構:", c.structure or "-")
     details_table.add_row("基地總坪:", base_str, "公設比率:", pub_str)
     details_table.add_row("車位總數:", park_cnt_str, "車位配比/型態:", f"{park_pct_str} ({c.park_type_str or '-'})")
+    details_table.add_row("車位價格:", c.park_price or "-", "土地分區:", c.land_division or "-")
     details_table.add_row("座向規則:", c.direction_rule or "-", "管理費單價:", mgmt_fee_str)
     details_table.add_row("投資建設:", c.developer_company or "-", "營造廠:", c.builder_company or "-")
     details_table.add_row("建築設計:", c.architect_company or "-", "景觀/公設設計:", f"{c.landscape_name or '-'} / {c.postulate_name or '-'}")
@@ -104,6 +107,9 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
         "source_provider": c.source_provider,
         "source_id": c.source_id,
         "name": c.name,
+        "housing_status": c.housing_status,
+        "building_type": c.building_type,
+        "build_purpose": c.build_purpose,
         "region_name": c.region_name,
         "section_name": c.section_name,
         "address": c.address,
@@ -116,7 +122,10 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
         "total_households": c.total_households,
         "floor_plan": c.floor_plan,
         "structure": c.structure,
+        "base_area_num": c.base_area_num,
         "base_area_pin": c.base_area_pin,
+        "land_division": c.land_division,
+        "park_price": c.park_price,
         "public_ratio_pct": c.public_ratio_pct,
         "parking_count": c.parking_count,
         "parking_ratio_pct": c.parking_ratio_pct,

@@ -43,7 +43,8 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             build_purpose="住宅",
-            building_type="新成屋",
+            building_type="住宅大樓",
+            housing_status="新成屋",
             region_name="台北市",
             section_name="松山區",
             full_address="台北市松山區延壽街76之1號",
@@ -59,13 +60,17 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         assert saved.lat == 25.0569
         assert saved.avg_unit_price_wan == 129.0
         assert saved.building_age_years == 1.0
+        assert saved.building_type == "住宅大樓"
+        assert saved.build_purpose == "住宅"
+        assert saved.housing_status == "新成屋"
 
         # 2. 從 Detail 豐富欄位規格
         detail = NormalizedCommunityDetail(
             community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
-            building_type="新成屋",
-            build_purpose="住宅",
+            building_type="住宅大樓",
+            build_purpose="住家用",
+            housing_status="新成屋",
             address="台北市松山區延壽街76之1號",
             region_name="台北市",
             section_name="松山區",
@@ -86,6 +91,9 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         )
         updated = await repo.upsert_from_detail(detail, provider_id="591")
         assert updated.id == saved.id
+        assert updated.building_type == "住宅大樓"
+        assert updated.build_purpose == "住家用"
+        assert updated.housing_status == "新成屋"
         assert updated.structure == "SRC造"
         assert updated.total_households == 290
         assert updated.manage_fee_per_pin == 150
