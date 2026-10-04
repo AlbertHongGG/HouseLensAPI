@@ -13,7 +13,7 @@ uv sync
 ```
 
 ### 2. 執行自動化測試
-全套 51 項單元與整合測試（含 591 即時 API 整合測試與診斷套件）：
+全套 77 項單元測試（涵蓋領域模型規格、591 封包正規化轉換、倉儲層、消歧去重服務與串流同步管線）：
 ```bash
 uv run pytest tests/ -v
 ```
@@ -235,9 +235,14 @@ uv run houselens test 591 --format json
 
 ## 核心架構與消歧去重機制
 
+* 領域模型自足性與不變性（Clean Architecture & DDD Invariants）：
+  * 核心層規範純淨強型別領域模型（Canonical Specifications），嚴格保持不可變性（Immutability）與構造完整性。
+  * 外部平台端點分散與封包特化細節完全由 Provider 適配器內部吸收與直取映射，嚴禁任何時序耦合的二段式補丁反模式（零臨時 enrich 打補丁邏輯）。
 * 外掛自主正規化（Anti-Corruption Layer）：
   * 各平台外掛模組（如 591）負責完全清洗其特化字串（如 `"5,258萬元"`, `"2F/24F"`, `"3房2廳2衛"`, `"1年"`, `"30%"`, `"4200元/月"`）。
   * 核心層契約與領域規格僅流通純強型別數值（`int`, `float`, `bool`），絕不允許非結構化雜質溢出模組外。
+* 串流微批次同步管線（Streaming Micro-batch Pipeline）：
+  * 逐頁探索、快篩已入庫、併發取得自足規格、即時微批次持久化入庫，兼顧記憶體控制、失敗重試隔離與目標筆數跨頁累加。
 * 實體與刊登解耦（1:N）：
   * `PropertyTable`：代表現實客觀物理房屋（純數值總價 `price_wan`、單價 `unit_price_wan`、總坪數 `total_area_pin`、所在樓層 `floor_current`、總樓層 `floor_total`、房數 `rooms`、屋齡 `building_age_years`）。
   * `PropertyListingTable`：代表各房仲刊登廣告（來源平台、外部 ID、該刊登開價、封面圖）。
@@ -276,8 +281,8 @@ uv run houselens test 591 --format json
 | `region_name` | String(32) | 縣市 | 清單 `items[].region`<br>詳情 `base_info.region_name` | 如「台北市」 |
 | `section_name` | String(32) | 行政區 | 清單 `items[].section`<br>詳情 `base_info.section_name` | 如「松山區」 |
 | `address` | String(256) | 地址 | 清單 `items[].simple_address`<br>詳情 `base_info.address` | 清單組合縣市與行政區 |
-| `lat` / `lng` | Float | 經緯度 | 清單 `items[].lat`, `lng`<br>詳情 `base_info.lat`, `lng` | 轉 float |
-| `avg_unit_price_wan` | Float | 平均單價 (萬/坪) | 清單 `items[].price.price` | 轉 float |
+| `lat` / `lng` | Float | 經緯度 | 清單 `items[].lat`, `lng`<br>詳情 `banners.lat`, `banners.lng` | 轉 float |
+| `avg_unit_price_wan` | Float | 平均單價 (萬/坪) | 清單 `items[].price.price`<br>詳情 `build_info.price.price` | 直取純數值，轉 float |
 | `building_age_years` | Float | 屋齡 (年) | 詳情 `build_info.age.content` | `1年` $\to$ `1.0`；`全新` $\to$ `0.0` |
 | `total_households` | Int | 總戶數 | 詳情 `build_info.all_house_num.content` | 轉 int |
 | `base_area_pin` | Float | 基地面積 (坪) | 詳情 `build_info.base_area_num` | 轉 float |
@@ -285,8 +290,8 @@ uv run houselens test 591 --format json
 | `parking_count` | Int | 車位總數 | 詳情 `build_info.all_park_num` | 轉 int |
 | `parking_ratio_pct` | Float | 車位比率 | 詳情 `build_info.park_rate` | 如 `1:1.07` $\to$ `1.07` |
 | `manage_fee_per_pin` | Int | 管理費 (元/坪/月) | 詳情 `build_info.manage_cost.price` | 轉 int |
-| `shopping_district` | String(64) | 所屬商圈 | 清單 `items[].shop_name` | - |
-| `transport` | String(128) | 鄰近站點 | 清單 `items[].station_name` | - |
+| `shopping_district` | String(64) | 所屬商圈 | 清單 `items[].shop_name`<br>詳情 `base_info.shopping_district` | - |
+| `transport` | String(128) | 鄰近站點 | 清單 `items[].station_name`<br>詳情 `base_info.transport` | - |
 | `floor_plan` | String(64) | 樓層規劃 | 詳情 `build_info.floor` | 如「地上24層,地下4層」 |
 | `structure` | String(64) | 結構工法 | 詳情 `build_info.structural_engine` | 如「SRC造」 |
 | `park_type_str` | String(64) | 車位型態 | 詳情 `build_info.park_type_str` | 如「坡道平面」 |
@@ -297,7 +302,7 @@ uv run houselens test 591 --format json
 | `developer_company` | String(128) | 建商 | 詳情 `build_info.company` | 建設公司名稱 |
 | `builder_company` | String(128) | 營造廠 | 詳情 `build_info.build_company` | 營造公司名稱 |
 | `architect_company` | String(128) | 建築師 | 詳情 `build_info.construction_company` | 事務所名稱 |
-| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src.src` | - |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src.src`<br>詳情 `banners.community_images` | 提取封面/外觀照片 |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |
 
 ---
