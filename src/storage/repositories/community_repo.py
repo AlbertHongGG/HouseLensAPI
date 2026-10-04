@@ -145,6 +145,7 @@ class CommunityRepository(ICommunityRepository):
                 developer_company=detail.developer_company,
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
+                cover_image_url=detail.cover_image_url,
             )
             self.session.add(record)
         else:
@@ -206,6 +207,8 @@ class CommunityRepository(ICommunityRepository):
                 record.builder_company = detail.builder_company
             if detail.architect_company:
                 record.architect_company = detail.architect_company
+            if detail.cover_image_url:
+                record.cover_image_url = detail.cover_image_url
 
         await self.session.flush()
         return record

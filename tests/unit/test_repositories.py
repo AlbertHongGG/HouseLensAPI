@@ -76,6 +76,10 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             public_ratio_pct=32.0,
             facilities=["接待大廳", "空中花園"],
             developer_company="中華工程股份有限公司",
+            cover_image_url="https://example.com/cover.jpg",
+            park_type_str="平面式",
+            landscape_name="境業設計",
+            postulate_name="境業設計",
         )
         updated = await repo.upsert_from_detail(detail, provider_id="591")
         assert updated.id == saved.id
@@ -83,6 +87,10 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         assert updated.total_households == 290
         assert updated.manage_fee_per_pin == 150
         assert updated.facilities == ["接待大廳", "空中花園"]
+        assert updated.cover_image_url == "https://example.com/cover.jpg"
+        assert updated.park_type_str == "平面式"
+        assert updated.landscape_name == "境業設計"
+        assert updated.postulate_name == "境業設計"
 
         # 3. 搜尋驗證 (含屋齡篩選)
         results = await repo.search(region="台北市", keyword="鳴森", min_age_years=0, max_age_years=5)

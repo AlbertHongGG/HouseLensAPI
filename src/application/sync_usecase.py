@@ -114,6 +114,7 @@ class SyncUseCase:
                 repo = CommunityRepository(session)
                 for item, detail in pairs:
                     if detail is not None:
+                        detail.enrich_from_summary(item)
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
                         saved.append(record)
                     else:

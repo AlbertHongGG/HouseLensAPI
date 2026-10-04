@@ -52,9 +52,12 @@ class Test591CommunityMappers:
         assert isinstance(summary, NormalizedCommunitySummary)
         assert summary.community_id == str(items[0]["id"])
         assert summary.community_name == items[0]["name"]
-        assert summary.region_name == "台北市"
         assert summary.avg_unit_price_wan is not None
         assert summary.coordinates is not None
+        assert summary.build_purpose == "住宅"
+        assert summary.shopping_district == "石牌"
+        assert summary.transport == "明德"
+        assert summary.cover_image_url is not None
 
     def test_map_community_detail_from_capture(self):
         data = load_captured_json("社區詳情資訊 Respond.json")
@@ -68,6 +71,45 @@ class Test591CommunityMappers:
         assert detail.parking_ratio_pct == 1.07
         assert detail.structure == "SRC造"
         assert len(detail.facilities) > 0
+        assert detail.build_purpose == "住宅"
+        assert detail.coordinates is not None
+        assert abs(detail.coordinates.lat - 25.05699) < 0.001
+        assert abs(detail.coordinates.lng - 121.56489) < 0.001
+        assert detail.avg_unit_price_wan == 129.0
+        assert detail.shopping_district == "民生社區"
+        assert detail.transport == "南京三民"
+        assert detail.park_type_str == "平面式"
+        assert detail.landscape_name == "境業設計工程有限公司"
+        assert detail.postulate_name == "境業設計工程有限公司"
+        assert detail.cover_image_url is not None
+
+    def test_enrich_community_detail_from_summary(self):
+        summary_data = load_captured_json("社區清單 Respond.json")
+        items = summary_data.get("data", {}).get("items", [])
+        summary = map_community_summary(items[0])
+
+        # 模擬一個部分欄位為空的 detail
+        detail = NormalizedCommunityDetail(
+            community_id="test_id",
+            community_name="測試社區",
+            address="",
+            region_name="台北市",
+            section_name="士林區",
+        )
+        assert detail.coordinates is None
+        assert detail.build_purpose is None
+        assert detail.shopping_district is None
+        assert detail.transport is None
+        assert detail.cover_image_url is None
+
+        detail.enrich_from_summary(summary)
+        assert detail.coordinates == summary.coordinates
+        assert detail.build_purpose == summary.build_purpose
+        assert detail.shopping_district == summary.shopping_district
+        assert detail.transport == summary.transport
+        assert detail.cover_image_url == summary.cover_image_url
+        assert detail.address == summary.full_address
+
 
 
 class Test591SaleHouseMappers:

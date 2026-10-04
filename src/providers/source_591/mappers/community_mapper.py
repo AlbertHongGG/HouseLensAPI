@@ -20,6 +20,67 @@ from src.providers.source_591.normalizers import (
 )
 
 
+def _extract_cover_image_from_banners(banners: Any) -> Optional[str]:
+    """從 591 詳情 banners.community_images 中擷取封面圖片網址"""
+    if not isinstance(banners, dict):
+        return None
+    imgs = banners.get("community_images") or []
+    if not isinstance(imgs, list):
+        return None
+
+    first_img: Optional[str] = None
+    for group in imgs:
+        if not isinstance(group, dict):
+            continue
+        g_imgs = group.get("images") or []
+        for item in g_imgs:
+            if isinstance(item, dict):
+                if "photo" in item or "bigphoto" in item:
+                    url = item.get("photo") or item.get("bigphoto") or item.get("maxphoto")
+                    if url and not first_img:
+                        first_img = url
+                elif "images" in item:
+                    nested_imgs = item.get("images") or []
+                    for n_item in nested_imgs:
+                        url = n_item.get("photo") or n_item.get("bigphoto") or n_item.get("maxphoto")
+                        if url:
+                            if item.get("type") == "logo" or item.get("name") == "封面":
+                                return url
+                            if not first_img:
+                                first_img = url
+    return first_img
+
+
+def _extract_avg_unit_price(data: Dict[str, Any]) -> Optional[float]:
+    """從 591 詳情封包中提取平均單價 (優先順序: 近一年均價 > 最新均價 > 一般價格)"""
+    price_trend = data.get("price_trend")
+    if isinstance(price_trend, dict):
+        year_obj = price_trend.get("year")
+        if isinstance(year_obj, dict) and year_obj.get("price"):
+            val = parse_unit_price(year_obj.get("price"))
+            if val is not None:
+                return val
+        new_obj = price_trend.get("new")
+        if isinstance(new_obj, dict) and new_obj.get("price"):
+            val = parse_unit_price(new_obj.get("price"))
+            if val is not None:
+                return val
+
+    price_obj = data.get("price")
+    if isinstance(price_obj, dict) and price_obj.get("price"):
+        val = parse_unit_price(price_obj.get("price"))
+        if val is not None:
+            return val
+
+    build_info = data.get("build_info") or {}
+    if build_info.get("price"):
+        val = parse_unit_price(build_info.get("price"))
+        if val is not None:
+            return val
+
+    return None
+
+
 def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
     """將 591 search/list 原始項目轉換為標準 NormalizedCommunitySummary"""
     # 座標解析
@@ -59,7 +120,8 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
         full_address=full_addr,
         coordinates=coords,
         avg_unit_price_wan=avg_price,
-        building_type=item.get("housing_type_str") or item.get("build_purpose_simple"),
+        building_type=item.get("housing_type_str") or item.get("build_type"),
+        build_purpose=item.get("build_purpose_simple"),
         living_circle_name=item.get("shop_name"),
         nearest_station=item.get("station_name"),
         cover_image_url=cover_url,
@@ -70,6 +132,7 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
     """將 591 community/info 原始資料清洗為強型別 NormalizedCommunityDetail"""
     base_info = data.get("base_info") or {}
     build_info = data.get("build_info") or {}
+    banners = data.get("banners") or {}
 
     # 屋齡解析為浮點數
     age_obj = build_info.get("age")
@@ -111,15 +174,28 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
     if isinstance(facility_list, str):
         facility_list = [f.strip() for f in facility_list.split(",") if f.strip()]
 
-    # 座標解析
-    lat = base_info.get("lat")
-    lng = base_info.get("lng")
+    # 座標解析：優先從 banners 取得，次由 base_info 取得
+    lat = banners.get("lat") or base_info.get("lat")
+    lng = banners.get("lng") or base_info.get("lng")
     coords: Optional[GeoPoint] = None
     if lat and lng:
         try:
             coords = GeoPoint(lat=float(lat), lng=float(lng))
         except (ValueError, TypeError):
             coords = None
+
+    # 單價解析
+    avg_price = _extract_avg_unit_price(data)
+
+    # 封面圖片解析
+    cover_image_url = _extract_cover_image_from_banners(banners)
+
+    # 用途
+    build_purpose = base_info.get("purpose_str") or build_info.get("purpose_str")
+
+    # 交通與生活圈商圈
+    transport = base_info.get("transport") or build_info.get("subway")
+    shopping_district = base_info.get("shopping_district")
 
     return NormalizedCommunityDetail(
         community_id=str(base_info.get("community_id")),
@@ -128,6 +204,7 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
         region_name=str(base_info.get("region_name") or ""),
         section_name=str(base_info.get("section_name") or ""),
         coordinates=coords,
+        avg_unit_price_wan=avg_price,
         total_households=total_households,
         parking_count=parking_count,
         parking_ratio_pct=park_ratio,
@@ -135,11 +212,17 @@ def map_community_detail(data: Dict[str, Any]) -> NormalizedCommunityDetail:
         manage_fee_per_pin=manage_fee,
         base_area_pin=base_area,
         building_age_years=building_age,
-        building_type=base_info.get("build_type_str"),
-        purpose=base_info.get("purpose_str"),
+        building_type=base_info.get("build_type_str") or build_info.get("build_type_str"),
+        build_purpose=build_purpose,
         structure=build_info.get("structural_engine"),
         direction_rule=build_info.get("direction_rule"),
         floor_plan_desc=build_info.get("floor"),
+        park_type_str=build_info.get("park_type_str"),
+        shopping_district=shopping_district,
+        transport=transport,
+        landscape_name=build_info.get("landscape_name"),
+        postulate_name=build_info.get("postulate_name"),
+        cover_image_url=cover_image_url,
         facilities=facility_list,
         developer_company=build_info.get("company"),
         builder_company=build_info.get("build_company"),
