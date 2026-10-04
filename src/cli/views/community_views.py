@@ -26,7 +26,7 @@ def render_community_table(communities: List[CommunityTable]) -> Table:
     table.add_column("區域", style="yellow")
     table.add_column("狀態", style="cyan", justify="center")
     table.add_column("型態", style="green")
-    table.add_column("平均單價", justify="right", style="bold yellow")
+    table.add_column("成交均價", justify="right", style="bold yellow")
     table.add_column("屋齡 / 戶數", justify="center")
     table.add_column("生活圈 / 捷運", style="dim")
 
@@ -75,7 +75,7 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     mgmt_fee_str = f"{c.manage_fee_per_pin} 元/坪/月" if c.manage_fee_per_pin is not None else "-"
 
     details_table.add_row("社區 ID:", c.id, "外部來源:", f"{c.source_provider} ({c.source_id})")
-    details_table.add_row("社區名稱:", f"[bold yellow]{c.name}[/bold yellow]", "均價行情:", price_str)
+    details_table.add_row("社區名稱:", f"[bold yellow]{c.name}[/bold yellow]", "成交均價:", price_str)
     details_table.add_row("地址描述:", c.address or "-", "地理座標:", coords_str)
     details_table.add_row("行政區域:", f"{c.region_name or ''} {c.section_name or ''}", "生活圈/捷運:", f"{c.shopping_district or '-'} / {c.transport or '-'}")
     details_table.add_row("狀態/型態:", f"{c.housing_status or '-'} / {c.building_type or '-'}", "法定用途:", c.build_purpose or "-")

@@ -132,11 +132,6 @@ def map_community_detail(
     # 土地使用分區
     land_division = build_info.get("land_division")
 
-    # 單價數值化解析 (直取 build_info.price)
-    price_obj = build_info.get("price")
-    price_raw = price_obj.get("price") if isinstance(price_obj, dict) else (str(price_obj) if price_obj else None)
-    avg_price = parse_unit_price(price_raw)
-
     # 三維正交解耦映射 (直取 build_info 單一區塊)
     # 1. 建物實體型態 (如: 住宅大樓、華廈、透天、商辦)
     building_type = build_info.get("purpose_str")
@@ -164,13 +159,14 @@ def map_community_detail(
         facility_list = [f.strip() for f in facility_list.split(",") if f.strip()]
 
     return NormalizedCommunityDetail(
-        # --- 基礎識別與地理資訊：100% 取自清單 (summary) ---
+        # --- 基礎識別、地理資訊與市場行情：100% 取自清單 (summary，成交均價單一事實來源) ---
         community_id=summary.community_id,
         community_name=summary.community_name,
         region_name=summary.region_name,
         section_name=summary.section_name,
         address=summary.full_address,
         coordinates=summary.coordinates,
+        avg_unit_price_wan=summary.avg_unit_price_wan,
         cover_image_url=summary.cover_image_url,
         shopping_district=summary.shopping_district,
         transport=summary.transport,
@@ -178,7 +174,6 @@ def map_community_detail(
         building_type=building_type,
         build_purpose=build_purpose,
         housing_status=housing_status,
-        avg_unit_price_wan=avg_price,
         total_households=total_households,
         parking_count=parking_count,
         park_price=park_price,

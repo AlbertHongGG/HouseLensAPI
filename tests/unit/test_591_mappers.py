@@ -89,7 +89,8 @@ class Test591CommunityMappers:
         assert detail.building_type == "住宅大樓"
         assert detail.build_purpose == "住商用"
         assert detail.housing_status == "新成屋"
-        assert detail.avg_unit_price_wan == 160.0
+        assert detail.avg_unit_price_wan == summary.avg_unit_price_wan
+        assert detail.avg_unit_price_wan == 94.0
         assert detail.park_type_str == "平面式"
         assert detail.park_price == "360~420萬"
         assert detail.base_area_num == 1446.0

@@ -19,7 +19,7 @@ class NormalizedCommunitySummary(BaseModel):
     section_name: str = Field(..., description="行政區名稱")
     full_address: str = Field(..., description="完整地址")
     coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
-    avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="平均單價 (萬元/坪)")
+    avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="成交均價 (萬元/坪)")
     building_age_years: Optional[float] = Field(None, ge=0.0, description="屋齡 (年)")
     # 三維正交解耦欄位
     building_type: Optional[str] = Field(None, description="建物實體型態 (如: 住宅大樓、華廈、公寓、透天)")
@@ -53,7 +53,7 @@ class NormalizedCommunityDetail(BaseModel):
     coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
 
     # 建築規劃規格 (純數值化)
-    avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="平均單價 (萬元/坪)")
+    avg_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="成交均價 (萬元/坪)")
     total_households: Optional[int] = Field(None, ge=0, description="總戶數純整數 (例如: 290)")
     parking_count: Optional[int] = Field(None, ge=0, description="規劃車位總數純整數 (例如: 152)")
     parking_ratio_pct: Optional[float] = Field(None, ge=0.0, description="車位配比率 (例如: 1.07)")

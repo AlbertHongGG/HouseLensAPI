@@ -37,7 +37,7 @@ class CommunityTable(Base, TimestampMixin):
     lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     # 純數值行情與規格
-    avg_unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 平均單價 (萬元/坪)
+    avg_unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 成交均價 (萬元/坪)
     building_age_years: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)  # 屋齡 (年)
     total_households: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 總戶數
     base_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積 (坪)

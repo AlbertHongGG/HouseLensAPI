@@ -269,7 +269,7 @@ uv run houselens test 591 --format json
 ### 1. `communities` (社區)
 
 對應來源：591 社區清單 API (`/v1/search/list`) & 社區詳情 API (`/v1/app/gateway/community/info`)  
-*架構原則：劃分單一事實來源（Single Source of Truth），基礎地理與身分 100% 來自「清單」API，詳細硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。*
+*架構原則：劃分單一事實來源（Single Source of Truth），基礎地理、成交均價與身分 100% 來自「清單」API，詳細建築硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。*
 
 | 欄位 | 型別 | 說明 | 591 API Body 路徑 | 轉換規則 / 備註 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -284,7 +284,7 @@ uv run houselens test 591 --format json
 | `section_name` | String(32) | 行政區 | 清單 `items[].section` | 如「松山區」 |
 | `address` | String(256) | 地址 | 清單 `items[].simple_address` 組合 | 清單組合縣市與行政區 |
 | `lat` / `lng` | Float | 經緯度 | 清單 `items[].lat`, `items[].lng` | 清單直取，轉 float |
-| `avg_unit_price_wan` | Float | 平均單價 (萬/坪) | 詳情 `build_info.price.price` | 直取純數值，轉 float |
+| `avg_unit_price_wan` | Float | 成交均價 (萬/坪) | 清單 `items[].price` | 清單直取實價登錄成交均價，轉 float |
 | `building_age_years` | Float | 屋齡 (年) | 詳情 `build_info.age.content` | `1年` $\to$ `1.0`；`全新` $\to$ `0.0` |
 | `total_households` | Int | 總戶數 | 詳情 `build_info.all_house_num.content` | 轉 int |
 | `base_area_num` | Float | 基地面積 (坪) | 詳情 `build_info.base_area_num` | 轉 float（支援 `base_area_pin` 別名） |
