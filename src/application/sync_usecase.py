@@ -115,9 +115,9 @@ class SyncUseCase:
                 for item, detail in pairs:
                     if detail is not None:
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+                        saved.append(record)
                     else:
-                        record = await repo.upsert_from_summary(item, provider_id=provider_id)
-                    saved.append(record)
+                        logger.warning(f"社區項目 {item.community_id} ({item.community_name}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedCommunitySummary, NormalizedCommunityDetail, CommunityTable](
@@ -198,19 +198,9 @@ class SyncUseCase:
                             summary=item,
                             candidate_property_id=candidate_id,
                         )
+                        saved.append(prop)
                     else:
-                        eval_res = await self.dedup.evaluate_candidate(item, repo)
-                        candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
-                        if eval_res.is_duplicate and candidate_id:
-                            dups_count += 1
-                            rep.on_item_duplicate(item.title, candidate_id)
-
-                        prop = await repo.upsert_from_summary(
-                            item,
-                            provider_id=provider_id,
-                            candidate_property_id=candidate_id,
-                        )
-                    saved.append(prop)
+                        logger.warning(f"中古屋房源項目 {item.house_id} ({item.title}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedSaleListing, NormalizedSalePropertyDetail, PropertyTable](
@@ -278,9 +268,9 @@ class SyncUseCase:
                 for item, detail in pairs:
                     if detail is not None:
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+                        saved.append(record)
                     else:
-                        record = await repo.upsert_from_summary(item, provider_id=provider_id)
-                    saved.append(record)
+                        logger.warning(f"新建案項目 {item.source_hid} ({item.project_name}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedNewHouseSummary, NormalizedNewHouseDetail, NewHouseTable](

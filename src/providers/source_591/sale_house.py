@@ -69,7 +69,7 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
         raw_records = data_block.get("records")
         total_records = int(raw_records) if raw_records else len(items_raw)
 
-        # 透過模組內部 mapper 清洗為純淨標準規格 (過濾廣告 is_ads == "1")
+        # 透過模組內部 mapper 與校驗器清洗為純淨標準規格 (過濾虛擬廣告卡片與定交下架項目)
         valid_items = []
         for it in items_raw:
             if isinstance(it, dict):

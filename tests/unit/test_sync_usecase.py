@@ -306,6 +306,7 @@ async def test_sync_all_with_unified_options(sync_test_db):
             provider_id="mock_591",
             title=f"中古屋_{hid}",
             price_wan=2500,
+            total_area_pin=31.25,
             region_name="台北市",
             section_name="大安區",
             full_address="台北市大安區和平東路",
@@ -313,7 +314,7 @@ async def test_sync_all_with_unified_options(sync_test_db):
         )
 
     mock_sale.search_sale_houses = AsyncMock(side_effect=mock_search_sale)
-    mock_sale.get_sale_property_detail = AsyncMock(side_effect=mock_detail_sale)
+    mock_sale.get_sale_house_detail = AsyncMock(side_effect=mock_detail_sale)
 
     # 3. Mock New House Service
     mock_new = MagicMock()
@@ -372,3 +373,70 @@ async def test_sync_all_with_unified_options(sync_test_db):
     assert mock_comm.search_communities.call_count == 1
     assert mock_sale.search_sale_houses.call_count == 1
     assert mock_new.search_new_houses.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_sync_sale_houses_skips_failed_details_and_accumulates(sync_test_db):
+    """驗證詳情獲取失敗（如 404/物件未找到）時跳過入庫，且累加器持續探索下一頁湊齊目標筆數"""
+    mock_sale = MagicMock()
+
+    # 第 1 頁提供 H_1 ~ H_5 (其中 H_2 詳情失敗)；第 2 頁提供 H_6 ~ H_10
+    async def mock_search(q: SaleHouseSearchQuery):
+        start = (q.page - 1) * 5 + 1
+        items = [
+            NormalizedSaleListing(
+                provider_id="mock_591",
+                external_house_id=f"H_{i}",
+                title=f"物件_{i}",
+                price_wan=2000,
+                unit_price_wan=60.0,
+                total_area_pin=30.0,
+                region="台北市",
+                section="內湖區",
+            )
+            for i in range(start, start + 5)
+        ]
+        return PageResult.create(items=items, total_records=20, page=q.page, page_size=5)
+
+    async def mock_detail(hid: str):
+        if hid == "H_2":
+            raise RuntimeError("591 API 回傳業務失敗: 物件未找到")
+        return NormalizedSalePropertyDetail(
+            external_house_id=hid,
+            provider_id="mock_591",
+            title=f"詳情_{hid}",
+            price_wan=2000,
+            unit_price_wan=60.0,
+            total_area_pin=30.0,
+            main_area_pin=20.0,
+            region_name="台北市",
+            section_name="內湖區",
+        )
+
+    mock_sale.search_sale_houses = AsyncMock(side_effect=mock_search)
+    mock_sale.get_sale_house_detail = AsyncMock(side_effect=mock_detail)
+
+    reg = ProviderRegistry()
+    reg.register_instance(DummyProvider(sale=mock_sale))
+
+    uc = SyncUseCase(provider_registry=reg, database=sync_test_db)
+
+    # 要求目標 5 筆：
+    # 第 1 頁 5 筆中，H_2 失敗略過，只入庫 4 筆 (H_1, H_3, H_4, H_5)
+    # 管線自動進入第 2 頁，入庫 H_6，達成目標 5 筆！
+    synced = await uc.sync_sale_houses(
+        provider_id="mock_591",
+        query=SaleHouseSearchQuery(region_id=1, page_size=5),
+        max_items=5,
+        concurrency=1,
+        reporter=SilentProgressReporter(),
+    )
+
+    assert len(synced) == 5
+    # 搜尋了 2 頁
+    assert mock_sale.search_sale_houses.call_count == 2
+    # 驗證入庫的 5 筆沒有 H_2
+    persisted_ids = [p.listings[0].external_house_id for p in synced]
+    assert "H_2" not in persisted_ids
+    assert "H_6" in persisted_ids
+

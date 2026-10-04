@@ -100,7 +100,7 @@ class Test591SaleHouseMappers:
         detail = map_sale_house_detail(data_block)
 
         assert isinstance(detail, NormalizedSalePropertyDetail)
-        assert detail.house_id == "20604856"
+        assert detail.house_id == "S20604856"
         assert detail.price_wan == 5258
         assert isinstance(detail.price_wan, int)
         assert detail.rooms == 3

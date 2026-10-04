@@ -143,7 +143,7 @@ class StreamingSyncPipeline(Generic[TSummary, TDetail, TRecord]):
             stats = PageProcessStats(
                 page=page,
                 total_in_page=len(items),
-                new_count=len(new_items),
+                new_count=len(saved_records),
                 skipped_count=len(skipped_items),
                 accumulated_new=len(all_synced_records),
                 target_count=self.target_count,

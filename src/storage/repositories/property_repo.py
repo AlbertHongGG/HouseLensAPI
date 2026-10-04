@@ -26,15 +26,33 @@ class PropertyRepository(IPropertyRepository):
     async def filter_existing_external_ids(
         self, provider_id: str, external_ids: List[str]
     ) -> Set[str]:
-        """批次查詢傳入的外部房源刊登 ID 中已存在於資料庫者"""
+        """批次查詢傳入的外部房源刊登 ID 中已存在於資料庫者 (支援前綴標準化比對)"""
         if not external_ids:
             return set()
+
+        lookup_ids = set(external_ids)
+        for eid in external_ids:
+            if eid.startswith("S"):
+                lookup_ids.add(eid[1:])
+            else:
+                lookup_ids.add(f"S{eid}")
+
         stmt = select(PropertyListingTable.external_house_id).where(
             PropertyListingTable.provider_id == provider_id,
-            PropertyListingTable.external_house_id.in_(external_ids),
+            PropertyListingTable.external_house_id.in_(list(lookup_ids)),
         )
         res = await self.session.execute(stmt)
-        return set(res.scalars().all())
+        found_in_db = set(res.scalars().all())
+
+        matched = set()
+        for eid in external_ids:
+            if (
+                eid in found_in_db
+                or (eid.startswith("S") and eid[1:] in found_in_db)
+                or (f"S{eid}" in found_in_db)
+            ):
+                matched.add(eid)
+        return matched
 
     async def find_duplicate_candidate(
         self,
@@ -217,12 +235,13 @@ class PropertyRepository(IPropertyRepository):
         cover_url = summary.cover_image_url if summary else None
         listing_price = summary.price_wan if summary else detail.price_wan
 
+        target_external_id = summary.house_id if summary else detail.house_id
         if listing is None:
             listing = PropertyListingTable(
                 id=str(uuid.uuid4()),
                 property_id=property_entity.id,
                 provider_id=provider_id,
-                external_house_id=detail.house_id,
+                external_house_id=target_external_id,
                 listing_title=detail.title,
                 listing_price_wan=listing_price,
                 cover_image_url=cover_url,

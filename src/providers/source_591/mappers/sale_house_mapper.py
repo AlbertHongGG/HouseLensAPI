@@ -12,6 +12,7 @@ from src.domain.sale_house import (
     NormalizedSalePropertyDetail,
 )
 from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
+from src.providers.source_591.mappers.sale_house_validator import Source591SaleHouseValidator
 from src.providers.source_591.normalizers import (
     parse_boolean,
     parse_currency_amount,
@@ -28,9 +29,10 @@ from src.providers.source_591.normalizers import (
 def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListing]:
     """將 591 sale/list 原始項目轉換為標準 NormalizedSaleListing。
 
-    若為廣告推廣項目 (is_ads == "1") 則回傳 None。
+    透過 Source591SaleHouseValidator 進行嚴格合法性過濾：
+    凡虛擬競價置頂卡片 (S25)、已定交成交下架卡片、顯式廣告標籤 (is_ads == '1')，一律回傳 None。
     """
-    if str(item.get("is_ads")) == "1":
+    if not Source591SaleHouseValidator.is_valid_sale_house(item):
         return None
 
     # 1. 權狀總坪數數值化解析
@@ -65,9 +67,12 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListi
     if not comm_name:
         comm_name = item.get("community_addr")
 
+    raw_hid = str(item.get("houseid") or "").strip().upper()
+    canonical_hid = raw_hid if raw_hid.startswith("S") else f"S{raw_hid}"
+
     return NormalizedSaleListing(
         provider_id="591",
-        external_house_id=str(item.get("houseid")),
+        external_house_id=canonical_hid,
         title=str(item.get("title") or ""),
         price_wan=price_wan,
         unit_price_wan=unit_price_wan,
@@ -158,8 +163,11 @@ def map_sale_house_detail(data: Dict[str, Any]) -> NormalizedSalePropertyDetail:
     num_str = f"{address_info.get('addr_number')}號" if address_info.get("addr_number") else ""
     full_address = f"{region_str}{section_str}{street_str}{addr_str}{num_str}"
 
+    raw_id = str(data.get("id") or "").strip().upper()
+    canonical_id = raw_id if raw_id.startswith("S") else f"S{raw_id}"
+
     return NormalizedSalePropertyDetail(
-        external_house_id=str(data.get("id")),
+        external_house_id=canonical_id,
         title=str(base_info.get("title") or ""),
         price_wan=price_wan,
         unit_price_wan=unit_price,
