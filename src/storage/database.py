@@ -60,23 +60,9 @@ class DatabaseManager:
         return self._sessionmaker
 
     async def init_db(self) -> None:
-        """非同步初始化資料庫，建立所有尚未建立之資料表，並確保必要欄位遷移"""
-        from sqlalchemy import text
+        """非同步初始化資料庫，建立所有尚未建立之資料表"""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            if "sqlite" in self.db_url:
-                # 檢查 properties 資料表是否缺少 building_age 欄位
-                table_check = await conn.execute(
-                    text("SELECT name FROM sqlite_master WHERE type='table' AND name='properties'")
-                )
-                if table_check.scalar_one_or_none():
-                    info_res = await conn.execute(text("PRAGMA table_info(properties)"))
-                    cols = [row[1] for row in info_res.fetchall()]
-                    if "building_age" not in cols:
-                        await conn.execute(text("ALTER TABLE properties ADD COLUMN building_age FLOAT"))
-                        await conn.execute(
-                            text("CREATE INDEX IF NOT EXISTS ix_properties_building_age ON properties (building_age)")
-                        )
 
     async def drop_all(self) -> None:
         """非同步清空資料庫，供測試或重置使用"""

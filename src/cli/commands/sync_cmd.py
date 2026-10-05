@@ -19,6 +19,12 @@ from src.storage.database import db_manager
 sync_app = typer.Typer(help="從外部房產平台串流同步資料並進行入庫與去重")
 
 
+async def _execute_with_db_ready(coro):
+    """CLI 控制層管線：在調用業務 Use Case 前確保基礎設施資料庫結構就緒"""
+    await db_manager.init_db()
+    return await coro
+
+
 @sync_app.command("community")
 def sync_communities_cmd(
     provider: str = typer.Option("591", "--provider", "-p", help="來源平台代碼"),
@@ -46,24 +52,28 @@ def sync_communities_cmd(
     try:
         if format_opt == "json":
             results = asyncio.run(
-                uc.sync_communities(
-                    provider_id=provider,
-                    query=query,
-                    max_items=limit,
-                    concurrency=concurrency,
-                    reporter=SilentProgressReporter(),
+                _execute_with_db_ready(
+                    uc.sync_communities(
+                        provider_id=provider,
+                        query=query,
+                        max_items=limit,
+                        concurrency=concurrency,
+                        reporter=SilentProgressReporter(),
+                    )
                 )
             )
             print_json_data({"synced_communities_count": len(results), "provider": provider})
         else:
             with RichProgressReporter() as reporter:
                 asyncio.run(
-                    uc.sync_communities(
-                        provider_id=provider,
-                        query=query,
-                        max_items=limit,
-                        concurrency=concurrency,
-                        reporter=reporter,
+                    _execute_with_db_ready(
+                        uc.sync_communities(
+                            provider_id=provider,
+                            query=query,
+                            max_items=limit,
+                            concurrency=concurrency,
+                            reporter=reporter,
+                        )
                     )
                 )
     except Exception as e:
@@ -102,24 +112,28 @@ def sync_sale_houses_cmd(
     try:
         if format_opt == "json":
             results = asyncio.run(
-                uc.sync_sale_houses(
-                    provider_id=provider,
-                    query=query,
-                    max_items=limit,
-                    concurrency=concurrency,
-                    reporter=SilentProgressReporter(),
+                _execute_with_db_ready(
+                    uc.sync_sale_houses(
+                        provider_id=provider,
+                        query=query,
+                        max_items=limit,
+                        concurrency=concurrency,
+                        reporter=SilentProgressReporter(),
+                    )
                 )
             )
             print_json_data({"synced_properties_count": len(results), "provider": provider})
         else:
             with RichProgressReporter() as reporter:
                 asyncio.run(
-                    uc.sync_sale_houses(
-                        provider_id=provider,
-                        query=query,
-                        max_items=limit,
-                        concurrency=concurrency,
-                        reporter=reporter,
+                    _execute_with_db_ready(
+                        uc.sync_sale_houses(
+                            provider_id=provider,
+                            query=query,
+                            max_items=limit,
+                            concurrency=concurrency,
+                            reporter=reporter,
+                        )
                     )
                 )
     except Exception as e:
@@ -155,24 +169,28 @@ def sync_new_houses_cmd(
     try:
         if format_opt == "json":
             results = asyncio.run(
-                uc.sync_new_houses(
-                    provider_id=provider,
-                    query=query,
-                    max_items=limit,
-                    concurrency=concurrency,
-                    reporter=SilentProgressReporter(),
+                _execute_with_db_ready(
+                    uc.sync_new_houses(
+                        provider_id=provider,
+                        query=query,
+                        max_items=limit,
+                        concurrency=concurrency,
+                        reporter=SilentProgressReporter(),
+                    )
                 )
             )
             print_json_data({"synced_new_houses_count": len(results), "provider": provider})
         else:
             with RichProgressReporter() as reporter:
                 asyncio.run(
-                    uc.sync_new_houses(
-                        provider_id=provider,
-                        query=query,
-                        max_items=limit,
-                        concurrency=concurrency,
-                        reporter=reporter,
+                    _execute_with_db_ready(
+                        uc.sync_new_houses(
+                            provider_id=provider,
+                            query=query,
+                            max_items=limit,
+                            concurrency=concurrency,
+                            reporter=reporter,
+                        )
                     )
                 )
     except Exception as e:
@@ -221,9 +239,11 @@ def sync_all_cmd(
     try:
         if format_opt == "json":
             results = asyncio.run(
-                uc.sync_all(
-                    options=options,
-                    reporter=SilentProgressReporter(),
+                _execute_with_db_ready(
+                    uc.sync_all(
+                        options=options,
+                        reporter=SilentProgressReporter(),
+                    )
                 )
             )
             print_json_data({
@@ -235,9 +255,11 @@ def sync_all_cmd(
         else:
             with RichProgressReporter() as reporter:
                 asyncio.run(
-                    uc.sync_all(
-                        options=options,
-                        reporter=reporter,
+                    _execute_with_db_ready(
+                        uc.sync_all(
+                            options=options,
+                            reporter=reporter,
+                        )
                     )
                 )
             print_success("全域三大領域串流同步作業全部順利完成！")

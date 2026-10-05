@@ -74,15 +74,6 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     park_pct_str = f"{c.parking_ratio_pct:.1f}%" if c.parking_ratio_pct is not None else "-"
     mgmt_fee_str = f"{c.manage_fee_per_pin} 元/坪/月" if c.manage_fee_per_pin is not None else "-"
 
-    if c.parking_ratio_pct is not None and c.park_type_str:
-        park_spec_str = f"{park_pct_str} ({c.park_type_str})"
-    elif c.parking_ratio_pct is not None:
-        park_spec_str = park_pct_str
-    elif c.park_type_str:
-        park_spec_str = c.park_type_str
-    else:
-        park_spec_str = "-"
-
     details_table.add_row("社區 ID:", c.id, "外部來源:", f"{c.source_provider} ({c.source_id})")
     details_table.add_row("社區名稱:", f"[bold yellow]{c.name}[/bold yellow]", "成交均價:", price_str)
     details_table.add_row("地址描述:", c.address or "-", "地理座標:", coords_str)
@@ -90,12 +81,13 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     details_table.add_row("狀態/型態:", f"{c.housing_status or '-'} / {c.building_type or '-'}", "法定用途:", c.build_purpose or "-")
     details_table.add_row("屋齡規格:", age_str, "規劃總戶數:", hh_str)
     details_table.add_row("樓層規劃:", c.floor_plan or "-", "建築結構:", c.structure or "-")
-    details_table.add_row("基地總坪:", base_str, "公設比率:", pub_str)
-    details_table.add_row("車位總數:", park_cnt_str, "車位配比/型態:", park_spec_str)
-    details_table.add_row("車位價格:", c.park_price or "-", "土地分區:", c.land_division or "-")
-    details_table.add_row("座向規則:", c.direction_rule or "-", "管理費單價:", mgmt_fee_str)
+    details_table.add_row("基地總坪:", base_str, "土地分區:", c.land_division or "-")
+    details_table.add_row("公設比率:", pub_str, "管理費單價:", mgmt_fee_str)
+    details_table.add_row("車位總數:", park_cnt_str, "車位配比:", park_pct_str)
+    details_table.add_row("車位型態:", c.park_type_str or "-", "車位價格:", c.park_price or "-")
+    details_table.add_row("座向規則:", c.direction_rule or "-", "景觀/公設設計:", f"{c.landscape_name or '-'} / {c.postulate_name or '-'}")
     details_table.add_row("投資建設:", c.developer_company or "-", "營造廠:", c.builder_company or "-")
-    details_table.add_row("建築設計:", c.architect_company or "-", "景觀/公設設計:", f"{c.landscape_name or '-'} / {c.postulate_name or '-'}")
+    details_table.add_row("建築設計:", c.architect_company or "-", "", "")
 
     # 公設清單
     facility_str = "、".join(c.facilities) if c.facilities else "無公設資料"
