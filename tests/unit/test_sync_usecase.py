@@ -100,6 +100,7 @@ async def test_sync_sale_houses_multi_page_accumulation(sync_test_db: DatabaseMa
 
     async def mock_detail(house_id: str, summary: Optional[NormalizedSaleListing] = None) -> NormalizedSalePropertyDetail:
         return NormalizedSalePropertyDetail(
+            provider_id="mock_591",
             external_house_id=house_id,
             title=f"詳細規格_{house_id}",
             price_wan=2500,
@@ -146,7 +147,8 @@ async def test_sync_communities_multi_page_accumulation(sync_test_db: DatabaseMa
     async def mock_search(query: CommunitySearchQuery) -> PageResult[NormalizedCommunitySummary]:
         items = [
             NormalizedCommunitySummary(
-                community_id=f"C_{(query.page - 1) * 10 + i}",
+                provider_id="mock_591",
+                external_community_id=f"C_{(query.page - 1) * 10 + i}",
                 community_name=f"測試社區_{(query.page - 1) * 10 + i}",
                 region_name="台北市",
                 section_name="信義區",
@@ -158,7 +160,8 @@ async def test_sync_communities_multi_page_accumulation(sync_test_db: DatabaseMa
 
     async def mock_detail(comm_id: str, summary: Optional[NormalizedCommunitySummary] = None) -> NormalizedCommunityDetail:
         return NormalizedCommunityDetail(
-            community_id=comm_id,
+            provider_id="mock_591",
+            external_community_id=comm_id,
             community_name=f"詳情_{comm_id}",
             address="台北市信義區信義路五段",
             region_name="台北市",
@@ -200,7 +203,8 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
     async def mock_search(query: NewHouseSearchQuery) -> PageResult[NormalizedNewHouseSummary]:
         items = [
             NormalizedNewHouseSummary(
-                source_hid=1000 + (query.page - 1) * 10 + i,
+                provider_id="mock_591",
+                external_project_id=str(1000 + (query.page - 1) * 10 + i),
                 project_name=f"測試建案_{(query.page - 1) * 10 + i}",
                 project_status="預售屋",
                 region_name="台北市",
@@ -213,11 +217,12 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
 
     async def mock_detail(new_house_id: str) -> NormalizedNewHouseDetail:
         return NormalizedNewHouseDetail(
-            hid=int(new_house_id),
+            provider_id="mock_591",
+            external_project_id=new_house_id,
             project_name=f"詳情_{new_house_id}",
             build_type="預售屋",
-            region="台北市",
-            section="南港區",
+            region_name="台北市",
+            section_name="南港區",
             address="台北市南港區重陽路",
             total_households=120,
         )
@@ -259,7 +264,8 @@ async def test_sync_all_with_unified_options(sync_test_db):
         assert q.max_age_years == 10.0
         items = [
             NormalizedCommunitySummary(
-                community_id=f"C_{i}",
+                provider_id="mock_591",
+                external_community_id=f"C_{i}",
                 community_name=f"社區_{i}",
                 region_name="台北市",
                 section_name="信義區",
@@ -271,7 +277,8 @@ async def test_sync_all_with_unified_options(sync_test_db):
 
     async def mock_detail_comm(cid: str, summary: Optional[NormalizedCommunitySummary] = None):
         return NormalizedCommunityDetail(
-            community_id=cid,
+            provider_id="mock_591",
+            external_community_id=cid,
             community_name=f"社區_{cid}",
             address="台北市信義區信義路",
             region_name="台北市",
@@ -305,6 +312,7 @@ async def test_sync_all_with_unified_options(sync_test_db):
 
     async def mock_detail_sale(hid: str, summary: Optional[NormalizedSaleListing] = None):
         return NormalizedSalePropertyDetail(
+            provider_id="mock_591",
             external_house_id=hid,
             title=f"中古屋_{hid}",
             price_wan=2500,
@@ -328,7 +336,8 @@ async def test_sync_all_with_unified_options(sync_test_db):
         assert not hasattr(q, "min_price_wan")
         items = [
             NormalizedNewHouseSummary(
-                source_hid=9000 + i,
+                provider_id="mock_591",
+                external_project_id=str(9000 + i),
                 project_name=f"建案_{i}",
                 project_status="新成屋",
                 region_name="台北市",
@@ -341,11 +350,12 @@ async def test_sync_all_with_unified_options(sync_test_db):
 
     async def mock_detail_new(hid: str):
         return NormalizedNewHouseDetail(
-            hid=int(hid),
+            provider_id="mock_591",
+            external_project_id=hid,
             project_name=f"建案_{hid}",
             build_type="新成屋",
-            region="台北市",
-            section="中山區",
+            region_name="台北市",
+            section_name="中山區",
             address="台北市中山區民生東路",
         )
 
@@ -404,6 +414,7 @@ async def test_sync_sale_houses_skips_failed_details_and_accumulates(sync_test_d
         if hid == "H_2":
             raise RuntimeError("591 API 回傳業務失敗: 物件未找到")
         return NormalizedSalePropertyDetail(
+            provider_id="mock_591",
             external_house_id=hid,
             title=f"詳情_{hid}",
             price_wan=2000,

@@ -40,7 +40,8 @@ def test_domain_model_clean_str_invariants():
     """驗證 CleanStr 在領域實例化時自動昇華空值與佔位符為 None"""
     # 測試 NormalizedCommunitySummary
     summary = NormalizedCommunitySummary(
-        community_id="C999",
+        provider_id="591",
+        external_community_id="C999",
         community_name="測試自衛社區",
         region_name="台北市",
         section_name="大安區",
@@ -61,7 +62,8 @@ def test_domain_model_clean_str_invariants():
 
     # 測試 NormalizedCommunityDetail
     detail = NormalizedCommunityDetail(
-        community_id="C999",
+        provider_id="591",
+        external_community_id="C999",
         community_name="測試自衛社區",
         address="台北市大安區新生南路",
         region_name="台北市",
@@ -106,8 +108,8 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
         # 1. 建立初始紀錄，包含舊硬體規格與舊文字
         initial_record = CommunityTable(
             id="test-uuid-001",
-            source_provider="591",
-            source_id="C12345",
+            provider_id="591",
+            external_community_id="C12345",
             name="原始社區名",
             region_name="台北市",
             section_name="大安區",
@@ -135,7 +137,8 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
         #    硬體規格中 park_type_str, park_price, land_division 等皆為 None (例如國宅無車位型態或無土地分區資料)
         #    avg_unit_price_wan 為 None (detail 未提供均價，需保留 summary 原始均價)
         clean_detail = NormalizedCommunityDetail(
-            community_id="C12345",
+            provider_id="591",
+            external_community_id="C12345",
             community_name="原始社區名",
             address="台北市大安區復興南路",
             region_name="台北市",
@@ -189,7 +192,8 @@ async def test_sale_house_property_authoritative_snapshot_and_fk_linking(mem_db:
 
         # 1. 預先建立所屬社區實體
         comm_summary = NormalizedCommunitySummary(
-            community_id="5855864",
+            provider_id="591",
+            external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             region_name="台北市",
             section_name="松山區",
@@ -207,20 +211,22 @@ async def test_sale_house_property_authoritative_snapshot_and_fk_linking(mem_db:
             total_area_pin=46.29,
             region_name="台北市",
             section_name="松山區",
-            community_id="5855864",
+            external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             cover_image_url="https://example.com/cover.jpg",
         )
         initial_prop = await prop_repo.upsert_from_summary(listing_summary, provider_id="591")
 
-        # 驗證外鍵自動綁定
-        assert initial_prop.community_id == saved_comm.id
+        # 驗證外部社區代碼持久化與內部 UUID 外鍵自動綁定
+        assert initial_prop.community_uuid == saved_comm.id
+        assert initial_prop.external_community_id == "5855864"
         assert initial_prop.community_name == "鳴森大苑-碧硯閣"
         assert initial_prop.region_name == "台北市"
         assert initial_prop.section_name == "松山區"
 
         # 3. 權威詳情快照覆蓋：包含五大產權面積拆解與完整物理規格
         detail_snapshot = NormalizedSalePropertyDetail(
+            provider_id="591",
             external_house_id="S20604856",
             title="鳴森大苑景觀高樓3房(權威詳情)",
             price_wan=5258,
@@ -252,7 +258,7 @@ async def test_sale_house_property_authoritative_snapshot_and_fk_linking(mem_db:
             street="三民路",
             address="台北市松山區三民路80巷25號",
             coordinates=GeoPoint(lat=25.056119, lng=121.564513),
-            community_id="5855864",
+            external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             cover_image_url="https://example.com/cover.jpg",
         )
@@ -265,7 +271,8 @@ async def test_sale_house_property_authoritative_snapshot_and_fk_linking(mem_db:
 
         # 驗證五大產權面積與規格權威覆蓋
         assert updated_prop.id == initial_prop.id
-        assert updated_prop.community_id == saved_comm.id
+        assert updated_prop.community_uuid == saved_comm.id
+        assert updated_prop.external_community_id == "5855864"
         assert updated_prop.main_area_pin == 23.10
         assert updated_prop.auxiliary_area_pin == 2.78
         assert updated_prop.common_area_pin == 11.17

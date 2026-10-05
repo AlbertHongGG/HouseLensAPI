@@ -21,7 +21,7 @@ def render_property_table(properties: List[PropertyTable]) -> Table:
         show_lines=True,
     )
 
-    table.add_column("實體 ID", style="dim", max_width=10, overflow="ellipsis")
+    table.add_column("外部編號 / 實體 ID", style="dim", max_width=18, overflow="ellipsis")
     table.add_column("標題 / 物件描述", style="bold white", max_width=30, overflow="ellipsis")
     table.add_column("所屬社區", style="cyan")
     table.add_column("總價", justify="right", style="bold green")
@@ -63,9 +63,10 @@ def render_property_table(properties: List[PropertyTable]) -> Table:
 
         specs = f"{layout_str} / {floor_str}"
         age_str = f"{p.building_age_years:.1f} 年" if p.building_age_years is not None else "-"
+        id_display = f"[{p.provider_id}] {p.external_house_id}" if (p.provider_id and p.external_house_id) else (p.id[:8] + "...")
 
         table.add_row(
-            p.id[:8] + "...",
+            id_display,
             p.title,
             p.community_name or "-",
             price_str,
@@ -116,7 +117,8 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     pub_ratio_str = f"{p.public_ratio_pct:.1f}%" if p.public_ratio_pct is not None else "-"
     lease_str = "帶租約" if p.has_lease is True else ("無租約" if p.has_lease is False else "-")
 
-    specs_table.add_row("客觀實體 ID:", p.id, "所屬社區:", p.community_name or "-")
+    id_disp = f"{p.id} [{p.provider_id}:{p.external_house_id}]" if (p.provider_id and p.external_house_id) else p.id
+    specs_table.add_row("客觀實體 ID:", id_disp, "所屬社區:", p.community_name or "-")
     specs_table.add_row("刊登參考標題:", p.title, "參考總價:", f"[bold green]{p.price_wan} 萬元[/bold green]")
     specs_table.add_row("權狀登記總坪:", total_area_str, "參考單價:", unit_price_str)
     specs_table.add_row("格局規劃:", layout_str, "建物型態/結構:", f"{p.building_type or '-'} / {p.building_structure or '-'}")
@@ -179,6 +181,10 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
     """將 PropertyTable 轉換為標準字典供 JSON 輸出"""
     return {
         "id": p.id,
+        "provider_id": p.provider_id,
+        "external_house_id": p.external_house_id,
+        "community_uuid": p.community_uuid,
+        "external_community_id": p.external_community_id,
         "community_name": p.community_name,
         "title": p.title,
         "price_wan": p.price_wan,

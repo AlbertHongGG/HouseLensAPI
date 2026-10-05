@@ -48,6 +48,8 @@ class PropertyDeduplicationService:
     ) -> DeduplicationResult:
         """評估傳入之中古屋清單或詳情是否在庫內已存在相同之物理實體"""
         community_name = candidate.community_name
+        ext_comm_id = candidate.external_community_id
+        is_whole_building = candidate.is_whole_building
         floor_current = candidate.floor_current
         floor_total = candidate.floor_total
         rooms = candidate.rooms
@@ -66,6 +68,8 @@ class PropertyDeduplicationService:
             street=street,
             floor_total=floor_total,
             area_tolerance_pct=self.area_tolerance_pct,
+            external_community_id=ext_comm_id,
+            is_whole_building=is_whole_building,
         )
 
         if not matched:
@@ -80,10 +84,13 @@ class PropertyDeduplicationService:
         reasons = []
         score = 0.0
 
-        if community_name and matched.community_name == community_name:
+        if ext_comm_id and matched.external_community_id == ext_comm_id:
+            score += 0.4
+            reasons.append(f"外部社區代碼完全相符: {ext_comm_id}")
+        elif community_name and matched.community_name == community_name:
             score += 0.4
             reasons.append(f"社區名稱完全相符: {community_name}")
-        elif not community_name and not matched.community_name:
+        elif not ext_comm_id and not matched.external_community_id and not community_name and not matched.community_name:
             if (
                 region_name
                 and matched.region_name == region_name
@@ -95,7 +102,14 @@ class PropertyDeduplicationService:
                 score += 0.4
                 reasons.append(f"行政區與路街完全相符: {region_name}{section_name}{street}")
 
-        if floor_current is not None and matched.floor_current is not None and floor_current == matched.floor_current:
+        if is_whole_building and matched.is_whole_building:
+            if floor_total is not None and matched.floor_total is not None and floor_total == matched.floor_total:
+                score += 0.3
+                reasons.append(f"整棟透天總樓層完全相符: 共{floor_total}樓")
+            else:
+                score += 0.2
+                reasons.append("皆為整棟銷售物件")
+        elif floor_current is not None and matched.floor_current is not None and floor_current == matched.floor_current:
             score += 0.3
             reasons.append(f"所在樓層完全相符: {floor_current}F")
 

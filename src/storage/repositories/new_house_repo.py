@@ -25,18 +25,15 @@ class NewHouseRepository(INewHouseRepository):
     async def filter_existing_external_ids(
         self, provider_id: str, external_ids: List[str]
     ) -> Set[str]:
-        """批次查詢傳入的外部新建案 HID 中已存在於資料庫者"""
+        """批次查詢傳入的外部新建案專案 ID 中已存在於資料庫者"""
         if not external_ids:
             return set()
-        int_ids = [int(i) for i in external_ids if str(i).isdigit()]
-        if not int_ids:
-            return set()
-        stmt = select(NewHouseTable.source_hid).where(
+        stmt = select(NewHouseTable.external_project_id).where(
             NewHouseTable.provider_id == provider_id,
-            NewHouseTable.source_hid.in_(int_ids),
+            NewHouseTable.external_project_id.in_(external_ids),
         )
         res = await self.session.execute(stmt)
-        return {str(x) for x in res.scalars().all()}
+        return set(res.scalars().all())
 
     async def upsert_from_summary(
         self, summary: NormalizedNewHouseSummary, provider_id: str
@@ -44,7 +41,7 @@ class NewHouseRepository(INewHouseRepository):
         """從 NormalizedNewHouseSummary 新增或更新新建案基本資料"""
         stmt = select(NewHouseTable).where(
             NewHouseTable.provider_id == provider_id,
-            NewHouseTable.source_hid == summary.source_hid,
+            NewHouseTable.external_project_id == summary.external_project_id,
         )
         res = await self.session.execute(stmt)
         record = res.scalar_one_or_none()
@@ -53,11 +50,11 @@ class NewHouseRepository(INewHouseRepository):
             record = NewHouseTable(
                 id=str(uuid.uuid4()),
                 provider_id=provider_id,
-                source_hid=summary.source_hid,
+                external_project_id=summary.external_project_id,
                 project_name=summary.project_name,
                 build_type=summary.project_status,
-                region=summary.region_name,
-                section=summary.section_name,
+                region_name=summary.region_name,
+                section_name=summary.section_name,
                 address=summary.address,
                 min_unit_price_wan=summary.min_unit_price_wan,
                 max_unit_price_wan=summary.max_unit_price_wan,
@@ -70,8 +67,8 @@ class NewHouseRepository(INewHouseRepository):
         else:
             record.project_name = summary.project_name
             record.build_type = summary.project_status
-            record.region = summary.region_name
-            record.section = summary.section_name
+            record.region_name = summary.region_name
+            record.section_name = summary.section_name
             record.address = summary.address
             if summary.min_unit_price_wan is not None:
                 record.min_unit_price_wan = summary.min_unit_price_wan
@@ -95,7 +92,7 @@ class NewHouseRepository(INewHouseRepository):
         """從 NormalizedNewHouseDetail 新增或更新新建案完整規劃規格"""
         stmt = select(NewHouseTable).where(
             NewHouseTable.provider_id == provider_id,
-            NewHouseTable.source_hid == detail.hid,
+            NewHouseTable.external_project_id == detail.external_project_id,
         )
         res = await self.session.execute(stmt)
         record = res.scalar_one_or_none()
@@ -106,11 +103,11 @@ class NewHouseRepository(INewHouseRepository):
             record = NewHouseTable(
                 id=str(uuid.uuid4()),
                 provider_id=provider_id,
-                source_hid=detail.hid,
+                external_project_id=detail.external_project_id,
                 project_name=detail.project_name,
                 build_type=detail.build_type,
-                region=detail.region,
-                section=detail.section,
+                region_name=detail.region_name,
+                section_name=detail.section_name,
                 address=detail.address,
                 base_area_pin=detail.base_area_pin,
                 public_ratio_pct=detail.public_ratio_pct,
@@ -130,10 +127,10 @@ class NewHouseRepository(INewHouseRepository):
         else:
             record.project_name = detail.project_name
             record.build_type = detail.build_type
-            if detail.region:
-                record.region = detail.region
-            if detail.section:
-                record.section = detail.section
+            if detail.region_name:
+                record.region_name = detail.region_name
+            if detail.section_name:
+                record.section_name = detail.section_name
             if detail.address:
                 record.address = detail.address
 
@@ -178,13 +175,13 @@ class NewHouseRepository(INewHouseRepository):
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
-    async def get_by_source_hid(
-        self, provider_id: str, source_hid: int
+    async def get_by_external_id(
+        self, provider_id: str, external_project_id: str
     ) -> Optional[NewHouseTable]:
-        """根據來源建案 HID 查詢新建案"""
+        """根據來源建案外部專案 ID 查詢新建案"""
         stmt = select(NewHouseTable).where(
             NewHouseTable.provider_id == provider_id,
-            NewHouseTable.source_hid == source_hid,
+            NewHouseTable.external_project_id == external_project_id,
         )
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
@@ -200,9 +197,9 @@ class NewHouseRepository(INewHouseRepository):
         """多條件檢索庫存新建案"""
         stmt = select(NewHouseTable)
         if region:
-            stmt = stmt.where(NewHouseTable.region == region)
+            stmt = stmt.where(NewHouseTable.region_name == region)
         if section:
-            stmt = stmt.where(NewHouseTable.section == section)
+            stmt = stmt.where(NewHouseTable.section_name == section)
         if keyword:
             pattern = f"%{keyword}%"
             stmt = stmt.where(

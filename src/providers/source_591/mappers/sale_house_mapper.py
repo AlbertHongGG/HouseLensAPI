@@ -53,20 +53,30 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListi
     unit_price_wan = parse_unit_price(item.get("area_price"))
 
     # 3. 樓層與格局數值化解析
-    floor_curr, floor_tot = parse_floor(item.get("floor"))
+    floor_curr, floor_tot, is_whole_building = parse_floor(item.get("floor"))
     if floor_tot is None and item.get("all_floor"):
-        _, parsed_tot = parse_floor(item.get("all_floor"))
+        _, parsed_tot, _ = parse_floor(item.get("all_floor"))
         floor_tot = parsed_tot or parse_int_count(item.get("all_floor"))
 
     rooms, living, baths = parse_layout(item.get("layout_str"))
 
-    # 4. 社區名稱解析
+    # 4. 客觀外部社區代碼與名稱精確解析 (杜絕路名偽裝社區)
     comm_info = item.get("community_info")
     comm_name: Optional[str] = None
+    ext_comm_id: Optional[str] = None
+
     if isinstance(comm_info, dict):
-        comm_name = comm_info.get("community_name")
-    if not comm_name:
-        comm_name = item.get("community_addr")
+        raw_cname = comm_info.get("community_name")
+        if raw_cname and str(raw_cname).strip():
+            comm_name = str(raw_cname).strip()
+        raw_cid = comm_info.get("community_id")
+        if raw_cid and str(raw_cid).strip() not in ("0", ""):
+            ext_comm_id = str(raw_cid).strip()
+
+    if not ext_comm_id:
+        top_cid = item.get("community_id")
+        if top_cid and str(top_cid).strip() not in ("0", ""):
+            ext_comm_id = str(top_cid).strip()
 
     raw_hid = str(item.get("houseid") or "").strip().upper()
     canonical_hid = raw_hid if raw_hid.startswith("S") else f"S{raw_hid}"
@@ -78,18 +88,19 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListi
         price_wan=price_wan,
         unit_price_wan=unit_price_wan,
         total_area_pin=total_area_pin,
-        floor_current=floor_curr,
+        floor_current=None if is_whole_building else floor_curr,
         floor_total=floor_tot,
         rooms=rooms,
         living_rooms=living,
         bathrooms=baths,
         building_age_years=None,  # 591 清單端點無屋齡欄位，詳情端點補齊
         building_type=clean_optional_str(item.get("kindStr")),
+        is_whole_building=is_whole_building,
         region_name=str(item.get("region") or "").strip(),
         section_name=str(item.get("section") or "").strip(),
         street=clean_optional_str(item.get("street_name")),
         address=clean_optional_str(item.get("address")),
-        community_id=clean_optional_str(item.get("community_id")),
+        external_community_id=clean_optional_str(ext_comm_id),
         community_name=clean_optional_str(comm_name),
         has_parking=str(item.get("cartplace")) == "1",
         cover_image_url=clean_optional_str(item.get("photo_src")),
@@ -131,7 +142,9 @@ def map_sale_house_detail(
     parking_area = parse_pin(area_dict.get("車位面積"))
 
     # 3. 樓層與格局數值化
-    floor_curr, floor_tot = parse_floor(info_dict.get("樓層"))
+    floor_curr, floor_tot, is_whole_building = parse_floor(info_dict.get("樓層"))
+    if not is_whole_building and summary and summary.is_whole_building:
+        is_whole_building = True
     rooms, living, baths = parse_layout(base_info.get("layout"))
 
     # 4. 座標浮點數解析
@@ -180,9 +193,21 @@ def map_sale_house_detail(
         full_address = summary.address
 
     # 9. 社區資訊與封面圖注入 (清單 API 為權威 SSOT)
-    comm_id = summary.community_id if summary and summary.community_id else clean_optional_str(data.get("community_id"))
-    comm_name = summary.community_name if summary and summary.community_name else clean_optional_str(data.get("community_name"))
-    cover_image = summary.cover_image_url if summary and summary.cover_image_url else clean_optional_str(data.get("photo_src"))
+    ext_comm_id = (
+        summary.external_community_id
+        if summary and summary.external_community_id
+        else clean_optional_str(data.get("community_id"))
+    )
+    comm_name = (
+        summary.community_name
+        if summary and summary.community_name
+        else clean_optional_str(data.get("community_name"))
+    )
+    cover_image = (
+        summary.cover_image_url
+        if summary and summary.cover_image_url
+        else clean_optional_str(data.get("photo_src"))
+    )
 
     raw_id = str(data.get("id") or (summary.external_house_id if summary else "") or "").strip().upper()
     canonical_id = raw_id if raw_id.startswith("S") else f"S{raw_id}"
@@ -190,6 +215,7 @@ def map_sale_house_detail(
     title = str(base_info.get("title") or (summary.title if summary else "") or "").strip()
 
     return NormalizedSalePropertyDetail(
+        provider_id=summary.provider_id if summary else "591",
         external_house_id=canonical_id,
         title=title,
         price_wan=price_wan,
@@ -200,7 +226,8 @@ def map_sale_house_detail(
         common_area_pin=common_area,
         land_area_pin=land_area,
         parking_area_pin=parking_area,
-        floor_current=floor_curr if floor_curr is not None else (summary.floor_current if summary else None),
+        is_whole_building=is_whole_building,
+        floor_current=None if is_whole_building else (floor_curr if floor_curr is not None else (summary.floor_current if summary else None)),
         floor_total=floor_tot if floor_tot is not None else (summary.floor_total if summary else None),
         rooms=rooms if rooms is not None else (summary.rooms if summary else None),
         living_rooms=living if living is not None else (summary.living_rooms if summary else None),
@@ -221,7 +248,7 @@ def map_sale_house_detail(
         street=clean_optional_str(street_str),
         address=clean_optional_str(full_address),
         coordinates=GeoPoint(lat=lat, lng=lng) if lat is not None and lng is not None else None,
-        community_id=comm_id,
+        external_community_id=ext_comm_id,
         community_name=comm_name,
         cover_image_url=cover_image,
     )

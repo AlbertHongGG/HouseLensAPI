@@ -31,7 +31,7 @@ def render_community_table(communities: List[CommunityTable]) -> Table:
     table.add_column("生活圈 / 捷運", style="dim")
 
     for c in communities:
-        source_tag = f"[{c.source_provider}] {c.source_id}"
+        source_tag = f"[{c.provider_id}] {c.external_community_id}"
         region = f"{c.region_name or ''}{c.section_name or ''}"
         price_str = f"{c.avg_unit_price_wan:.1f} 萬/坪" if c.avg_unit_price_wan is not None else "-"
 
@@ -74,7 +74,7 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     park_pct_str = f"{c.parking_ratio_pct:.1f}%" if c.parking_ratio_pct is not None else "-"
     mgmt_fee_str = f"{c.manage_fee_per_pin} 元/坪/月" if c.manage_fee_per_pin is not None else "-"
 
-    details_table.add_row("社區 ID:", c.id, "外部來源:", f"{c.source_provider} ({c.source_id})")
+    details_table.add_row("社區 ID:", c.id, "外部來源:", f"{c.provider_id} ({c.external_community_id})")
     details_table.add_row("社區名稱:", f"[bold yellow]{c.name}[/bold yellow]", "成交均價:", price_str)
     details_table.add_row("地址描述:", c.address or "-", "地理座標:", coords_str)
     details_table.add_row("行政區域:", f"{c.region_name or ''} {c.section_name or ''}", "生活圈/捷運:", f"{c.shopping_district or '-'} / {c.transport or '-'}")
@@ -105,8 +105,8 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
     """將 CommunityTable 轉換為標準字典供 JSON 輸出"""
     return {
         "id": c.id,
-        "source_provider": c.source_provider,
-        "source_id": c.source_id,
+        "provider_id": c.provider_id,
+        "external_community_id": c.external_community_id,
         "name": c.name,
         "housing_status": c.housing_status,
         "building_type": c.building_type,

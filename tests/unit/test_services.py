@@ -110,6 +110,7 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
 
         # 測試無社區之詳情物件去重評估
         detail_no_community = NormalizedSalePropertyDetail(
+            provider_id="provider_b",
             external_house_id="B2002_detail_raw",
             title="碧硯閣二樓三房優質釋出",
             price_wan=5300,
@@ -125,6 +126,7 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
 
         # 測試具備社區之詳情物件成功判定重複
         detail_with_community = NormalizedSalePropertyDetail(
+            provider_id="provider_b",
             external_house_id="B2002_detail",
             title="碧硯閣二樓三房優質釋出",
             price_wan=5300,

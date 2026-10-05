@@ -37,11 +37,12 @@ class MockCommunityProvider(ICommunityProvider):
 
     async def get_community_detail(
         self,
-        community_id: str,
+        external_community_id: str,
         summary: Optional[NormalizedCommunitySummary] = None,
     ) -> NormalizedCommunityDetail:
         return NormalizedCommunityDetail(
-            community_id=community_id,
+            provider_id="mock_src",
+            external_community_id=external_community_id,
             community_name="測試社區",
             address="測試地址",
             region_name="台北市",
@@ -57,6 +58,7 @@ class MockSaleHouseProvider(ISaleHouseProvider):
         self, house_id: str, summary: Optional[NormalizedSaleListing] = None
     ) -> NormalizedSalePropertyDetail:
         return NormalizedSalePropertyDetail(
+            provider_id="mock_src",
             external_house_id=house_id,
             title="測試房屋",
             price_wan=2000,
@@ -68,13 +70,14 @@ class MockNewHouseProvider(INewHouseProvider):
     async def search_new_houses(self, query: NewHouseSearchQuery) -> PageResult[NormalizedNewHouseSummary]:
         return PageResult.create(items=[], total_records=0, page=1, page_size=20)
 
-    async def get_new_house_detail(self, new_house_id: str) -> NormalizedNewHouseDetail:
+    async def get_new_house_detail(self, external_project_id: str) -> NormalizedNewHouseDetail:
         return NormalizedNewHouseDetail(
-            hid=int(new_house_id),
+            provider_id="mock_src",
+            external_project_id=external_project_id,
             project_name="測試建案",
             build_type="預售屋",
-            region="台北市",
-            section="中正區",
+            region_name="台北市",
+            section_name="中正區",
             address="測試路",
         )
 
@@ -172,11 +175,11 @@ async def test_mock_provider_flow():
     assert await provider.health_check() is True
 
     community_detail = await provider.community.get_community_detail("1001")
-    assert community_detail.community_id == "1001"
+    assert community_detail.external_community_id == "1001"
 
     house_detail = await provider.sale_house.get_sale_house_detail("S12345")
     assert house_detail.external_house_id == "S12345"
     assert house_detail.price_wan == 2000
 
     new_house_detail = await provider.new_house.get_new_house_detail("9999")
-    assert new_house_detail.hid == 9999
+    assert new_house_detail.external_project_id == "9999"

@@ -55,7 +55,8 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
     full_addr = f"{region}{section}{simple_addr}"
 
     return NormalizedCommunitySummary(
-        community_id=str(item.get("id")),
+        provider_id="591",
+        external_community_id=str(item.get("id")),
         community_name=str(item.get("name") or "").strip(),
         region_name=region,
         section_name=section,
@@ -163,7 +164,8 @@ def map_community_detail(
 
     return NormalizedCommunityDetail(
         # --- 基礎識別、地理資訊與市場行情：100% 取自清單 (summary，成交均價單一事實來源) ---
-        community_id=summary.community_id,
+        provider_id=summary.provider_id,
+        external_community_id=summary.external_community_id,
         community_name=summary.community_name,
         region_name=summary.region_name,
         section_name=summary.section_name,

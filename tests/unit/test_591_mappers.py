@@ -33,8 +33,26 @@ CAPTURES_DIR = Path(__file__).parent.parent.parent / "封包紀錄"
 
 
 def load_captured_json(filename: str) -> dict:
-    file_path = CAPTURES_DIR / filename
-    with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+    root = Path(__file__).parent.parent.parent
+    target_path = None
+
+    # 1. 優先在 591 封包目錄查找
+    for p in root.rglob("*" + filename):
+        if "591" in p.parts and p.is_file():
+            target_path = p
+            break
+
+    # 2. 次選任意子目錄查找
+    if target_path is None:
+        for p in root.rglob("*" + filename):
+            if p.is_file():
+                target_path = p
+                break
+
+    if target_path is None:
+        target_path = CAPTURES_DIR / filename
+
+    with open(target_path, "r", encoding="utf-8", errors="replace") as f:
         content = f.read()
     idx = content.find("{")
     if idx == -1:
@@ -50,7 +68,8 @@ class Test591CommunityMappers:
 
         summary = map_community_summary(items[0])
         assert isinstance(summary, NormalizedCommunitySummary)
-        assert summary.community_id == str(items[0]["id"])
+        assert summary.provider_id == "591"
+        assert summary.external_community_id == str(items[0]["id"])
         assert summary.community_name == items[0]["name"]
         assert summary.avg_unit_price_wan is not None
         assert summary.coordinates is not None
@@ -71,7 +90,8 @@ class Test591CommunityMappers:
 
         assert isinstance(detail, NormalizedCommunityDetail)
         # 地理與身分資訊 100% 來自 summary
-        assert detail.community_id == summary.community_id
+        assert detail.provider_id == summary.provider_id
+        assert detail.external_community_id == summary.external_community_id
         assert detail.community_name == summary.community_name
         assert detail.address == summary.address
         assert detail.region_name == summary.region_name
@@ -168,8 +188,89 @@ class Test591SaleHouseMappers:
         assert summary_candidate is not None
         detail_enriched = map_sale_house_detail(data_block, summary=summary_candidate)
         assert detail_enriched.community_name == summary_candidate.community_name
-        assert detail_enriched.community_id == summary_candidate.community_id
+        assert detail_enriched.external_community_id == summary_candidate.external_community_id
         assert detail_enriched.cover_image_url == summary_candidate.cover_image_url
+
+    def test_parse_floor_magic_99_and_whole_building(self):
+        from src.providers.source_591.normalizers import parse_floor
+
+        # 1. 591 清單 API 魔術數字 99 (代表整棟透天/別墅)
+        curr, tot, is_whole = parse_floor("99")
+        assert curr is None  # 絕不可為 99 樓！
+        assert tot is None
+        assert is_whole is True
+
+        curr_int, tot_int, is_whole_int = parse_floor(99)
+        assert curr_int is None
+        assert is_whole_int is True
+
+        # 2. 591 詳情 API 規格 "整棟/5F"
+        curr_det, tot_det, is_whole_det = parse_floor("整棟/5F")
+        assert curr_det is None
+        assert tot_det == 5
+        assert is_whole_det is True
+
+        # 3. 一般樓層 "3F/12F"
+        curr_norm, tot_norm, is_whole_norm = parse_floor("3F/12F")
+        assert curr_norm == 3
+        assert tot_norm == 12
+        assert is_whole_norm is False
+
+        # 4. 地下室 "B1/7F"
+        curr_b1, tot_b1, is_whole_b1 = parse_floor("B1/7F")
+        assert curr_b1 == -1
+        assert tot_b1 == 7
+        assert is_whole_b1 is False
+
+    def test_sale_house_community_addr_never_pollutes_community_name(self):
+        # 模擬無社區之公寓/透天項目，含有 community_addr (路街地址) 但 community_info 為空
+        mock_raw_item = {
+            "houseid": "S12345678",
+            "title": "大安區老老公寓三樓",
+            "price": "2,500萬",
+            "area_price": "80萬",
+            "area_str": "31.25坪",
+            "floor": "3",
+            "all_floor": "4",
+            "kindStr": "公寓",
+            "region": "台北市",
+            "section": "大安區",
+            "street_name": "和平東路二段",
+            "community_addr": "和平東路二段175巷",  # 路名絕對不可污染為社區名稱！
+            "community_info": {},  # 無社區
+        }
+        listing = map_sale_house_summary(mock_raw_item)
+        assert listing is not None
+        assert listing.community_name is None
+        assert listing.external_community_id is None
+        assert listing.floor_current == 3
+        assert listing.floor_total == 4
+        assert listing.is_whole_building is False
+
+    def test_sale_house_detached_villa_summary_and_detail(self):
+        # 模擬透天別墅清單封包 (floor="99", all_floor="5", 有外部社區 ID)
+        mock_villa_summary = {
+            "houseid": "S99887766",
+            "title": "陽明山景觀獨棟別墅",
+            "price": "8,800萬",
+            "area_str": "120.0坪",
+            "floor": "99",
+            "all_floor": "5",
+            "kindStr": "別墅",
+            "region": "台北市",
+            "section": "士林區",
+            "community_info": {
+                "community_id": 5855864,
+                "community_name": "陽明山莊",
+            },
+        }
+        summary = map_sale_house_summary(mock_villa_summary)
+        assert summary is not None
+        assert summary.is_whole_building is True
+        assert summary.floor_current is None  # 絕不可為 99 樓！
+        assert summary.floor_total == 5
+        assert summary.external_community_id == "5855864"
+        assert summary.community_name == "陽明山莊"
 
 
 class Test591AgeMapper:
@@ -211,7 +312,8 @@ class Test591NewHouseMappers:
 
         summary = map_new_house_summary(items[0])
         assert isinstance(summary, NormalizedNewHouseSummary)
-        assert summary.source_hid == items[0]["hid"]
+        assert summary.provider_id == "591"
+        assert summary.external_project_id == str(items[0]["hid"])
         assert summary.project_name == items[0]["build_name"]
         assert summary.min_unit_price_wan == 79.0
         assert summary.max_unit_price_wan == 90.0
@@ -224,10 +326,11 @@ class Test591NewHouseMappers:
         detail = map_new_house_detail(data_block)
 
         assert isinstance(detail, NormalizedNewHouseDetail)
-        assert detail.hid == 138045
+        assert detail.provider_id == "591"
+        assert detail.external_project_id == "138045"
         assert detail.project_name == "長虹MVP"
-        assert detail.region == "台北市"
-        assert detail.section == "萬華區"
+        assert detail.region_name == "台北市"
+        assert detail.section_name == "萬華區"
         assert detail.structural_engine == "SRC鋼骨鋼筋混凝土結構"
         assert len(detail.layouts) > 0
         assert detail.layouts[0].room_name == "一房"

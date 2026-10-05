@@ -30,13 +30,21 @@ class PropertyTable(Base, TimestampMixin):
         primary_key=True,
         default=lambda: str(uuid.uuid4()),
     )
-    community_id: Mapped[Optional[str]] = mapped_column(
+    # 建立此客觀房屋之首要來源身分二元組 (如 591 與 S20604856)
+    provider_id: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    external_house_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+
+    # 內部關聯外鍵 (指向 communities 表之主鍵 UUID)
+    community_uuid: Mapped[Optional[str]] = mapped_column(
         String(36),
         ForeignKey("communities.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
+    # 外部來源平台社區識別碼 (如 591 社區 ID: '5855864'，客觀保留不可遺失)
+    external_community_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     community_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, index=True)
+    is_whole_building: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
 
     title: Mapped[str] = mapped_column(String(256), nullable=False)
     price_wan: Mapped[int] = mapped_column(Integer, nullable=False, index=True)  # 總價 (萬元純整數)
@@ -91,7 +99,10 @@ class PropertyTable(Base, TimestampMixin):
     )
 
     __table_args__ = (
+        Index("ix_property_provider_house", "provider_id", "external_house_id"),
         Index("ix_property_dedup", "community_name", "floor_current", "rooms"),
+        Index("ix_property_external_community_id", "external_community_id"),
+        Index("ix_property_community_uuid", "community_uuid"),
         Index("ix_property_region_section", "region_name", "section_name"),
         Index("ix_property_price_wan", "price_wan"),
         Index("ix_property_building_age_years", "building_age_years"),

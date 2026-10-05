@@ -40,7 +40,8 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
 
         # 1. 從 Summary 寫入
         summary = NormalizedCommunitySummary(
-            community_id="5855864",
+            provider_id="591",
+            external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             build_purpose="住宅",
             building_type="住宅大樓",
@@ -66,7 +67,8 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
 
         # 2. 從 Detail 豐富欄位規格
         detail = NormalizedCommunityDetail(
-            community_id="5855864",
+            provider_id="591",
+            external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             building_type="住宅大樓",
             build_purpose="住家用",
@@ -122,6 +124,7 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
 
         # 1. 591 來源刊登與物件寫入
         sh_detail = NormalizedSalePropertyDetail(
+            provider_id="591",
             external_house_id="20604856",
             title="鳴森大苑景觀高樓3房",
             price_wan=5258,
@@ -165,6 +168,8 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
             summary=sh_summary_591,
         )
         assert prop1.id is not None
+        assert prop1.provider_id == "591"
+        assert prop1.external_house_id == "S20604856"
         assert prop1.price_wan == 5258
         assert prop1.floor_current == 2
         assert prop1.rooms == 3
@@ -217,6 +222,82 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
 
 
 @pytest.mark.asyncio
+async def test_property_repository_detached_villa_and_external_community_persistence(test_db: DatabaseManager):
+    """測試透天別墅(整棟銷售)與外部社區代碼獨立持久化 (無內部社區時客觀代碼不丟失)"""
+    async with test_db.session() as session:
+        repo = PropertyRepository(session)
+
+        # 1. 建立透天別墅刊登與詳情 (外部社區 ID 為 5855864，但 communities 表無此社區)
+        villa_detail = NormalizedSalePropertyDetail(
+            provider_id="591",
+            external_house_id="S88776655",
+            title="陽明山尊榮透天獨棟別墅",
+            price_wan=9800,
+            unit_price_wan=98.0,
+            total_area_pin=100.0,
+            rooms=5,
+            living_rooms=3,
+            bathrooms=4,
+            is_whole_building=True,
+            floor_current=None,  # 整棟銷售無單一所在樓層
+            floor_total=4,
+            building_type="別墅",
+            region_name="台北市",
+            section_name="士林區",
+            external_community_id="5855864",
+            community_name="陽明山莊",
+        )
+        villa_summary = NormalizedSaleListing(
+            provider_id="591",
+            external_house_id="S88776655",
+            title="陽明山尊榮透天獨棟別墅",
+            price_wan=9800,
+            total_area_pin=100.0,
+            rooms=5,
+            living_rooms=3,
+            bathrooms=4,
+            is_whole_building=True,
+            floor_current=None,
+            floor_total=4,
+            region_name="台北市",
+            section_name="士林區",
+            external_community_id="5855864",
+            community_name="陽明山莊",
+        )
+
+        saved = await repo.upsert_property_with_listing(
+            detail=villa_detail,
+            provider_id="591",
+            summary=villa_summary,
+        )
+
+        # 2. 驗證客觀外部社區代碼 100% 保留，內部 UUID 為 None (因無主檔)
+        assert saved.external_community_id == "5855864"
+        assert saved.community_uuid == None
+        assert saved.community_name == "陽明山莊"
+        assert saved.is_whole_building is True
+        assert saved.floor_current is None  # 絕不可為 99！
+        assert saved.floor_total == 4
+
+        # 3. 驗證依 external_community_id 檢索
+        found = await repo.search(external_community_id="5855864")
+        assert len(found) == 1
+        assert found[0].id == saved.id
+
+        # 4. 驗證整棟透天去重候選者比對
+        dup = await repo.find_duplicate_candidate(
+            community_name="陽明山莊",
+            total_area_pin=100.0,
+            rooms=5,
+            floor_total=4,
+            external_community_id="5855864",
+            is_whole_building=True,
+        )
+        assert dup is not None
+        assert dup.id == saved.id
+
+
+@pytest.mark.asyncio
 async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManager):
     """測試新建案 Summary 與 Detail (含結構化 layout_v2) 儲存"""
     async with test_db.session() as session:
@@ -224,7 +305,8 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
 
         # 1. 寫入 Summary
         nh_summary = NormalizedNewHouseSummary(
-            source_hid=138045,
+            provider_id="591",
+            external_project_id="138045",
             project_name="長虹MVP",
             project_status="預售屋",
             region_name="台北市",
@@ -237,7 +319,7 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
             developer="長虹建設股份有限公司",
         )
         saved = await repo.upsert_from_summary(nh_summary, provider_id="591")
-        assert saved.source_hid == 138045
+        assert saved.external_project_id == "138045"
         assert saved.min_unit_price_wan == 79.0
         assert saved.max_unit_price_wan == 90.0
         assert saved.min_area_pin == 28.0
@@ -245,11 +327,12 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
 
         # 2. 豐富完整 Detail
         nh_detail = NormalizedNewHouseDetail(
-            hid=138045,
+            provider_id="591",
+            external_project_id="138045",
             project_name="長虹MVP",
             build_type="預售屋",
-            region="台北市",
-            section="萬華區",
+            region_name="台北市",
+            section_name="萬華區",
             address="台北市萬華區康定路、峨眉街口",
             manage_fee_per_pin=150,
             structural_engine="SRC鋼骨鋼筋混凝土結構",
@@ -274,8 +357,8 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
         assert updated.layouts[0]["rooms_count"] == 2
         assert updated.layouts[1]["min_area_pin"] == 35.0
 
-        # 3. 根據 HID 查詢
-        found = await repo.get_by_source_hid("591", 138045)
+        # 3. 根據外部專案 ID 查詢
+        found = await repo.get_by_external_id("591", "138045")
         assert found is not None
         assert found.project_name == "長虹MVP"
 
@@ -291,7 +374,8 @@ async def test_repository_filter_existing_external_ids(test_db: DatabaseManager)
         # 1. 寫入社區資料
         await comm_repo.upsert_from_summary(
             NormalizedCommunitySummary(
-                community_id="C100",
+                provider_id="591",
+                external_community_id="C100",
                 community_name="測試社區A",
                 region_name="台北市",
                 section_name="大安區",
@@ -321,7 +405,8 @@ async def test_repository_filter_existing_external_ids(test_db: DatabaseManager)
         # 3. 寫入新建案資料
         await nh_repo.upsert_from_summary(
             NormalizedNewHouseSummary(
-                source_hid=900,
+                provider_id="591",
+                external_project_id="900",
                 project_name="測試建案A",
                 project_status="預售屋",
                 region_name="台北市",

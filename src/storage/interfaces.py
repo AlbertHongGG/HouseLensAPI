@@ -53,10 +53,10 @@ class ICommunityRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_source_id(
-        self, provider_id: str, source_id: str
+    async def get_by_external_id(
+        self, provider_id: str, external_community_id: str
     ) -> Optional[CommunityTable]:
-        """根據來源平台代碼與外部 ID 查詢社區"""
+        """根據來源平台代碼與外部社區 ID 查詢社區"""
         pass
 
     @abstractmethod
@@ -129,8 +129,10 @@ class IPropertyRepository(ABC):
         street: Optional[str] = None,
         floor_total: Optional[int] = None,
         area_tolerance_pct: float = 0.02,
+        external_community_id: Optional[str] = None,
+        is_whole_building: bool = False,
     ) -> Optional[PropertyTable]:
-        """依社區（第一級）或行政區路街總樓層（第二級無社區物件）、樓層純整數、房數純整數與坪數誤差 (預設 ±2%) 尋找庫內可能之重複物件"""
+        """依外部社區代碼/社區名（第一級）或行政區路街總樓層（第二級無社區物件）、樓層純整數/整棟標記、房數純整數與坪數誤差尋找庫內可能之重複物件"""
         pass
 
     @abstractmethod
@@ -144,6 +146,8 @@ class IPropertyRepository(ABC):
         min_age_years: Optional[float] = None,
         max_age_years: Optional[float] = None,
         rooms: Optional[int] = None,
+        external_community_id: Optional[str] = None,
+        community_uuid: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[PropertyTable]:
@@ -181,10 +185,10 @@ class INewHouseRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_source_hid(
-        self, provider_id: str, source_hid: int
+    async def get_by_external_id(
+        self, provider_id: str, external_project_id: str
     ) -> Optional[NewHouseTable]:
-        """根據來源建案 HID 查詢新建案"""
+        """根據來源建案外部 ID 查詢新建案"""
         pass
 
     @abstractmethod

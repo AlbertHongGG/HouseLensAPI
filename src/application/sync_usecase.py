@@ -104,7 +104,7 @@ class SyncUseCase:
                 return await repo.filter_existing_external_ids(provider_id, ids)
 
         async def fetch_detail(summary: NormalizedCommunitySummary) -> Optional[NormalizedCommunityDetail]:
-            return await provider.community.get_community_detail(summary.community_id, summary=summary)
+            return await provider.community.get_community_detail(summary.external_community_id, summary=summary)
 
         async def persist_batch(
             pairs: List[Tuple[NormalizedCommunitySummary, Optional[NormalizedCommunityDetail]]]
@@ -117,12 +117,12 @@ class SyncUseCase:
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
                         saved.append(record)
                     else:
-                        logger.warning(f"社區項目 {item.community_id} ({item.community_name}) 詳情獲取失敗或已失效，略過入庫。")
+                        logger.warning(f"社區項目 {item.external_community_id} ({item.community_name}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedCommunitySummary, NormalizedCommunityDetail, CommunityTable](
             fetch_page_func=fetch_page,
-            extract_id_func=lambda s: s.community_id,
+            extract_id_func=lambda s: s.external_community_id,
             check_existing_func=check_existing,
             fetch_detail_func=fetch_detail,
             persist_batch_func=persist_batch,
@@ -260,7 +260,7 @@ class SyncUseCase:
                 return await repo.filter_existing_external_ids(provider_id, ids)
 
         async def fetch_detail(summary: NormalizedNewHouseSummary) -> Optional[NormalizedNewHouseDetail]:
-            return await provider.new_house.get_new_house_detail(str(summary.source_hid))
+            return await provider.new_house.get_new_house_detail(summary.external_project_id)
 
         async def persist_batch(
             pairs: List[Tuple[NormalizedNewHouseSummary, Optional[NormalizedNewHouseDetail]]]
@@ -273,12 +273,12 @@ class SyncUseCase:
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
                         saved.append(record)
                     else:
-                        logger.warning(f"新建案項目 {item.source_hid} ({item.project_name}) 詳情獲取失敗或已失效，略過入庫。")
+                        logger.warning(f"新建案項目 {item.external_project_id} ({item.project_name}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedNewHouseSummary, NormalizedNewHouseDetail, NewHouseTable](
             fetch_page_func=fetch_page,
-            extract_id_func=lambda s: str(s.source_hid),
+            extract_id_func=lambda s: s.external_project_id,
             check_existing_func=check_existing,
             fetch_detail_func=fetch_detail,
             persist_batch_func=persist_batch,

@@ -64,12 +64,12 @@ class Source591CommunityProvider(ICommunityProvider):
 
     async def get_community_detail(
         self,
-        community_id: str,
+        external_community_id: str,
         summary: Optional[NormalizedCommunitySummary] = None,
     ) -> NormalizedCommunityDetail:
-        """根據社區 ID 取得完整正規化詳情 (基礎地理自 summary，規格直取 build_info)"""
+        """根據社區外部 ID 取得完整正規化詳情 (基礎地理自 summary，規格直取 build_info)"""
         params = {
-            "id": community_id,
+            "id": external_community_id,
             "cm91dGU": "L2NvbW11bml0eS9kZXRhaWw=",
         }
         res = await self._client.get("market", "/v1/app/gateway/community/info", params=params)

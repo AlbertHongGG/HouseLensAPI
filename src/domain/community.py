@@ -13,7 +13,8 @@ from src.domain.common import BaseSearchQuery, CleanStr, GeoPoint
 class NormalizedCommunitySummary(BaseModel):
     """跨平台統一社區清單摘要規格 (自衛性強型別規格)"""
 
-    community_id: str = Field(..., description="社區唯一代碼")
+    provider_id: str = Field(..., description="來源平台識別代碼 (如: '591')")
+    external_community_id: str = Field(..., description="外部平台社區代碼 (如: '5855864')")
     community_name: str = Field(..., description="社區名稱")
     region_name: str = Field(..., description="縣市名稱")
     section_name: str = Field(..., description="行政區名稱")
@@ -33,7 +34,8 @@ class NormalizedCommunitySummary(BaseModel):
 class NormalizedCommunityDetail(BaseModel):
     """跨平台統一社區完整規格 (純數值化與自衛性強型別規格)"""
 
-    community_id: str = Field(..., description="社區唯一代號")
+    provider_id: str = Field(..., description="來源平台識別代碼 (如: '591')")
+    external_community_id: str = Field(..., description="外部平台社區代碼 (如: '5855864')")
     community_name: str = Field(..., description="社區名稱")
     address: str = Field(..., description="社區完整地址")
     region_name: str = Field(..., description="縣市名稱")

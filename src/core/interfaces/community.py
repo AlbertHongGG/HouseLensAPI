@@ -22,8 +22,8 @@ class ICommunityProvider(ABC):
     @abstractmethod
     async def get_community_detail(
         self,
-        community_id: str,
+        external_community_id: str,
         summary: Optional[NormalizedCommunitySummary] = None,
     ) -> NormalizedCommunityDetail:
-        """根據社區唯一 ID 與可選之清單摘要取得完整社區硬體規格 (基礎地理來自 summary，規格來自 detail)"""
+        """根據社區外部唯一代碼與可選之清單摘要取得完整社區規格"""
         pass

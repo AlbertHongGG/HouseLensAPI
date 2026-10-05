@@ -53,10 +53,10 @@ class HouseAggregatorService:
         async def fetch_community_detail(summary):
             async with sem:
                 try:
-                    detail = await provider.community.get_community_detail(summary.community_id, summary=summary)
+                    detail = await provider.community.get_community_detail(summary.external_community_id, summary=summary)
                     return (summary, detail)
                 except Exception as e:
-                    logger.warning(f"獲取社區 {summary.community_id} 詳情失敗: {e}")
+                    logger.warning(f"獲取社區 {summary.external_community_id} 詳情失敗: {e}")
                     return (summary, None)
 
         enriched_pairs = await asyncio.gather(
@@ -153,10 +153,10 @@ class HouseAggregatorService:
         async def fetch_new_house_detail(summary):
             async with sem:
                 try:
-                    detail = await provider.new_house.get_new_house_detail(str(summary.source_hid))
+                    detail = await provider.new_house.get_new_house_detail(summary.external_project_id)
                     return (summary, detail)
                 except Exception as e:
-                    logger.warning(f"獲取新建案 {summary.source_hid} 詳情失敗: {e}")
+                    logger.warning(f"獲取新建案 {summary.external_project_id} 詳情失敗: {e}")
                     return (summary, None)
 
         enriched_pairs = await asyncio.gather(

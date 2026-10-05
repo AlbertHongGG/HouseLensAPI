@@ -72,7 +72,8 @@ class TestCommonModels:
 class TestCommunityModels:
     def test_community_summary_instantiation(self):
         summary = NormalizedCommunitySummary(
-            community_id="5934204",
+            provider_id="591",
+            external_community_id="5934204",
             community_name="鳴森大苑-鳴森苑",
             region_name="台北市",
             section_name="松山區",
@@ -87,7 +88,8 @@ class TestCommunityModels:
             transport="南京三民站",
             cover_image_url="https://example.com/cover.jpg",
         )
-        assert summary.community_id == "5934204"
+        assert summary.provider_id == "591"
+        assert summary.external_community_id == "5934204"
         assert summary.avg_unit_price_wan == 141.0
         assert summary.coordinates.lat == 25.056
         assert summary.address == "台北市松山區延壽街72巷..."
@@ -98,7 +100,8 @@ class TestCommunityModels:
 
     def test_community_detail_instantiation(self):
         detail = NormalizedCommunityDetail(
-            community_id="5934204",
+            provider_id="591",
+            external_community_id="5934204",
             community_name="鳴森大苑-鳴森苑",
             address="台北市松山區延壽街72巷",
             region_name="台北市",
@@ -114,7 +117,8 @@ class TestCommunityModels:
             base_area_pin=450.0,
             public_ratio_pct=32.0,
         )
-        assert detail.community_id == "5934204"
+        assert detail.provider_id == "591"
+        assert detail.external_community_id == "5934204"
         assert detail.base_area_pin == 450.0
         assert len(detail.facilities) == 2
         assert detail.direction_rule == "朝北、朝南"
@@ -141,14 +145,17 @@ class TestSaleHouseModels:
             section_name="松山區",
             street="三民路",
             address="鳴森大苑-碧硯閣 松山區-三民路",
-            community_id="5855864",
+            external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             floor_current=2,
             floor_total=24,
+            is_whole_building=False,
             has_parking=True,
             cover_image_url="https://example.com/house.jpg",
         )
         assert summary.external_house_id == "S20604856"
+        assert summary.external_community_id == "5855864"
+        assert summary.is_whole_building is False
         assert summary.total_area_pin == 46.3
         assert summary.price_wan == 5258
         assert summary.has_parking is True
@@ -157,6 +164,7 @@ class TestSaleHouseModels:
 
     def test_sale_house_detail_cross_platform_contract(self):
         detail = NormalizedSalePropertyDetail(
+            provider_id="591",
             external_house_id="20604856",
             title="全新碧硯閣三房車位",
             price_wan=5258,
@@ -187,6 +195,7 @@ class TestSaleHouseModels:
             address="台北市松山區三民路80巷25號",
             coordinates=GeoPoint(lat=25.056119, lng=121.564513),
         )
+        assert detail.provider_id == "591"
         assert detail.price_wan == 5258
         assert isinstance(detail.price_wan, int)
         assert detail.rooms == 3
@@ -208,7 +217,8 @@ class TestSaleHouseModels:
 class TestNewHouseModels:
     def test_new_house_summary(self):
         summary = NormalizedNewHouseSummary(
-            source_hid=138045,
+            provider_id="591",
+            external_project_id="138045",
             project_name="長虹MVP",
             project_status="預售屋",
             region_name="台北市",
@@ -221,18 +231,20 @@ class TestNewHouseModels:
             developer="長虹建設",
             cover_image_url="https://example.com/project.jpg",
         )
-        assert summary.source_hid == 138045
+        assert summary.provider_id == "591"
+        assert summary.external_project_id == "138045"
         assert summary.min_unit_price_wan == 79.0
         assert summary.max_unit_price_wan == 90.0
         assert summary.min_area_pin == 28.0
 
     def test_new_house_detail(self):
         detail = NormalizedNewHouseDetail(
-            hid=138045,
+            provider_id="591",
+            external_project_id="138045",
             project_name="長虹MVP",
             build_type="預售屋",
-            region="台北市",
-            section="萬華區",
+            region_name="台北市",
+            section_name="萬華區",
             address="台北市萬華區康定路、峨眉街口",
             manage_fee_per_pin=150,
             structural_engine="SRC鋼骨鋼筋混凝土結構",
@@ -247,7 +259,8 @@ class TestNewHouseModels:
             public_ratio_pct=32.89,
             total_households=331,
         )
-        assert detail.hid == 138045
+        assert detail.provider_id == "591"
+        assert detail.external_project_id == "138045"
         assert len(detail.layouts) == 2
         assert detail.layouts[0].room_name == "二房"
         assert detail.layouts[0].rooms_count == 2

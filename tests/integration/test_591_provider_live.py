@@ -42,13 +42,13 @@ async def test_591_community_live_flow():
     assert len(res.items) > 0
     first_comm = res.items[0]
     assert isinstance(first_comm, NormalizedCommunitySummary)
-    assert first_comm.community_id is not None
+    assert first_comm.external_community_id is not None
     assert first_comm.community_name != ""
 
     # 2. 獲取第一筆社區的詳情
-    detail = await provider.community.get_community_detail(first_comm.community_id, summary=first_comm)
+    detail = await provider.community.get_community_detail(first_comm.external_community_id, summary=first_comm)
     assert isinstance(detail, NormalizedCommunityDetail)
-    assert detail.community_id == first_comm.community_id
+    assert detail.external_community_id == first_comm.external_community_id
     assert detail.community_name != ""
     assert detail.address == first_comm.address
     assert detail.region_name == first_comm.region_name
@@ -96,12 +96,12 @@ async def test_591_new_house_live_flow():
     assert len(res.items) > 0
     first_nh = res.items[0]
     assert isinstance(first_nh, NormalizedNewHouseSummary)
-    assert first_nh.source_hid > 0
+    assert first_nh.external_project_id != ""
     assert first_nh.project_name != ""
 
     # 2. 獲取建案詳情
-    detail = await provider.new_house.get_new_house_detail(str(first_nh.source_hid))
+    detail = await provider.new_house.get_new_house_detail(first_nh.external_project_id)
     assert isinstance(detail, NormalizedNewHouseDetail)
-    assert detail.hid == first_nh.source_hid
+    assert detail.external_project_id == first_nh.external_project_id
     assert detail.project_name != ""
-    assert detail.region != ""
+    assert detail.region_name != ""

@@ -66,8 +66,10 @@ class PropertyRepository(IPropertyRepository):
         street: Optional[str] = None,
         floor_total: Optional[int] = None,
         area_tolerance_pct: float = 0.02,
+        external_community_id: Optional[str] = None,
+        is_whole_building: bool = False,
     ) -> Optional[PropertyTable]:
-        """依社區（第一級）或行政區路街總樓層（第二級無社區物件）、樓層純整數、房數純整數與坪數 (誤差 ±2%) 尋找可能之重複物理物件"""
+        """依外部社區代碼/社區名（第一級）或行政區路街總樓層（第二級無社區物件）、樓層純整數/整棟標記、房數純整數與坪數 (誤差 ±2%) 尋找可能之重複物理物件"""
         if total_area_pin is None:
             return None
 
@@ -76,22 +78,41 @@ class PropertyRepository(IPropertyRepository):
         min_area = total_area_pin - area_delta
         max_area = total_area_pin + area_delta
 
-        # 第一級：同社區比對
-        if community_name:
-            stmt = select(PropertyTable).where(
-                PropertyTable.community_name == community_name,
+        # 第一級：同外部社區或同社區名稱比對
+        if external_community_id or community_name:
+            conds = [
                 PropertyTable.total_area_pin >= min_area,
                 PropertyTable.total_area_pin <= max_area,
-            )
+            ]
+            if external_community_id and community_name:
+                conds.append(
+                    or_(
+                        PropertyTable.external_community_id == external_community_id,
+                        PropertyTable.community_name == community_name,
+                    )
+                )
+            elif external_community_id:
+                conds.append(PropertyTable.external_community_id == external_community_id)
+            else:
+                conds.append(PropertyTable.community_name == community_name)
+
+            stmt = select(PropertyTable).where(*conds)
             res = await self.session.execute(stmt)
             candidates = list(res.scalars().all())
 
             for cand in candidates:
-                # 樓層純整數比對
-                if floor_current is not None and cand.floor_current is not None:
-                    if cand.floor_current != floor_current:
+                if is_whole_building:
+                    if not cand.is_whole_building:
                         continue
-                # 格局房數純整數比對
+                    if floor_total is not None and cand.floor_total is not None:
+                        if cand.floor_total != floor_total:
+                            continue
+                else:
+                    if cand.is_whole_building:
+                        continue
+                    if floor_current is not None and cand.floor_current is not None:
+                        if cand.floor_current != floor_current:
+                            continue
                 if rooms is not None and cand.rooms is not None:
                     if cand.rooms != rooms:
                         continue
@@ -100,6 +121,7 @@ class PropertyRepository(IPropertyRepository):
         # 第二級：無社區物件之行政區、路街、樓層比對
         elif region_name and section_name and street:
             stmt = select(PropertyTable).where(
+                PropertyTable.external_community_id.is_(None),
                 PropertyTable.community_name.is_(None),
                 PropertyTable.region_name == region_name,
                 PropertyTable.section_name == section_name,
@@ -111,12 +133,21 @@ class PropertyRepository(IPropertyRepository):
             candidates = list(res.scalars().all())
 
             for cand in candidates:
-                if floor_current is not None and cand.floor_current is not None:
-                    if cand.floor_current != floor_current:
+                if is_whole_building:
+                    if not cand.is_whole_building:
                         continue
-                if floor_total is not None and cand.floor_total is not None:
-                    if cand.floor_total != floor_total:
+                    if floor_total is not None and cand.floor_total is not None:
+                        if cand.floor_total != floor_total:
+                            continue
+                else:
+                    if cand.is_whole_building:
                         continue
+                    if floor_current is not None and cand.floor_current is not None:
+                        if cand.floor_current != floor_current:
+                            continue
+                    if floor_total is not None and cand.floor_total is not None:
+                        if cand.floor_total != floor_total:
+                            continue
                 if rooms is not None and cand.rooms is not None:
                     if cand.rooms != rooms:
                         continue
@@ -154,32 +185,36 @@ class PropertyRepository(IPropertyRepository):
         lat = detail.coordinates.lat if detail.coordinates else None
         lng = detail.coordinates.lng if detail.coordinates else None
         comm_name = summary.community_name if summary else detail.community_name
-        raw_comm_id = summary.community_id if summary and summary.community_id else detail.community_id
+        ext_comm_id = summary.external_community_id if summary and summary.external_community_id else detail.external_community_id
 
-        # 3. 查詢關聯社區實體外鍵
-        matched_community_id: Optional[str] = None
-        if raw_comm_id:
+        # 3. 查詢關聯社區實體內部外鍵 (UUID)
+        matched_community_uuid: Optional[str] = None
+        if ext_comm_id:
             comm_stmt = select(CommunityTable.id).where(
                 or_(
-                    CommunityTable.source_id == raw_comm_id,
-                    CommunityTable.source_id == f"C{raw_comm_id}",
-                    CommunityTable.source_id == raw_comm_id.lstrip("C"),
+                    CommunityTable.external_community_id == ext_comm_id,
+                    CommunityTable.external_community_id == f"C{ext_comm_id}",
+                    CommunityTable.external_community_id == ext_comm_id.lstrip("C"),
                 )
             ).limit(1)
             comm_res = await self.session.execute(comm_stmt)
-            matched_community_id = comm_res.scalar_one_or_none()
+            matched_community_uuid = comm_res.scalar_one_or_none()
 
-        if not matched_community_id and comm_name:
+        if not matched_community_uuid and comm_name:
             comm_name_stmt = select(CommunityTable.id).where(CommunityTable.name == comm_name).limit(1)
             comm_name_res = await self.session.execute(comm_name_stmt)
-            matched_community_id = comm_name_res.scalar_one_or_none()
+            matched_community_uuid = comm_name_res.scalar_one_or_none()
 
         # 4. 若無既有物件，建立全新實體；否則以權威快照直接覆蓋
         if property_entity is None:
             property_entity = PropertyTable(
                 id=str(uuid.uuid4()),
-                community_id=matched_community_id,
+                provider_id=provider_id,
+                external_house_id=target_external_id,
+                community_uuid=matched_community_uuid,
+                external_community_id=ext_comm_id,
                 community_name=comm_name,
+                is_whole_building=detail.is_whole_building,
                 title=detail.title,
                 price_wan=detail.price_wan,
                 unit_price_wan=detail.unit_price_wan,
@@ -215,10 +250,13 @@ class PropertyRepository(IPropertyRepository):
             self.session.add(property_entity)
         else:
             # 權威快照覆蓋語意 (Authoritative Snapshot Override)
-            if matched_community_id:
-                property_entity.community_id = matched_community_id
+            if matched_community_uuid:
+                property_entity.community_uuid = matched_community_uuid
+            if ext_comm_id:
+                property_entity.external_community_id = ext_comm_id
             if comm_name:
                 property_entity.community_name = comm_name
+            property_entity.is_whole_building = detail.is_whole_building
 
             property_entity.title = detail.title
             property_entity.price_wan = detail.price_wan
@@ -306,29 +344,33 @@ class PropertyRepository(IPropertyRepository):
             if candidate_property_id:
                 property_entity = await self.get_by_id(candidate_property_id)
 
-        # 查詢關聯社區實體外鍵
-        matched_community_id: Optional[str] = None
-        if summary.community_id:
+        # 查詢關聯社區實體內部外鍵 (UUID)
+        matched_community_uuid: Optional[str] = None
+        if summary.external_community_id:
             comm_stmt = select(CommunityTable.id).where(
                 or_(
-                    CommunityTable.source_id == summary.community_id,
-                    CommunityTable.source_id == f"C{summary.community_id}",
-                    CommunityTable.source_id == summary.community_id.lstrip("C"),
+                    CommunityTable.external_community_id == summary.external_community_id,
+                    CommunityTable.external_community_id == f"C{summary.external_community_id}",
+                    CommunityTable.external_community_id == summary.external_community_id.lstrip("C"),
                 )
             ).limit(1)
             comm_res = await self.session.execute(comm_stmt)
-            matched_community_id = comm_res.scalar_one_or_none()
+            matched_community_uuid = comm_res.scalar_one_or_none()
 
-        if not matched_community_id and summary.community_name:
+        if not matched_community_uuid and summary.community_name:
             comm_name_stmt = select(CommunityTable.id).where(CommunityTable.name == summary.community_name).limit(1)
             comm_name_res = await self.session.execute(comm_name_stmt)
-            matched_community_id = comm_name_res.scalar_one_or_none()
+            matched_community_uuid = comm_name_res.scalar_one_or_none()
 
         if property_entity is None:
             property_entity = PropertyTable(
                 id=str(uuid.uuid4()),
-                community_id=matched_community_id,
+                provider_id=provider_id,
+                external_house_id=summary.external_house_id,
+                community_uuid=matched_community_uuid,
+                external_community_id=summary.external_community_id,
                 community_name=summary.community_name,
+                is_whole_building=summary.is_whole_building,
                 title=summary.title,
                 price_wan=summary.price_wan,
                 unit_price_wan=summary.unit_price_wan,
@@ -347,10 +389,13 @@ class PropertyRepository(IPropertyRepository):
             )
             self.session.add(property_entity)
         else:
-            if matched_community_id:
-                property_entity.community_id = matched_community_id
+            if matched_community_uuid:
+                property_entity.community_uuid = matched_community_uuid
+            if summary.external_community_id:
+                property_entity.external_community_id = summary.external_community_id
             if summary.community_name:
                 property_entity.community_name = summary.community_name
+            property_entity.is_whole_building = summary.is_whole_building
             if summary.price_wan > 0:
                 property_entity.price_wan = summary.price_wan
             if summary.unit_price_wan is not None:
@@ -433,6 +478,8 @@ class PropertyRepository(IPropertyRepository):
         min_age_years: Optional[float] = None,
         max_age_years: Optional[float] = None,
         rooms: Optional[int] = None,
+        external_community_id: Optional[str] = None,
+        community_uuid: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[PropertyTable]:
@@ -442,6 +489,10 @@ class PropertyRepository(IPropertyRepository):
             stmt = stmt.where(PropertyTable.region_name == region_name)
         if section_name:
             stmt = stmt.where(PropertyTable.section_name == section_name)
+        if external_community_id:
+            stmt = stmt.where(PropertyTable.external_community_id == external_community_id)
+        if community_uuid:
+            stmt = stmt.where(PropertyTable.community_uuid == community_uuid)
         if min_price_wan is not None:
             stmt = stmt.where(PropertyTable.price_wan >= min_price_wan)
         if max_price_wan is not None:

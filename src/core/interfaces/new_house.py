@@ -19,6 +19,6 @@ class INewHouseProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_new_house_detail(self, new_house_id: str) -> NormalizedNewHouseDetail:
-        """根據建案 ID 取得建案詳情、規劃房型 (layout_v2)、建商團隊與開價資訊"""
+    async def get_new_house_detail(self, external_project_id: str) -> NormalizedNewHouseDetail:
+        """根據外部建案 ID 取得建案詳情、規劃房型、建商團隊與開價資訊"""
         pass

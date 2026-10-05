@@ -30,11 +30,12 @@ class NormalizedSaleListing(BaseModel):
 
     # 分類與地理位置
     building_type: CleanStr = Field(None, description="建物型態 (如: 住宅、辦公)")
+    is_whole_building: bool = Field(default=False, description="是否為整棟銷售 (如透天、整棟別墅)")
     region_name: str = Field(..., description="縣市名稱 (如: 台北市)")
     section_name: str = Field(..., description="行政區名稱 (如: 松山區)")
     street: CleanStr = Field(None, description="街道名稱 (如: 三民路)")
     address: CleanStr = Field(None, description="地址概況描述")
-    community_id: CleanStr = Field(None, description="所屬社區 ID")
+    external_community_id: CleanStr = Field(None, description="外部平台所屬社區代號 (如 591 社區 ID: '5855864')")
     community_name: CleanStr = Field(None, description="所屬社區名稱")
     has_parking: bool = Field(default=False, description="是否含車位")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
@@ -43,6 +44,7 @@ class NormalizedSaleListing(BaseModel):
 class NormalizedSalePropertyDetail(BaseModel):
     """跨平台統一中古屋物理實體完整規格 (含深層產權面積拆解與完整規格)"""
 
+    provider_id: str = Field(..., description="來源平台識別代碼 (如: '591')")
     external_house_id: str = Field(..., description="來源物件唯一刊登代號")
     title: str = Field(..., description="物件刊登標題")
     price_wan: int = Field(..., ge=0, description="總價純整數 (單位: 萬元)")
@@ -71,6 +73,7 @@ class NormalizedSalePropertyDetail(BaseModel):
     # 構造與現況描述
     building_type: CleanStr = Field(None, description="建物類型 (如: 住宅)")
     building_structure: CleanStr = Field(None, description="建築構造 (如: 電梯大樓、公寓)")
+    is_whole_building: bool = Field(default=False, description="是否為整棟銷售 (如透天、整棟別墅)")
     orientation: CleanStr = Field(None, description="主要朝向 (如: 坐南朝北)")
     purpose: CleanStr = Field(None, description="法定主要用途 (如: 住家用)")
     current_state: CleanStr = Field(None, description="使用現況 (如: 住宅)")
@@ -82,7 +85,7 @@ class NormalizedSalePropertyDetail(BaseModel):
     street: CleanStr = Field(None, description="路街名稱")
     address: CleanStr = Field(None, description="完整地址描述")
     coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
-    community_id: CleanStr = Field(None, description="所屬社區 ID")
+    external_community_id: CleanStr = Field(None, description="外部平台所屬社區代號 (如 591 社區 ID: '5855864')")
     community_name: CleanStr = Field(None, description="社區名稱")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
 

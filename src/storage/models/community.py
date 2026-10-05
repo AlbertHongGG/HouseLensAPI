@@ -21,8 +21,8 @@ class CommunityTable(Base, TimestampMixin):
         primary_key=True,
         default=lambda: str(uuid.uuid4()),
     )
-    source_provider: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
-    source_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    provider_id: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    external_community_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
 
     name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     building_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
@@ -67,7 +67,7 @@ class CommunityTable(Base, TimestampMixin):
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     __table_args__ = (
-        UniqueConstraint("source_provider", "source_id", name="uq_community_source"),
+        UniqueConstraint("provider_id", "external_community_id", name="uq_community_source"),
         Index("ix_community_region_section", "region_name", "section_name"),
         Index("ix_community_building_age_years", "building_age_years"),
     )

@@ -84,7 +84,7 @@ def test_cli_get_detail_views():
     assert res_nh.exit_code == 0
     items_nh = json.loads(res_nh.output)
     if items_nh:
-        hid = str(items_nh[0]["source_hid"])
+        hid = str(items_nh[0]["external_project_id"])
         res_get = runner.invoke(app, ["get", "newhouse", hid])
         assert res_get.exit_code == 0
         assert hid in res_get.output

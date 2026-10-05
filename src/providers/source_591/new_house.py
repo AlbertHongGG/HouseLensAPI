@@ -61,10 +61,10 @@ class Source591NewHouseProvider(INewHouseProvider):
             page_size=query.page_size,
         )
 
-    async def get_new_house_detail(self, new_house_id: str) -> NormalizedNewHouseDetail:
-        """根據建案 HID 取得完整新建案詳情"""
+    async def get_new_house_detail(self, external_project_id: str) -> NormalizedNewHouseDetail:
+        """根據建案外部 ID 取得完整新建案詳情"""
         params = {
-            "id": new_house_id,
+            "id": external_project_id,
             "short_video": 1,
             "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw=",
         }

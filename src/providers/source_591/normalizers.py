@@ -61,54 +61,72 @@ def parse_pin(raw: Any) -> Optional[float]:
     return None
 
 
-def parse_floor(raw: Any) -> Tuple[Optional[int], Optional[int]]:
-    """解析樓層為 (所在樓層純整數, 總樓層純整數)。
+def parse_floor(raw: Any) -> Tuple[Optional[int], Optional[int], bool]:
+    """解析樓層為 (所在樓層純整數, 總樓層純整數, 是否為整棟銷售)。
 
     支援格式:
-        "2F/24F" -> (2, 24)
-        "2樓/共24樓" -> (2, 24)
-        "B1/12F" -> (-1, 12)
-        "頂樓" / "整棟" -> (None, None)
-        2 -> (2, None)
+        "2F/24F" -> (2, 24, False)
+        "2樓/共24樓" -> (2, 24, False)
+        "B1/12F" -> (-1, 12, False)
+        "整棟/5F" -> (None, 5, True)
+        "全棟/5F" -> (None, 5, True)
+        "99" / 99 -> (None, None, True) (591 協議中代表整棟透天/別墅)
+        "整棟" / "全棟" -> (None, None, True)
+        2 -> (2, None, False)
     """
     if raw is None:
-        return (None, None)
+        return (None, None, False)
+
+    if raw == 99 or str(raw).strip() == "99":
+        return (None, None, True)
 
     if isinstance(raw, int):
-        return (raw, None)
+        return (raw, None, False)
 
     clean_str = str(raw).strip()
     if not clean_str:
-        return (None, None)
+        return (None, None, False)
 
+    is_whole_building = False
     curr_floor: Optional[int] = None
     total_floor: Optional[int] = None
 
     if "/" in clean_str:
-        parts = clean_str.split("/")
+        parts = clean_str.split("/", 1)
         curr_part = parts[0].strip()
         total_part = parts[1].strip()
 
-        # 解析所在樓層
-        curr_floor = _parse_single_floor(curr_part)
+        if curr_part in ("整棟", "全棟", "99"):
+            is_whole_building = True
+            curr_floor = None
+        else:
+            curr_floor = _parse_single_floor(curr_part)
+
         total_floor = _parse_single_floor(total_part)
     else:
-        curr_floor = _parse_single_floor(clean_str)
+        if clean_str in ("整棟", "全棟", "99"):
+            is_whole_building = True
+            curr_floor = None
+        else:
+            curr_floor = _parse_single_floor(clean_str)
 
-    return (curr_floor, total_floor)
+    return (curr_floor, total_floor, is_whole_building)
 
 
 def _parse_single_floor(s: str) -> Optional[int]:
-    """輔助解析單一樓層字串 (支援地下室 B1 -> -1)"""
+    """輔助解析單一樓層字串 (支援地下室 B1 -> -1，嚴格過濾 99 與整棟文字)"""
     if not s:
         return None
     s = s.upper().replace("F", "").replace("樓", "").replace("共", "").strip()
+    if s in ("整棟", "全棟", "99", "頂樓"):
+        return None
     if s.startswith("B"):
         b_num = s.replace("B", "").strip()
         if b_num.isdigit():
             return -int(b_num)
     if s.isdigit():
-        return int(s)
+        val = int(s)
+        return None if val == 99 else val
     # 支援負數 "-1"
     if s.startswith("-") and s[1:].isdigit():
         return int(s)

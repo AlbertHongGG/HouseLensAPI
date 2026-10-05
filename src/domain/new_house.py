@@ -22,7 +22,8 @@ class NewHouseLayoutSpec(BaseModel):
 class NormalizedNewHouseSummary(BaseModel):
     """跨平台統一新建案清單摘要規格"""
 
-    source_hid: int = Field(..., description="建案識別代碼")
+    provider_id: str = Field(..., description="來源平台識別代碼 (如: '591')")
+    external_project_id: str = Field(..., description="外部平台建案識別代碼 (如: '138810')")
     project_name: str = Field(..., description="建案名稱")
     project_status: str = Field(..., description="建案期程狀態 (預售屋/新成屋)")
     region_name: str = Field(..., description="縣市名稱")
@@ -39,11 +40,12 @@ class NormalizedNewHouseSummary(BaseModel):
 class NormalizedNewHouseDetail(BaseModel):
     """跨平台統一新建案完整規格 (純數值化)"""
 
-    hid: int = Field(..., description="建案 HID")
+    provider_id: str = Field(..., description="來源平台識別代碼 (如: '591')")
+    external_project_id: str = Field(..., description="外部平台建案識別代碼 (如: '138810')")
     project_name: str = Field(..., description="建案名稱")
     build_type: CleanStr = Field(None, description="建案狀態 (預售屋/新成屋)")
-    region: str = Field(..., description="縣市名稱")
-    section: str = Field(..., description="行政區名稱")
+    region_name: str = Field(..., description="縣市名稱")
+    section_name: str = Field(..., description="行政區名稱")
     address: str = Field(..., description="基地位置地址")
 
     # 建築數值化規格

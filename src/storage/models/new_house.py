@@ -22,12 +22,12 @@ class NewHouseTable(Base, TimestampMixin):
         default=lambda: str(uuid.uuid4()),
     )
     provider_id: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
-    source_hid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    external_project_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
 
     project_name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     build_type: Mapped[str] = mapped_column(String(64), nullable=False)
-    region: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
-    section: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    region_name: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    section_name: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     address: Mapped[str] = mapped_column(String(256), nullable=False)
 
     # 開價與坪數純數值區間
@@ -57,6 +57,6 @@ class NewHouseTable(Base, TimestampMixin):
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     __table_args__ = (
-        UniqueConstraint("provider_id", "source_hid", name="uq_new_house_source"),
-        Index("ix_new_house_region_section", "region", "section"),
+        UniqueConstraint("provider_id", "external_project_id", name="uq_new_house_source"),
+        Index("ix_new_house_region_section", "region_name", "section_name"),
     )

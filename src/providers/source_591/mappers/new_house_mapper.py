@@ -28,7 +28,8 @@ def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
     min_area, max_area = parse_range_float(item.get("area"))
 
     return NormalizedNewHouseSummary(
-        source_hid=int(item.get("hid")),
+        provider_id="591",
+        external_project_id=str(item.get("hid")),
         project_name=str(item.get("build_name") or "").strip(),
         project_status=str(item.get("build_type_name") or "").strip(),
         region_name=str(item.get("region") or "").strip(),
@@ -92,11 +93,12 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     total_households = parse_households_count(housing.get("households"))
 
     return NormalizedNewHouseDetail(
-        hid=int(housing.get("hid")),
+        provider_id="591",
+        external_project_id=str(housing.get("hid")),
         project_name=str(housing.get("build_name") or "").strip(),
         build_type=clean_optional_str(housing.get("build_type_name")),
-        region=str(housing.get("region") or "").strip(),
-        section=str(housing.get("section") or "").strip(),
+        region_name=str(housing.get("region") or "").strip(),
+        section_name=str(housing.get("section") or "").strip(),
         address=clean_optional_str(housing.get("address")) or "",
         base_area_pin=base_area_pin,
         public_ratio_pct=public_ratio_pct,

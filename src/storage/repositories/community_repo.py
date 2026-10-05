@@ -28,9 +28,9 @@ class CommunityRepository(ICommunityRepository):
         """批次查詢傳入的外部社區 ID 中已存在於資料庫者"""
         if not external_ids:
             return set()
-        stmt = select(CommunityTable.source_id).where(
-            CommunityTable.source_provider == provider_id,
-            CommunityTable.source_id.in_(external_ids),
+        stmt = select(CommunityTable.external_community_id).where(
+            CommunityTable.provider_id == provider_id,
+            CommunityTable.external_community_id.in_(external_ids),
         )
         res = await self.session.execute(stmt)
         return set(res.scalars().all())
@@ -40,8 +40,8 @@ class CommunityRepository(ICommunityRepository):
     ) -> CommunityTable:
         """從 NormalizedCommunitySummary 新增或更新社區節點"""
         stmt = select(CommunityTable).where(
-            CommunityTable.source_provider == provider_id,
-            CommunityTable.source_id == summary.community_id,
+            CommunityTable.provider_id == provider_id,
+            CommunityTable.external_community_id == summary.external_community_id,
         )
         res = await self.session.execute(stmt)
         record = res.scalar_one_or_none()
@@ -52,8 +52,8 @@ class CommunityRepository(ICommunityRepository):
         if record is None:
             record = CommunityTable(
                 id=str(uuid.uuid4()),
-                source_provider=provider_id,
-                source_id=summary.community_id,
+                provider_id=provider_id,
+                external_community_id=summary.external_community_id,
                 name=summary.community_name,
                 building_type=summary.building_type,
                 build_purpose=summary.build_purpose,
@@ -106,8 +106,8 @@ class CommunityRepository(ICommunityRepository):
     ) -> CommunityTable:
         """從 NormalizedCommunityDetail 新增或更新社區完整規格"""
         stmt = select(CommunityTable).where(
-            CommunityTable.source_provider == provider_id,
-            CommunityTable.source_id == detail.community_id,
+            CommunityTable.provider_id == provider_id,
+            CommunityTable.external_community_id == detail.external_community_id,
         )
         res = await self.session.execute(stmt)
         record = res.scalar_one_or_none()
@@ -118,8 +118,8 @@ class CommunityRepository(ICommunityRepository):
         if record is None:
             record = CommunityTable(
                 id=str(uuid.uuid4()),
-                source_provider=provider_id,
-                source_id=detail.community_id,
+                provider_id=provider_id,
+                external_community_id=detail.external_community_id,
                 name=detail.community_name,
                 building_type=detail.building_type,
                 build_purpose=detail.build_purpose,
@@ -214,13 +214,13 @@ class CommunityRepository(ICommunityRepository):
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
-    async def get_by_source_id(
-        self, provider_id: str, source_id: str
+    async def get_by_external_id(
+        self, provider_id: str, external_community_id: str
     ) -> Optional[CommunityTable]:
-        """根據來源平台代碼與外部 ID 查詢社區"""
+        """根據來源平台代碼與外部社區 ID 查詢社區"""
         stmt = select(CommunityTable).where(
-            CommunityTable.source_provider == provider_id,
-            CommunityTable.source_id == source_id,
+            CommunityTable.provider_id == provider_id,
+            CommunityTable.external_community_id == external_community_id,
         )
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()

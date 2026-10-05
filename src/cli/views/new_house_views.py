@@ -21,7 +21,7 @@ def render_new_house_table(new_houses: List[NewHouseTable]) -> Table:
         show_lines=True,
     )
 
-    table.add_column("建案 HID", style="bold yellow", justify="center")
+    table.add_column("建案外部 ID", style="bold yellow", justify="center")
     table.add_column("建案名稱", style="bold white")
     table.add_column("期程狀態", style="magenta", justify="center")
     table.add_column("行政區域", style="yellow")
@@ -53,10 +53,10 @@ def render_new_house_table(new_houses: List[NewHouseTable]) -> Table:
             area_str = "-"
 
         table.add_row(
-            str(nh.source_hid),
+            f"[{nh.provider_id}] {nh.external_project_id}",
             nh.project_name,
             nh.build_type,
-            f"{nh.region}{nh.section}",
+            f"{nh.region_name}{nh.section_name}",
             price_str,
             area_str,
             specs_team,
@@ -97,10 +97,10 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     hh_str = f"{nh.total_households} 戶" if nh.total_households is not None else "-"
     mgmt_fee_str = f"{nh.manage_fee_per_pin} 元/坪/月" if nh.manage_fee_per_pin is not None else "-"
 
-    specs_table.add_row("建案 HID:", str(nh.source_hid), "來源平台:", f"[{nh.provider_id.upper()}]")
+    specs_table.add_row("外部 ID:", nh.external_project_id, "來源平台:", f"[{nh.provider_id.upper()}]")
     specs_table.add_row("建案名稱:", f"[bold yellow]{nh.project_name}[/bold yellow]", "建案狀態:", nh.build_type)
     specs_table.add_row("基地地址:", nh.address, "接待會館:", nh.reception_address or "-")
-    specs_table.add_row("開價區間:", f"[bold green]{price_str}[/bold green]", "行政區域:", f"{nh.region}{nh.section}")
+    specs_table.add_row("開價區間:", f"[bold green]{price_str}[/bold green]", "行政區域:", f"{nh.region_name}{nh.section_name}")
     specs_table.add_row("坪數範圍:", area_str, "基地總坪:", base_str)
     specs_table.add_row("公設比率:", pub_str, "規劃總戶數:", hh_str)
     specs_table.add_row("管理費單價:", mgmt_fee_str, "座向規則:", nh.direction_rule or "-")
@@ -148,12 +148,12 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
     """將 NewHouseTable 轉換為標準字典供 JSON 輸出"""
     return {
         "id": nh.id,
-        "source_hid": nh.source_hid,
         "provider_id": nh.provider_id,
+        "external_project_id": nh.external_project_id,
         "project_name": nh.project_name,
         "build_type": nh.build_type,
-        "region": nh.region,
-        "section": nh.section,
+        "region_name": nh.region_name,
+        "section_name": nh.section_name,
         "address": nh.address,
         "min_unit_price_wan": nh.min_unit_price_wan,
         "max_unit_price_wan": nh.max_unit_price_wan,
