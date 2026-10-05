@@ -303,12 +303,12 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
     async with test_db.session() as session:
         repo = NewHouseRepository(session)
 
-        # 1. 寫入 Summary
-        nh_summary = NormalizedNewHouseSummary(
+        # 1. 寫入初始 Detail
+        nh_detail_init = NormalizedNewHouseDetail(
             provider_id="591",
             external_project_id="138045",
             project_name="長虹MVP",
-            project_status="預售屋",
+            build_type="預售屋",
             region_name="台北市",
             section_name="萬華區",
             address="台北市萬華區康定路、峨眉街口",
@@ -316,9 +316,9 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
             max_unit_price_wan=90.0,
             min_area_pin=28.0,
             max_area_pin=41.0,
-            developer="長虹建設股份有限公司",
+            developer_company="長虹建設股份有限公司",
         )
-        saved = await repo.upsert_from_summary(nh_summary, provider_id="591")
+        saved = await repo.upsert_from_detail(nh_detail_init, provider_id="591")
         assert saved.external_project_id == "138045"
         assert saved.min_unit_price_wan == 79.0
         assert saved.max_unit_price_wan == 90.0
@@ -403,12 +403,12 @@ async def test_repository_filter_existing_external_ids(test_db: DatabaseManager)
         assert existing_prop == {"S500"}
 
         # 3. 寫入新建案資料
-        await nh_repo.upsert_from_summary(
-            NormalizedNewHouseSummary(
+        await nh_repo.upsert_from_detail(
+            NormalizedNewHouseDetail(
                 provider_id="591",
                 external_project_id="900",
                 project_name="測試建案A",
-                project_status="預售屋",
+                build_type="預售屋",
                 region_name="台北市",
                 section_name="南港區",
                 address="台北市南港區重陽路",

@@ -215,7 +215,7 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
         ]
         return PageResult.create(items=items, total_records=50, page=query.page, page_size=10)
 
-    async def mock_detail(new_house_id: str) -> NormalizedNewHouseDetail:
+    async def mock_detail(new_house_id: str, summary: Optional[NormalizedNewHouseSummary] = None) -> NormalizedNewHouseDetail:
         return NormalizedNewHouseDetail(
             provider_id="mock_591",
             external_project_id=new_house_id,
@@ -348,7 +348,7 @@ async def test_sync_all_with_unified_options(sync_test_db):
         ]
         return PageResult.create(items=items, total_records=5, page=q.page, page_size=q.page_size)
 
-    async def mock_detail_new(hid: str):
+    async def mock_detail_new(hid: str, summary: Optional[NormalizedNewHouseSummary] = None):
         return NormalizedNewHouseDetail(
             provider_id="mock_591",
             external_project_id=hid,

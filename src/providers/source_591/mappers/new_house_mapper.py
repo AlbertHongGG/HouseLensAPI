@@ -4,7 +4,7 @@
 所有雜質、未清洗字串在進入核心層前必須徹底清洗完畢。
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from src.domain.new_house import (
     NewHouseLayoutSpec,
@@ -51,9 +51,26 @@ def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
     )
 
 
-def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
-    """將 591 detail/base-info 回應正規化為 NormalizedNewHouseDetail。"""
+def map_new_house_detail(
+    data: Dict[str, Any],
+    summary: Optional[NormalizedNewHouseSummary] = None,
+) -> NormalizedNewHouseDetail:
+    """將 591 detail/base-info 回應正規化為 NormalizedNewHouseDetail。
+
+    兩層式跨領域統一架構：
+    - 第一層 (身分與地理空間標識)：100% 統一自清單 API (summary)。
+    - 第二層 (深層建築規劃與規格)：100% 統一自詳情 API (data.housing)。
+    """
     housing = data.get("housing") or {}
+
+    # 第一層：身分與地理空間標識 (統一由 summary 提供)
+    ext_id = summary.external_project_id if summary else str(housing.get("hid"))
+    p_name = summary.project_name if summary else str(housing.get("build_name") or "").strip()
+    build_type_val = summary.project_status if summary else clean_optional_str(housing.get("build_type_name"))
+    r_name = summary.region_name if summary else str(housing.get("region") or "").strip()
+    s_name = summary.section_name if summary else str(housing.get("section") or "").strip()
+    addr = summary.address if summary else (clean_optional_str(housing.get("address")) or "")
+    cover_url = summary.cover_image_url if summary else clean_optional_str(housing.get("cover"))
 
     # 1. 房型與坪數結構化解析
     layout_v2_raw = housing.get("layout_v2") or []
@@ -61,12 +78,12 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     if isinstance(layout_v2_raw, list):
         for it in layout_v2_raw:
             if isinstance(it, dict) and "room" in it:
-                r_name = str(it.get("room") or "").strip()
-                r_count = parse_room_count(r_name)
+                r_name_item = str(it.get("room") or "").strip()
+                r_count = parse_room_count(r_name_item)
                 min_a, max_a = parse_range_float(it.get("area"))
                 layouts.append(
                     NewHouseLayoutSpec(
-                        room_name=r_name,
+                        room_name=r_name_item,
                         rooms_count=r_count,
                         min_area_pin=min_a,
                         max_area_pin=max_a,
@@ -77,7 +94,11 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     price_obj = housing.get("price")
     min_price, max_price = parse_range_float(price_obj)
 
-    # 3. 基地坪數
+    # 3. 規劃坪數區間解析 (坪)
+    area_obj = housing.get("area")
+    min_area_val, max_area_val = parse_range_float(area_obj)
+
+    # 4. 基地坪數
     base_area_raw = housing.get("base_area")
     base_area_pin = None
     if isinstance(base_area_raw, dict):
@@ -85,7 +106,7 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     else:
         base_area_pin = parse_pin(base_area_raw)
 
-    # 4. 管理費 (元/坪/月)
+    # 5. 管理費 (元/坪/月)
     manage_cost_raw = housing.get("manage_cost")
     manage_fee_per_pin = None
     if isinstance(manage_cost_raw, dict):
@@ -93,18 +114,18 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     elif manage_cost_raw:
         manage_fee_per_pin = parse_currency_amount(manage_cost_raw)
 
-    # 5. 公設比 (百分比)
+    # 6. 公設比 (百分比)
     public_ratio_pct = parse_percent(housing.get("ratio"))
 
-    # 6. 總戶數 (純整數)
+    # 7. 總戶數 (純整數)
     total_households = parse_households_count(housing.get("households"))
 
-    # 7. 建物型態、法定用途、土地使用分區
+    # 8. 建物型態、法定用途、土地使用分區
     building_type = clean_optional_str(housing.get("purpose_name"))
     legal_purpose = clean_optional_str(housing.get("purpose_other_name"))
     land_division = clean_optional_str(housing.get("land_division"))
 
-    # 8. 時程規劃: 完工交屋期程與公開銷售日期
+    # 9. 時程規劃: 完工交屋期程與公開銷售日期
     handover_time = None
     deal_time_raw = housing.get("deal_time_v2")
     if isinstance(deal_time_raw, dict):
@@ -127,7 +148,7 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     elif sell_time_raw:
         open_sell_date = clean_optional_str(sell_time_raw)
 
-    # 9. 車位規劃與充電設備規格解析
+    # 10. 車位規劃與充電設備規格解析
     park_price_raw = housing.get("park_price")
     p_price_desc, min_p_price, max_p_price = parse_new_house_parking_price(park_price_raw)
     p_ratio_desc, p_ratio_val = parse_parking_ratio(housing.get("park_ratio"))
@@ -153,7 +174,7 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
         parking_style=park_style,
     )
 
-    # 10. 社區跨領域外部關聯
+    # 11. 社區跨領域外部關聯
     external_community_id = None
     cid_raw = housing.get("community_id")
     if cid_raw is not None and str(cid_raw).strip() not in ("0", ""):
@@ -161,7 +182,7 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     community_name = clean_optional_str(housing.get("community_name"))
     community_age = parse_int_count(housing.get("community_age"))
 
-    # 11. 基地經緯度坐標
+    # 12. 基地經緯度坐標
     map_raw = housing.get("map")
     lat_val = None
     lng_val = None
@@ -173,16 +194,19 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
         lng_val = parse_coordinate(housing.get("lng"))
 
     return NormalizedNewHouseDetail(
-        provider_id="591",
-        external_project_id=str(housing.get("hid")),
-        project_name=str(housing.get("build_name") or "").strip(),
-        build_type=clean_optional_str(housing.get("build_type_name")),
+        # --- 第一層：身分與地理空間標識 (100% 清單 API summary 唯一來源) ---
+        provider_id=summary.provider_id if summary else "591",
+        external_project_id=ext_id,
+        project_name=p_name,
+        region_name=r_name,
+        section_name=s_name,
+        address=addr,
+        cover_image_url=cover_url,
+        # --- 第二層：深層建築規格、規劃、時程與坐標 (100% 詳情 API 唯一來源) ---
+        build_type=build_type_val,
         building_type=building_type,
         legal_purpose=legal_purpose,
         land_division=land_division,
-        region_name=str(housing.get("region") or "").strip(),
-        section_name=str(housing.get("section") or "").strip(),
-        address=clean_optional_str(housing.get("address")) or "",
         handover_time=handover_time,
         open_sell_date=open_sell_date,
         base_area_pin=base_area_pin,
@@ -191,6 +215,8 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
         manage_fee_per_pin=manage_fee_per_pin,
         min_unit_price_wan=min_price,
         max_unit_price_wan=max_price,
+        min_area_pin=min_area_val,
+        max_area_pin=max_area_val,
         parking=parking,
         layouts=layouts,
         structural_engine=clean_optional_str(housing.get("structural_engine")),

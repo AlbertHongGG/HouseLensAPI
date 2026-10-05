@@ -1,6 +1,5 @@
-"""HouseLensAPI - 新建案領域服務抽象合約 (INewHouseProvider)"""
-
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from src.domain.common import PageResult
 from src.domain.new_house import (
@@ -19,6 +18,10 @@ class INewHouseProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_new_house_detail(self, external_project_id: str) -> NormalizedNewHouseDetail:
+    async def get_new_house_detail(
+        self,
+        external_project_id: str,
+        summary: Optional[NormalizedNewHouseSummary] = None,
+    ) -> NormalizedNewHouseDetail:
         """根據外部建案 ID 取得建案詳情、規劃房型、建商團隊與開價資訊"""
         pass

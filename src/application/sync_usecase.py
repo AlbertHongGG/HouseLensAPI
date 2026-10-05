@@ -260,7 +260,7 @@ class SyncUseCase:
                 return await repo.filter_existing_external_ids(provider_id, ids)
 
         async def fetch_detail(summary: NormalizedNewHouseSummary) -> Optional[NormalizedNewHouseDetail]:
-            return await provider.new_house.get_new_house_detail(summary.external_project_id)
+            return await provider.new_house.get_new_house_detail(summary.external_project_id, summary=summary)
 
         async def persist_batch(
             pairs: List[Tuple[NormalizedNewHouseSummary, Optional[NormalizedNewHouseDetail]]]

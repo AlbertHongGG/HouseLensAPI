@@ -137,10 +137,10 @@ def map_community_detail(
     # 1. 建物實體型態 (如: 住宅大樓、華廈、透天、商辦)
     building_type = clean_optional_str(build_info.get("purpose_str"))
 
-    # 2. 法定使用用途 (如: 住家用、住商用、商業用)
-    build_purpose = clean_optional_str(build_info.get("purpose_other2")) or summary.build_purpose
+    # 2. 法定使用用途 (100% 來自詳情 build_info.purpose_other2)
+    build_purpose = clean_optional_str(build_info.get("purpose_other2"))
 
-    # 3. 成屋/建案狀態 (如: 預售屋、新成屋、中古屋)
+    # 3. 成屋/建案狀態 (100% 來自詳情 build_info.build_type / build_type_str)
     raw_status_code = build_info.get("build_type")
     raw_status_str = clean_optional_str(build_info.get("build_type_str"))
     if raw_status_str:
@@ -152,7 +152,7 @@ def map_community_detail(
     elif raw_status_code == 5:
         housing_status = "中古屋"
     else:
-        housing_status = summary.housing_status
+        housing_status = None
 
     # 公設清單
     facility_raw = build_info.get("facility") or []

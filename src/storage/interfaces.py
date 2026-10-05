@@ -166,13 +166,6 @@ class INewHouseRepository(ABC):
         pass
 
     @abstractmethod
-    async def upsert_from_summary(
-        self, summary: NormalizedNewHouseSummary, provider_id: str
-    ) -> NewHouseTable:
-        """從 NormalizedNewHouseSummary 新增或更新新建案基本資料"""
-        pass
-
-    @abstractmethod
     async def upsert_from_detail(
         self, detail: NormalizedNewHouseDetail, provider_id: str
     ) -> NewHouseTable:

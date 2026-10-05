@@ -262,56 +262,54 @@ uv run houselens test 591 --format json
 
 ## 資料庫資料表與 API 欄位對照 (Database Schema & API Mapping)
 
-資料庫共有 **4 張資料表**，所有數值欄位皆已清洗為純數字型別（`int` / `float`）：
-
-* **`communities`**：社區基本資訊、行情、管費、公設規劃
-* **`properties`**：中古屋客觀實體主檔（固化首要來源二元組，去重合併後之房屋物理資料）
-* **`property_listings`**：平台刊登廣告表（各大仲介刊登紀錄，1:N 關聯至 `properties`）
-* **`new_houses`**：新建案與預售屋實體表（建案資訊、價格區間、結構化房型規劃矩陣）
+資料庫共有 **4 張資料表**，所有數值欄位皆已清洗為純數字型別（`int` / `float`）。  
+系統全面貫徹**「兩層式跨領域統一架構 (Unified Two-Tier SSOT Architecture)」**，徹底杜絕同一個欄位跨 API 雙重抓取與 Fallback 混用：
+* **第一層：身分與地理空間標識層**（`external_xxx_id`、名稱/標題、`region_name`、`section_name`、`street`、`address`、`cover_image_url`、關聯外部社區代碼/名稱、社區 `lat/lng`）：**100% 統一自清單 API 取得**。
+* **第二層：深層建築、硬體規格與時程層**（價格/單價、產權坪數拆解、樓層、格局、陽台、車位規格值物件、完工/銷售時程、分區、工法、團隊代銷、結構化房型矩陣、中古屋與新建案基地坐標 `lat/lng`）：**100% 統一自詳情 API 取得**。
 
 ---
 
 ### 1. `communities` (社區)
 
 對應來源：591 社區清單 API (`/v1/search/list`) & 社區詳情 API (`/v1/app/gateway/community/info`)  
-*架構原則：劃分單一事實來源（Single Source of Truth），基礎地理、成交均價與身分 100% 來自「清單」API，詳細建築硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。全文字欄位空字串與佔位雜質一律在防腐層正規化為 SQL `NULL`。*
+*架構原則：劃分單一事實來源（Single Source of Truth），第一層身分地理、坐標與成交均價 100% 來自「清單」API；第二層建築硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。全文字欄位空字串與佔位雜質一律在防腐層正規化為 SQL `NULL`。*
 
-| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 轉換規則 / 備註 |
+| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
 | :--- | :--- | :--- | :--- | :--- |
-| `id` | String(36) | 主鍵 (PK) | - | UUID v4 |
+| `id` | String(36) | 主鍵 (PK) | - | 系統產生 UUID v4 |
 | `provider_id` | String(32) | 來源平台代碼 | - | 固定 `"591"`，索引 |
-| `external_community_id` | String(64) | 外部社區 ID | 清單 `items[].id` | 轉字串，與 `provider_id` 構成複合唯一約束 `uq_community_source` |
-| `name` | String(128) | 社區名稱 | 清單 `items[].name` | 去前後空白，索引 |
-| `housing_status` | String(32) | 成屋/建案狀態 | 清單 `housing_text`<br>詳情 `build_info.build_type` 代碼 | 如「預售屋」、「新成屋」、「中古屋」 |
-| `building_type` | String(64) | 建物實體型態 | 詳情 `build_info.purpose_str` | 如「住宅大樓」、「華廈」、「透天」、「商辦」；空值轉 NULL |
-| `build_purpose` | String(64) | 法定使用用途 | 詳情 `build_info.purpose_other2` | 如「住家用」、「住商用」、「商業用」；空值轉 NULL |
-| `region_name` | String(32) | 縣市 | 清單 `items[].region` | 如「台北市」，索引 |
-| `section_name` | String(32) | 行政區 | 清單 `items[].section` | 如「松山區」，索引 |
-| `address` | String(256) | 地址 | 清單 `items[].simple_address` 組合 | 清單組合縣市與行政區 |
-| `lat` / `lng` | Float | 經緯度 | 清單 `items[].lat`, `items[].lng` | 清單直取，轉 float |
-| `avg_unit_price_wan` | Float | 成交均價 (萬/坪) | 清單 `items[].price` | 清單直取實價登錄成交均價，轉 float |
-| `building_age_years` | Float | 屋齡 (年) | 詳情 `build_info.age.content` | `1年` $\to$ `1.0`；`全新` $\to$ `0.0`，索引 |
-| `total_households` | Int | 總戶數 | 詳情 `build_info.all_house_num.content` | 轉 int |
-| `base_area_pin` | Float | 基地面積 (坪) | 詳情 `build_info.base_area_num` | 轉 float (全系統唯一統一坪數命名規範) |
-| `land_division` | String(128) | 土地使用分區 | 詳情 `build_info.land_division` | 如「第三種住宅區」；空值轉 NULL |
-| `park_price` | String(64) | 車位價格 | 詳情 `build_info.park_price` | 如「290~330萬」；修正 591 統計缺陷「0~320萬」為「最高 320萬」 |
-| `public_ratio_pct` | Float | 公設比 (%) | 詳情 `build_info.ratio` | 如 `30%` $\to$ `30.0` |
-| `parking_count` | Int | 車位總數 | 詳情 `build_info.all_park_num` | 轉 int；平台未登錄之假性 0 轉 NULL |
-| `parking_ratio_pct` | Float | 車位比率 | 詳情 `build_info.park_rate` | 如 `1:1.07` $\to$ `1.07` |
-| `manage_fee_per_pin` | Int | 管理費 (元/坪/月) | 詳情 `build_info.manage_cost.price` | 轉 int |
-| `shopping_district` | String(64) | 所屬商圈 | 清單 `items[].shop_name` | 清單直取商圈字串 |
-| `transport` | String(128) | 鄰近站點 | 清單 `items[].station_name` | 清單直取交通站點字串 |
-| `floor_plan` | String(64) | 樓層規劃 | 詳情 `build_info.floor` | 如「地上24層,地下4層」 |
-| `structure` | String(64) | 結構工法 | 詳情 `build_info.structural_engine` | 如「SRC造」；空值轉 NULL |
-| `park_type_str` | String(64) | 車位型態 | 詳情 `build_info.park_type_str` | 如「坡道平面」；空值轉 NULL |
-| `direction_rule` | String(64) | 座向規劃 | 詳情 `build_info.direction_rule` | 如「朝北、朝南」 |
-| `landscape_name` | String(128) | 景觀設計 | 詳情 `build_info.landscape_name` | 詳情 build_info 直取 |
-| `postulate_name` | String(128) | 公設設計 | 詳情 `build_info.postulate_name` | 詳情 build_info 直取 |
-| `facilities` | JSON | 公設清單 | 詳情 `build_info.facility` | 字串陣列 `["健身房", ...]` |
-| `developer_company` | String(128) | 建商 | 詳情 `build_info.company` | 建設公司名稱 |
-| `builder_company` | String(128) | 營造廠 | 詳情 `build_info.build_company` | 營造公司名稱 |
-| `architect_company` | String(128) | 建築師 | 詳情 `build_info.construction_company` | 事務所名稱 |
-| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src.src` | 清單直取外觀縮圖 URL |
+| `external_community_id` | String(64) | 外部社區 ID | 清單 `items[].id` | 【第一層：清單】轉字串，與 `provider_id` 構成複合唯一約束 `uq_community_source` |
+| `name` | String(128) | 社區名稱 | 清單 `items[].name` | 【第一層：清單】去前後空白，索引 |
+| `region_name` | String(32) | 縣市 | 清單 `items[].region` | 【第一層：清單】如「台北市」，索引 |
+| `section_name` | String(32) | 行政區 | 清單 `items[].section` | 【第一層：清單】如「松山區」，索引 |
+| `address` | String(256) | 地址 | 清單 `items[].simple_address` 組合 | 【第一層：清單】組合縣市與行政區 |
+| `lat` / `lng` | Float | 經緯度 | 清單 `items[].lat`, `items[].lng` | 【第一層：清單】清單直取，轉 float (社區詳情無坐標，清單為唯一來源) |
+| `avg_unit_price_wan` | Float | 成交均價 (萬/坪) | 清單 `items[].price` | 【第一層：清單】清單直取實價登錄成交均價，轉 float |
+| `shopping_district` | String(64) | 所屬商圈 | 清單 `items[].shop_name` | 【第一層：清單】清單直取商圈字串 |
+| `transport` | String(128) | 鄰近站點 | 清單 `items[].station_name` | 【第一層：清單】清單直取交通站點字串 |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src.src` | 【第一層：清單】清單直取外觀縮圖 URL |
+| `housing_status` | String(32) | 成屋/建案狀態 | 詳情 `build_info.build_type` / `build_type_str` | 【第二層：詳情】如「預售屋」、「新成屋」、「中古屋」 |
+| `building_type` | String(64) | 建物實體型態 | 詳情 `build_info.purpose_str` | 【第二層：詳情】如「住宅大樓」、「華廈」、「透天」、「商辦」；空值轉 NULL |
+| `build_purpose` | String(64) | 法定使用用途 | 詳情 `build_info.purpose_other2` | 【第二層：詳情】如「住家用」、「住商用」、「商業用」；空值轉 NULL |
+| `building_age_years` | Float | 屋齡 (年) | 詳情 `build_info.age.content` | 【第二層：詳情】`1年` $\to$ `1.0`；`全新` $\to$ `0.0`，索引 |
+| `total_households` | Int | 總戶數 | 詳情 `build_info.all_house_num.content` | 【第二層：詳情】轉 int |
+| `base_area_pin` | Float | 基地面積 (坪) | 詳情 `build_info.base_area_num` | 【第二層：詳情】轉 float (全系統唯一統一坪數命名規範) |
+| `land_division` | String(128) | 土地使用分區 | 詳情 `build_info.land_division` | 【第二層：詳情】如「第三種住宅區」；空值轉 NULL |
+| `park_price` | String(64) | 車位價格 | 詳情 `build_info.park_price` | 【第二層：詳情】修正統計缺陷「0~320萬」為「最高 320萬」 |
+| `public_ratio_pct` | Float | 公設比 (%) | 詳情 `build_info.ratio` | 【第二層：詳情】如 `30%` $\to$ `30.0` |
+| `parking_count` | Int | 車位總數 | 詳情 `build_info.all_park_num` | 【第二層：詳情】轉 int；平台未登錄之假性 0 轉 NULL |
+| `parking_ratio_pct` | Float | 車位比率 | 詳情 `build_info.park_rate` | 【第二層：詳情】如 `1:1.07` $\to$ `1.07` |
+| `manage_fee_per_pin` | Int | 管理費 (元/坪/月) | 詳情 `build_info.manage_cost.price` | 【第二層：詳情】轉 int |
+| `floor_plan` | String(64) | 樓層規劃 | 詳情 `build_info.floor` | 【第二層：詳情】如「地上24層,地下4層」 |
+| `structure` | String(64) | 結構工法 | 詳情 `build_info.structural_engine` | 【第二層：詳情】如「SRC造」；空值轉 NULL |
+| `park_type_str` | String(64) | 車位型態 | 詳情 `build_info.park_type_str` | 【第二層：詳情】如「坡道平面」；空值轉 NULL |
+| `direction_rule` | String(64) | 座向規劃 | 詳情 `build_info.direction_rule` | 【第二層：詳情】如「朝北、朝南」 |
+| `landscape_name` | String(128) | 景觀設計 | 詳情 `build_info.landscape_name` | 【第二層：詳情】詳情 build_info 直取 |
+| `postulate_name` | String(128) | 公設設計 | 詳情 `build_info.postulate_name` | 【第二層：詳情】詳情 build_info 直取 |
+| `facilities` | JSON | 公設清單 | 詳情 `build_info.facility` | 【第二層：詳情】字串陣列 `["健身房", ...]` |
+| `developer_company` | String(128) | 建商 | 詳情 `build_info.company` | 【第二層：詳情】建設公司名稱 |
+| `builder_company` | String(128) | 營造廠 | 詳情 `build_info.build_company` | 【第二層：詳情】營造公司名稱 |
+| `architect_company` | String(128) | 建築師 | 詳情 `build_info.construction_company` | 【第二層：詳情】事務所名稱 |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |
 
 ---
@@ -321,45 +319,45 @@ uv run houselens test 591 --format json
 對應來源：591 中古屋清單 API (`/v1/app/gateway/sale/list`) & 詳情 API (`/v1/app/gateway/sale/detail`)  
 *消歧去重規則：同社區（或無社區者同路街樓層）+ 樓層相等 + 房數相等 + 坪數誤差 $\pm 2\%$ 內自動合併。主表固化建立來源身分二元組。*
 
-| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 轉換規則 / 備註 |
+| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
 | :--- | :--- | :--- | :--- | :--- |
-| `id` | String(36) | 實體主鍵 (PK) | - | UUID v4 |
+| `id` | String(36) | 實體主鍵 (PK) | - | 系統產生 UUID v4 |
 | `provider_id` | String(32) | 首要來源平台代碼 | - | 建立該房屋實體之代表來源（如 `"591"`），索引 |
-| `external_house_id` | String(64) | 首要來源外部房屋代碼 | 清單 `items[].houseid`<br>詳情 `data.id` | 建立該房屋實體之代表代號（如 `"S20604856"`），索引 |
+| `external_house_id` | String(64) | 首要來源外部房屋代碼 | 清單 `items[].houseid` | 【第一層：清單】代表代號（如 `"S20604856"`），索引 |
 | `community_uuid` | String(36) | 所屬社區內部 UUID (FK) | - | 關聯至 `communities.id` (外鍵，ondelete="SET NULL") |
-| `external_community_id` | String(64) | 外部平台社區識別碼 | 清單 `items[].community_info.community_id` | 如 `"5855864"`，保留客觀身分代碼，索引 |
-| `community_name` | String(128) | 社區名稱 | 清單 `items[].community_info.community_name` | 去重比對鍵，索引 |
-| `is_whole_building` | Bool | 是否整棟銷售 | 清單/詳情 `floor` 欄位 | 整棟銷售標記（如透天、別墅），索引 |
-| `title` | String(256) | 物件標題 | 清單 `items[].title`<br>詳情 `baseInfo.title` | 保留最新標題 |
-| `price_wan` | Int | 總價 (萬元) | 清單 `items[].price`<br>詳情 `baseInfo.price` | 轉 int (如 `5258`)，索引 |
-| `unit_price_wan` | Float | 單價 (萬/坪) | 清單 `items[].area_price`<br>詳情 `baseInfo.unitPrice` | 轉 float (如 `132.2`) |
-| `total_area_pin` | Float | 登記總坪數 (坪) | 清單 `items[].areaUnit.area`<br>詳情 `baseInfo.area` | 轉 float (去重容差 $\pm 2\%$)，索引 |
-| `rooms` | Int | 格局：房數 | 清單 `items[].layout_str`<br>詳情 `baseInfo.layout` | 解析純整數 (如 `3`)，索引 |
-| `living_rooms` | Int | 格局：廳數 | 清單 `items[].layout_str`<br>詳情 `baseInfo.layout` | 解析純整數 (如 `2`) |
-| `bathrooms` | Int | 格局：衛數 | 清單 `items[].layout_str`<br>詳情 `baseInfo.layout` | 解析純整數 (如 `2`) |
-| `balconies` | Int | 格局：陽台數 | 詳情 `baseInfo.info[陽台].value` | 解析純整數 (如 `1`) |
-| `floor_current` | Int | 所在樓層 | 清單 `items[].floor`<br>詳情 `baseInfo.info[樓層].value` | 轉 int (如 `2`；B1 記為 `-1`；整棟為 NULL)，索引 |
-| `floor_total` | Int | 總樓層 | 清單 `items[].all_floor`<br>詳情 `baseInfo.info[樓層].value` | 轉 int (如 `24`)，索引 |
-| `building_age_years` | Float | 屋齡 (年) | 詳情 `baseInfo.info[屋齡].value` | `1年` $\to$ `1.0`，索引 |
-| `management_fee_monthly` | Int | 管理費 (元/月) | 詳情 `baseInfo.info[管理費].value` | 轉 int (如 `4200`) |
-| `public_ratio_pct` | Float | 公設比 (%) | 詳情 `baseInfo.info[公設比].value` | 如 `30%` $\to$ `30.0` |
-| `has_lease` | Bool | 帶租約 | 詳情 `baseInfo.info[帶租約].value` | `"是"` $\to$ `True`, `"否"` $\to$ `False` |
-| `building_type` | String(64) | 建物型態 | 清單 `items[].kindStr`<br>詳情 `kindStr` | 如「住宅」 |
-| `building_structure` | String(64) | 建築型態 | 詳情 `baseInfo.info[型態].value` | 如「電梯大樓」 |
-| `orientation` | String(32) | 朝向 | 詳情 `baseInfo.info[朝向].value` | 如「坐南朝北」 |
-| `purpose` | String(64) | 法定用途 | 詳情 `baseInfo.info[用途].value` | 如「住家用」 |
-| `current_state` | String(64) | 現況 | 詳情 `baseInfo.info[現況].value` | 如「住宅」 |
-| `parking_desc` | String(256) | 車位說明 | 詳情 `baseInfo.parking` | - |
-| `main_area_pin` | Float | 主建物 (坪) | 詳情 `baseInfo.areaIntro[主建物].value` | 轉 float |
-| `auxiliary_area_pin` | Float | 附屬建物 (坪) | 詳情 `baseInfo.areaIntro[附屬建物].value` | 轉 float |
-| `common_area_pin` | Float | 共有部分 (坪) | 詳情 `baseInfo.areaIntro[共有部分].value` | 轉 float |
-| `land_area_pin` | Float | 土地持分 (坪) | 詳情 `baseInfo.areaIntro[土地持分坪數].value` | 轉 float |
-| `parking_area_pin` | Float | 車位面積 (坪) | 詳情 `baseInfo.areaIntro[車位面積].value` | 轉 float |
-| `region_name` | String(32) | 縣市 | 清單 `items[].region`<br>詳情 `baseInfo.address.region` | 如「台北市」，索引 |
-| `section_name` | String(32) | 行政區 | 清單 `items[].section`<br>詳情 `baseInfo.address.section` | 如「松山區」，索引 |
-| `street` | String(64) | 街道 | 清單 `items[].street_name`<br>詳情 `baseInfo.address.street` | 如「三民路」，索引 |
-| `address` | String(256) | 完整地址 | 清單 `items[].address`<br>詳情 `baseInfo.address` 組合 | 結構化組合完整地址 |
-| `lat` / `lng` | Float | 經緯度 | 詳情 `baseInfo.address.lat`, `lng` | 轉 float |
+| `external_community_id` | String(64) | 外部平台社區識別碼 | 清單 `items[].community_info.community_id` | 【第一層：清單】如 `"5855864"`，保留客觀身分代碼，索引 |
+| `community_name` | String(128) | 社區名稱 | 清單 `items[].community_info.community_name` | 【第一層：清單】去重比對鍵，索引 |
+| `title` | String(256) | 物件標題 | 清單 `items[].title` | 【第一層：清單】保留來源最新刊登標題 |
+| `region_name` | String(32) | 縣市 | 清單 `items[].region` | 【第一層：清單】如「台北市」，索引 |
+| `section_name` | String(32) | 行政區 | 清單 `items[].section` | 【第一層：清單】如「松山區」，索引 |
+| `street` | String(64) | 街道 | 清單 `items[].street_name` | 【第一層：清單】如「三民路」，索引 |
+| `address` | String(256) | 完整地址 | 清單 `items[].address` | 【第一層：清單】清單規範地址 |
+| `is_whole_building` | Bool | 是否整棟銷售 | 詳情 `baseInfo.info[樓層].value` | 【第二層：詳情】整棟銷售標記（如透天、別墅），索引 |
+| `price_wan` | Int | 總價 (萬元) | 詳情 `baseInfo.price` | 【第二層：詳情】轉 int (如 `5258`)，索引 |
+| `unit_price_wan` | Float | 單價 (萬/坪) | 詳情 `baseInfo.unitPrice` | 【第二層：詳情】轉 float (如 `132.2`) |
+| `total_area_pin` | Float | 登記總坪數 (坪) | 詳情 `baseInfo.area` | 【第二層：詳情】轉 float (去重容差 $\pm 2\%$)，索引 |
+| `rooms` | Int | 格局：房數 | 詳情 `baseInfo.layout` | 【第二層：詳情】解析純整數 (如 `3`)，索引 |
+| `living_rooms` | Int | 格局：廳數 | 詳情 `baseInfo.layout` | 【第二層：詳情】解析純整數 (如 `2`) |
+| `bathrooms` | Int | 格局：衛數 | 詳情 `baseInfo.layout` | 【第二層：詳情】解析純整數 (如 `2`) |
+| `balconies` | Int | 格局：陽台數 | 詳情 `baseInfo.info[陽台].value` | 【第二層：詳情】解析純整數 (如 `1`) |
+| `floor_current` | Int | 所在樓層 | 詳情 `baseInfo.info[樓層].value` | 【第二層：詳情】轉 int (如 `2`；B1 記為 `-1`；整棟為 NULL)，索引 |
+| `floor_total` | Int | 總樓層 | 詳情 `baseInfo.info[樓層].value` | 【第二層：詳情】轉 int (如 `24`)，索引 |
+| `building_age_years` | Float | 屋齡 (年) | 詳情 `baseInfo.info[屋齡].value` | 【第二層：詳情】`1年` $\to$ `1.0`，索引 |
+| `management_fee_monthly` | Int | 管理費 (元/月) | 詳情 `baseInfo.info[管理費].value` | 【第二層：詳情】轉 int (如 `4200`) |
+| `public_ratio_pct` | Float | 公設比 (%) | 詳情 `baseInfo.info[公設比].value` | 【第二層：詳情】如 `30%` $\to$ `30.0` |
+| `has_lease` | Bool | 帶租約 | 詳情 `baseInfo.info[帶租約].value` | 【第二層：詳情】`"是"` $\to$ `True`, `"否"` $\to$ `False` |
+| `building_type` | String(64) | 建物型態 | 詳情 `kindStr` | 【第二層：詳情】如「住宅」 |
+| `building_structure` | String(64) | 建築型態 | 詳情 `baseInfo.info[型態].value` | 【第二層：詳情】如「電梯大樓」 |
+| `orientation` | String(32) | 朝向 | 詳情 `baseInfo.info[朝向].value` | 【第二層：詳情】如「坐南朝北」 |
+| `purpose` | String(64) | 法定用途 | 詳情 `baseInfo.info[用途].value` | 【第二層：詳情】如「住家用」 |
+| `current_state` | String(64) | 現況 | 詳情 `baseInfo.info[現況].value` | 【第二層：詳情】如「住宅」 |
+| `parking_desc` | String(256) | 車位說明 | 詳情 `baseInfo.parking` | 【第二層：詳情】車位文字規格說明 |
+| `main_area_pin` | Float | 主建物 (坪) | 詳情 `baseInfo.areaIntro[主建物].value` | 【第二層：詳情】轉 float |
+| `auxiliary_area_pin` | Float | 附屬建物 (坪) | 詳情 `baseInfo.areaIntro[附屬建物].value` | 【第二層：詳情】轉 float |
+| `common_area_pin` | Float | 共有部分 (坪) | 詳情 `baseInfo.areaIntro[共有部分].value` | 【第二層：詳情】轉 float |
+| `land_area_pin` | Float | 土地持分 (坪) | 詳情 `baseInfo.areaIntro[土地持分坪數].value` | 【第二層：詳情】轉 float |
+| `parking_area_pin` | Float | 車位面積 (坪) | 詳情 `baseInfo.areaIntro[車位面積].value` | 【第二層：詳情】轉 float |
+| `lat` / `lng` | Float | 經緯度 | 詳情 `baseInfo.address.lat`, `lng` | 【第二層：詳情】轉 float (中古屋物理精確坐標來自詳情 API) |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |
 
 ---
@@ -367,17 +365,17 @@ uv run houselens test 591 --format json
 ### 3. `property_listings` (刊登廣告表)
 
 記錄各平台發布之房源廣告，多筆刊登可歸戶至同一 `properties` 實體。  
-對應來源：591 中古屋清單 API (`/v1/app/gateway/sale/list`) & 詳情 API (`/v1/app/gateway/sale/detail`)
+對應來源：591 中古屋清單 API (`/v1/app/gateway/sale/list`)
 
-| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 轉換規則 / 備註 |
+| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
 | :--- | :--- | :--- | :--- | :--- |
-| `id` | String(36) | 刊登主鍵 (PK) | - | UUID v4 |
+| `id` | String(36) | 刊登主鍵 (PK) | - | 系統產生 UUID v4 |
 | `property_id` | String(36) | 所屬實體 ID (FK) | - | 關聯 `properties.id` (CASCADE) |
 | `provider_id` | String(32) | 來源平台代碼 | - | 如 `"591"`，索引 |
-| `external_house_id` | String(64) | 平台房源外部代碼 | 清單 `items[].houseid`<br>詳情 `data.id` | 如 `"S20604856"`，複合唯一索引 `uq_listing_source(provider_id, external_house_id)` |
-| `listing_title` | String(256) | 刊登廣告標題 | 清單 `items[].title`<br>詳情 `baseInfo.title` | 房仲自訂廣告標題 |
-| `listing_price_wan` | Int | 刊登開價 (萬元) | 清單 `items[].price`<br>詳情 `baseInfo.price` | 轉 int |
-| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | - |
+| `external_house_id` | String(64) | 平台房源外部代碼 | 清單 `items[].houseid` | 【第一層：清單】如 `"S20604856"`，複合唯一索引 `uq_listing_source` |
+| `listing_title` | String(256) | 刊登廣告標題 | 清單 `items[].title` | 【第一層：清單】房仲自訂廣告標題 |
+| `listing_price_wan` | Int | 刊登開價 (萬元) | 清單 `items[].price` | 【第一層：清單】轉 int |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | 【第一層：清單】清單刊登縮圖 |
 | `raw_data` | JSON | 原始封包 | - | 快照備份 (可選) |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |
 
@@ -386,54 +384,54 @@ uv run houselens test 591 --format json
 ### 4. `new_houses` (新建案)
 
 對應來源：591 新建案清單 API (`/v1/list-search`) & 詳情 API (`/v1/detail/base-info`)  
-*架構原則：劃分單一事實來源（Single Source of Truth），基礎分頁與初篩由「清單」API 提供，深入建築規格、車位規劃、時程用途、團隊代銷、關聯社區與經緯度 100% 來自「詳情」API 的 `housing` 區塊集中提供。車位規格完整數值化為 `NewHouseParkingSpec` 值物件。*
+*架構原則：劃分單一事實來源（Single Source of Truth），第一層身分地理由「清單」API 提供；第二層建築規格、車位規格值物件 (`NewHouseParkingSpec`)、時程用途、團隊代銷、關聯社區與基地經緯度 100% 來自「詳情」API 的 `housing` 區塊集中提供。*
 
-| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 轉換規則 / 備註 |
+| 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
 | :--- | :--- | :--- | :--- | :--- |
-| `id` | String(36) | 建案主鍵 (PK) | - | UUID v4 |
+| `id` | String(36) | 建案主鍵 (PK) | - | 系統產生 UUID v4 |
 | `provider_id` | String(32) | 來源平台代碼 | - | 如 `"591"`，索引 |
-| `external_project_id` | String(64) | 外部建案專案代碼 | 清單 `items[].hid`<br>詳情 `housing.hid` | 轉字串 (如 `"138045"`)，複合唯一約束 `uq_new_house_source(provider_id, external_project_id)` |
-| `project_name` | String(128) | 建案名稱 | 清單 `items[].build_name`<br>詳情 `housing.build_name` | 如「長虹MVP」，索引 |
-| `build_type` | String(64) | 期程狀態 | 清單 `items[].build_type_name`<br>詳情 `housing.build_type_name` | 如「預售屋」、「新成屋」 |
-| `building_type` | String(64) | 建物型態 | 詳情 `housing.purpose_name` | 如「住宅大樓」、「華廈」、「透天」、「電梯公寓」；空值轉 NULL |
-| `legal_purpose` | String(64) | 法定用途 | 詳情 `housing.purpose_other_name` | 如「住商用」、「住家用」、「商業用」；空值轉 NULL |
-| `land_division` | String(128) | 土地使用分區 | 詳情 `housing.land_division` | 如「第四種商業區」、「住宅區」；空值轉 NULL |
-| `region_name` | String(32) | 縣市 | 清單 `items[].region`<br>詳情 `housing.region` | 如「台北市」，索引 |
-| `section_name` | String(32) | 行政區 | 清單 `items[].section`<br>詳情 `housing.section` | 如「萬華區」，索引 |
-| `address` | String(256) | 基地地址 | 清單 `items[].address`<br>詳情 `housing.address` | - |
-| `handover_time` | String(64) | 完工/交屋期程 | 詳情 `housing.deal_time_v2.date`<br>fallback `housing.deal_time.date` | 如「預計2028年第一季度」、「2026年04月」；pending 轉 NULL |
-| `open_sell_date` | String(32) | 公開銷售日期 | 詳情 `housing.sell_time.date_origin` | 標準 ISO 日期如「2025-02-01」；pending 轉 NULL |
-| `min_unit_price_wan` | Float | 開價下限 (萬/坪) | 清單 `items[].price`<br>詳情 `housing.price` | 區間拆解 (如 `79.0`) |
-| `max_unit_price_wan` | Float | 開價上限 (萬/坪) | 清單 `items[].price`<br>詳情 `housing.price` | 區間拆解 (如 `90.0`) |
-| `min_area_pin` | Float | 規劃坪數下限 (坪) | 清單 `items[].area` | 區間拆解 (如 `28.0`) |
-| `max_area_pin` | Float | 規劃坪數上限 (坪) | 清單 `items[].area` | 區間拆解 (如 `41.0`) |
-| `base_area_pin` | Float | 基地面積 (坪) | 詳情 `housing.base_area.area` | 轉 float |
-| `public_ratio_pct` | Float | 公設比 (%) | 詳情 `housing.ratio` | 如 `34.5%` $\to$ `34.5` |
-| `total_households` | Int | 規劃戶數 | 詳情 `housing.households` | 轉 int (如 `120`) |
-| `manage_fee_per_pin` | Int | 管理費 (元/坪/月) | 詳情 `housing.manage_cost.price` | 轉 int |
-| `min_parking_price_wan` | Float | 車位開價下限 (萬元) | 詳情 `housing.park_price.price` | 轉 float (如 `155.0`)；待定轉 NULL |
-| `max_parking_price_wan` | Float | 車位開價上限 (萬元) | 詳情 `housing.park_price.price` | 轉 float (如 `320.0`)；待定轉 NULL |
-| `parking_price_desc` | String(64) | 車位價格描述 | 詳情 `housing.park_price` | 如「155~320萬」或「價格待定」 |
-| `parking_ratio_desc` | String(32) | 車位配比描述 | 詳情 `housing.park_ratio` | 如「1:0.46」 |
-| `parking_ratio_val` | Float | 車位配比數值比率 | 詳情 `housing.park_ratio` | 轉 float (如 `0.46`) |
-| `parking_planning_desc` | String(128) | 車位規劃描述 | 詳情 `housing.park_planning` | 如「平面式111個、機械式41個」 |
-| `plane_parking_count` | Int | 平面車位數量 | 詳情 `housing.park_planning` | 解析純整數 (如 `111`) |
-| `mechanical_parking_count` | Int | 機械車位數量 | 詳情 `housing.park_planning` | 解析純整數 (如 `41`) |
-| `charging_piles_desc` | String(64) | 充電設備規劃 | 詳情 `housing.park_piles` | 如「有充電設備（含預留）」、「無充電設備」 |
-| `has_charging_piles` | Bool | 具備充電或預留設備 | 詳情 `housing.park_piles` | 包含有充電或預留轉 `True`，無轉 `False` |
-| `parking_style` | String(64) | 車位型態風格 | 詳情 `housing.park_style` | 透天建案呈現如「1樓停車」、「前院停車」；集合大樓「暫無」清洗為 NULL |
-| `layouts` | JSON | 結構化房型坪數矩陣 | 詳情 `housing.layout_v2[]` | `[{"room_name":"一房","rooms_count":1,"min_area_pin":14.0,"max_area_pin":17.0}]` |
-| `structural_engine` | String(128) | 結構工法 | 詳情 `housing.structural_engine` | 如「SRC鋼骨鋼筋混凝土」 |
-| `direction_rule` | String(64) | 座向規劃 | 詳情 `housing.direction_rule` | 如「朝南、朝東」 |
-| `developer_company` | String(128) | 投資興建 | 清單 `items[].company`<br>詳情 `housing.company` | 建設公司名稱 |
-| `builder_company` | String(128) | 營造廠 | 詳情 `housing.build_company` | 營造公司名稱 |
-| `architect_company` | String(128) | 建築設計 | 詳情 `housing.construction_company` | 建築師事務所名稱 |
-| `sales_agency_company` | String(128) | 企劃銷售 | 詳情 `housing.sell_company` | 代銷公司名稱 |
-| `reception_address` | String(256) | 接待會館 | 詳情 `housing.reception_address` | - |
-| `external_community_id` | String(64) | 關聯社區外部代碼 | 詳情 `housing.community_id` | 標準字串代碼 (如 `"5962516"`)，跨領域索引 |
-| `community_name` | String(128) | 關聯社區名稱 | 詳情 `housing.community_name` | 如「長虹MVP」 |
-| `community_age` | Int | 社區屋齡 | 詳情 `housing.community_age` | 純整數 (新建案通常為 0) |
-| `latitude` / `longitude` | Float | 基地經緯度坐標 | 詳情 `housing.map.lat` / `.lng` | 轉 float，建立複合索引 `ix_new_house_lat_lng` |
-| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | - |
+| `external_project_id` | String(64) | 外部建案專案代碼 | 清單 `items[].hid` | 【第一層：清單】轉字串 (如 `"138045"`)，複合唯一約束 `uq_new_house_source` |
+| `project_name` | String(128) | 建案名稱 | 清單 `items[].build_name` | 【第一層：清單】如「長虹MVP」，索引 |
+| `build_type` | String(64) | 期程狀態 | 清單 `items[].build_type_name` | 【第一層：清單】如「預售屋」、「新成屋」 |
+| `region_name` | String(32) | 縣市 | 清單 `items[].region` | 【第一層：清單】如「台北市」，索引 |
+| `section_name` | String(32) | 行政區 | 清單 `items[].section` | 【第一層：清單】如「萬華區」，索引 |
+| `address` | String(256) | 基地地址 | 清單 `items[].address` | 【第一層：清單】基地詳細地址 |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | 【第一層：清單】外觀縮圖 URL |
+| `building_type` | String(64) | 建物型態 | 詳情 `housing.purpose_name` | 【第二層：詳情】如「住宅大樓」、「華廈」、「透天」、「電梯公寓」；空值轉 NULL |
+| `legal_purpose` | String(64) | 法定用途 | 詳情 `housing.purpose_other_name` | 【第二層：詳情】如「住商用」、「住家用」、「商業用」；空值轉 NULL |
+| `land_division` | String(128) | 土地使用分區 | 詳情 `housing.land_division` | 【第二層：詳情】如「第四種商業區」、「第一種住宅區」；空值轉 NULL |
+| `handover_time` | String(64) | 完工/交屋期程 | 詳情 `housing.deal_time_v2.date` (備用 `housing.deal_time.date`) | 【第二層：詳情】如「預計2028年第一季度」、「隨時交屋」；pending 轉 NULL |
+| `open_sell_date` | String(32) | 公開銷售日期 | 詳情 `housing.sell_time.date_origin` | 【第二層：詳情】標準 ISO 日期如「2025-02-01」；pending 轉 NULL |
+| `min_unit_price_wan` | Float | 開價下限 (萬/坪) | 詳情 `housing.price` | 【第二層：詳情】區間拆解 (如 `79.0`) |
+| `max_unit_price_wan` | Float | 開價上限 (萬/坪) | 詳情 `housing.price` | 【第二層：詳情】區間拆解 (如 `90.0`) |
+| `min_area_pin` | Float | 規劃坪數下限 (坪) | 詳情 `housing.area` | 【第二層：詳情】區間拆解 (如 `28.0`) |
+| `max_area_pin` | Float | 規劃坪數上限 (坪) | 詳情 `housing.area` | 【第二層：詳情】區間拆解 (如 `41.0`) |
+| `base_area_pin` | Float | 基地面積 (坪) | 詳情 `housing.base_area.area` | 【第二層：詳情】轉 float |
+| `public_ratio_pct` | Float | 公設比 (%) | 詳情 `housing.ratio` | 【第二層：詳情】如 `34.5%` $\to$ `34.5` |
+| `total_households` | Int | 規劃戶數 | 詳情 `housing.households` | 【第二層：詳情】轉 int (如 `120`) |
+| `manage_fee_per_pin` | Int | 管理費 (元/坪/月) | 詳情 `housing.manage_cost.price` | 【第二層：詳情】轉 int |
+| `min_parking_price_wan` | Float | 車位開價下限 (萬元) | 詳情 `housing.park_price.price` | 【第二層：詳情】轉 float (如 `155.0`)；待定轉 NULL |
+| `max_parking_price_wan` | Float | 車位開價上限 (萬元) | 詳情 `housing.park_price.price` | 【第二層：詳情】轉 float (如 `320.0`)；待定轉 NULL |
+| `parking_price_desc` | String(64) | 車位價格描述 | 詳情 `housing.park_price` | 【第二層：詳情】如「155~320萬」或「價格待定」 |
+| `parking_ratio_desc` | String(32) | 車位配比描述 | 詳情 `housing.park_ratio` | 【第二層：詳情】如「1:0.46」 |
+| `parking_ratio_val` | Float | 車位配比數值比率 | 詳情 `housing.park_ratio` | 【第二層：詳情】轉 float (如 `0.46`) |
+| `parking_planning_desc` | String(128) | 車位規劃描述 | 詳情 `housing.park_planning` | 【第二層：詳情】如「平面式111個、機械式41個」 |
+| `plane_parking_count` | Int | 平面車位數量 | 詳情 `housing.park_planning` | 【第二層：詳情】解析純整數 (如 `111`) |
+| `mechanical_parking_count` | Int | 機械車位數量 | 詳情 `housing.park_planning` | 【第二層：詳情】解析純整數 (如 `41`) |
+| `charging_piles_desc` | String(64) | 充電設備規劃 | 詳情 `housing.park_piles` | 【第二層：詳情】如「有充電設備（含預留）」、「無充電設備」 |
+| `has_charging_piles` | Bool | 具備充電或預留設備 | 詳情 `housing.park_piles` | 【第二層：詳情】包含有充電或預留轉 `True`，無轉 `False` |
+| `parking_style` | String(64) | 車位型態風格 | 詳情 `housing.park_style` | 【第二層：詳情】透天別墅呈現「1樓停車」、「前院停車」；集合大樓「暫無」清洗為 NULL |
+| `layouts` | JSON | 結構化房型坪數矩陣 | 詳情 `housing.layout_v2[]` | 【第二層：詳情】`[{"room_name":"一房","rooms_count":1,"min_area_pin":14.0,"max_area_pin":17.0}]` |
+| `structural_engine` | String(128) | 結構工法 | 詳情 `housing.structural_engine` | 【第二層：詳情】如「SRC鋼骨鋼筋混凝土」 |
+| `direction_rule` | String(64) | 座向規劃 | 詳情 `housing.direction_rule` | 【第二層：詳情】如「朝南、朝東」 |
+| `developer_company` | String(128) | 投資興建 | 詳情 `housing.company` | 【第二層：詳情】建設公司名稱 |
+| `builder_company` | String(128) | 營造廠 | 詳情 `housing.build_company` | 【第二層：詳情】營造公司名稱 |
+| `architect_company` | String(128) | 建築設計 | 詳情 `housing.construction_company` | 【第二層：詳情】建築師事務所名稱 |
+| `sales_agency_company` | String(128) | 企劃銷售 | 詳情 `housing.sell_company` | 【第二層：詳情】代銷公司名稱 |
+| `reception_address` | String(256) | 接待會館 | 詳情 `housing.reception_address` | 【第二層：詳情】接待中心地址 |
+| `external_community_id` | String(64) | 關聯社區外部代碼 | 詳情 `housing.community_id` | 【第二層：詳情】標準字串代碼 (如 `"5962516"`)，跨領域索引 |
+| `community_name` | String(128) | 關聯社區名稱 | 詳情 `housing.community_name` | 【第二層：詳情】如「長虹MVP」 |
+| `community_age` | Int | 社區屋齡 | 詳情 `housing.community_age` | 【第二層：詳情】純整數 (新建案通常為 0) |
+| `latitude` / `longitude` | Float | 基地經緯度坐標 | 詳情 `housing.map.lat` / `.lng` | 【第二層：詳情】轉 float，建立複合索引 `ix_new_house_lat_lng` |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |
 

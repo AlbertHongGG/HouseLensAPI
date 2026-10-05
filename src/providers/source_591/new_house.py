@@ -1,6 +1,4 @@
-"""HouseLensAPI - 591 新建案領域服務實作 (591 New House Provider)"""
-
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from src.core.interfaces.new_house import INewHouseProvider
 from src.domain.common import PageResult
@@ -61,7 +59,11 @@ class Source591NewHouseProvider(INewHouseProvider):
             page_size=query.page_size,
         )
 
-    async def get_new_house_detail(self, external_project_id: str) -> NormalizedNewHouseDetail:
+    async def get_new_house_detail(
+        self,
+        external_project_id: str,
+        summary: Optional[NormalizedNewHouseSummary] = None,
+    ) -> NormalizedNewHouseDetail:
         """根據建案外部 ID 取得完整新建案詳情"""
         params = {
             "id": external_project_id,
@@ -70,4 +72,4 @@ class Source591NewHouseProvider(INewHouseProvider):
         }
         res = await self._client.get("newhouse", "/v1/detail/base-info", params=params)
         data_block = res.get("data") or {}
-        return map_new_house_detail(data_block)
+        return map_new_house_detail(data=data_block, summary=summary)

@@ -15,6 +15,10 @@ from src.domain.community import (
     NormalizedCommunityDetail,
     NormalizedCommunitySummary,
 )
+from src.domain.new_house import (
+    NormalizedNewHouseDetail,
+    NormalizedNewHouseSummary,
+)
 from src.domain.sale_house import (
     NormalizedSaleListing,
     NormalizedSalePropertyDetail,
@@ -349,3 +353,151 @@ async def test_sale_house_multi_level_deduplication(mem_db: DatabaseManager):
         )
         res_diff = await dedup.evaluate_candidate(candidate_diff_floor, repo)
         assert res_diff.is_duplicate is False
+
+
+def test_cross_domain_ssot_two_tier_invariants():
+    """驗證跨領域兩層式單一事實來源 (SSOT) 架構不變量：
+    - 第一層 (身分與地理空間標識)：100% 統一自清單 API (summary)
+    - 第二層 (深層建築規劃與硬體規格)：100% 統一自詳情 API (detail)，零跨 API Fallback 妥協
+    """
+    from src.providers.source_591.mappers.sale_house_mapper import map_sale_house_detail
+    from src.providers.source_591.mappers.new_house_mapper import map_new_house_detail
+    from src.providers.source_591.mappers.community_mapper import map_community_detail
+
+    # 1. 中古屋 (Sale House) SSOT 驗證
+    sale_summary = NormalizedSaleListing(
+        provider_id="591",
+        external_house_id="S99887766",
+        title="清單專屬權威標題",
+        price_wan=1000,
+        unit_price_wan=50.0,
+        total_area_pin=20.0,
+        region_name="台北市",
+        section_name="大安區",
+        street="信義路",
+        address="台北市大安區信義路四段100號",
+        external_community_id="C_12345",
+        community_name="信義名邸",
+        cover_image_url="https://img.example.com/summary_cover.jpg",
+    )
+    sale_detail_raw = {
+        "id": "11223344",  # 詳情原始 ID (應被 summary.external_house_id 覆蓋)
+        "kindStr": "電梯大樓",
+        "baseInfo": {
+            "title": "詳情不一致標題",
+            "price": "3500",  # 第二層深層規格：詳情真實成交/委託牌價
+            "unitPrice": "70.0",
+            "area": "50.0",
+            "layout": "3房2廳2衛",
+            "info": [
+                {"name": "樓層", "value": "10F/20F"},
+                {"name": "屋齡", "value": "5年"},
+            ],
+            "address": {
+                "region": "新北市",
+                "section": "板橋區",
+                "lat": "25.0330",
+                "lng": "121.5430",
+            },
+        },
+    }
+    mapped_sale = map_sale_house_detail(data=sale_detail_raw, summary=sale_summary)
+    # 第一層：100% 統一由 summary 注入
+    assert mapped_sale.external_house_id == "S99887766"
+    assert mapped_sale.title == "清單專屬權威標題"
+    assert mapped_sale.region_name == "台北市"
+    assert mapped_sale.section_name == "大安區"
+    assert mapped_sale.address == "台北市大安區信義路四段100號"
+    assert mapped_sale.external_community_id == "C_12345"
+    assert mapped_sale.community_name == "信義名邸"
+    assert mapped_sale.cover_image_url == "https://img.example.com/summary_cover.jpg"
+    # 第二層：100% 來自詳情 API，絕不取用 summary 之數值
+    assert mapped_sale.price_wan == 3500
+    assert mapped_sale.unit_price_wan == 70.0
+    assert mapped_sale.total_area_pin == 50.0
+    assert mapped_sale.floor_current == 10
+    assert mapped_sale.floor_total == 20
+    assert mapped_sale.rooms == 3
+    assert mapped_sale.coordinates is not None
+    assert mapped_sale.coordinates.lat == 25.0330
+
+    # 2. 新建案 (New House) SSOT 驗證
+    nh_summary = NormalizedNewHouseSummary(
+        provider_id="591",
+        external_project_id="888001",
+        project_name="清單權威建案名",
+        project_status="預售屋",
+        region_name="新北市",
+        section_name="三重區",
+        address="新北市三重區重新路",
+        cover_image_url="https://img.example.com/nh_summary.jpg",
+    )
+    nh_detail_raw = {
+        "housing": {
+            "hid": 999999,  # 詳情原始 ID (應被 summary.external_project_id 覆蓋)
+            "build_name": "詳情建案名",
+            "build_type_name": "成屋",
+            "region": "台北市",
+            "section": "士林區",
+            "price": "60~75",
+            "area": "25~45",
+            "base_area": "600",
+            "households": "150戶",
+            "map": {"lat": "25.0600", "lng": "121.4900"},
+        }
+    }
+    mapped_nh = map_new_house_detail(data=nh_detail_raw, summary=nh_summary)
+    # 第一層：100% 統一由 summary 注入
+    assert mapped_nh.external_project_id == "888001"
+    assert mapped_nh.project_name == "清單權威建案名"
+    assert mapped_nh.build_type == "預售屋"
+    assert mapped_nh.region_name == "新北市"
+    assert mapped_nh.section_name == "三重區"
+    assert mapped_nh.address == "新北市三重區重新路"
+    assert mapped_nh.cover_image_url == "https://img.example.com/nh_summary.jpg"
+    # 第二層：100% 來自詳情 API
+    assert mapped_nh.min_unit_price_wan == 60.0
+    assert mapped_nh.max_unit_price_wan == 75.0
+    assert mapped_nh.min_area_pin == 25.0
+    assert mapped_nh.max_area_pin == 45.0
+    assert mapped_nh.base_area_pin == 600.0
+    assert mapped_nh.total_households == 150
+    assert mapped_nh.latitude == 25.0600
+
+    # 3. 社區 (Community) SSOT 驗證
+    comm_summary = NormalizedCommunitySummary(
+        provider_id="591",
+        external_community_id="590011",
+        community_name="清單權威社區",
+        region_name="台中市",
+        section_name="西屯區",
+        address="台中市西屯區台灣大道",
+        coordinates=GeoPoint(lat=24.1600, lng=120.6400),
+        cover_image_url="https://img.example.com/comm_summary.jpg",
+    )
+    comm_detail_raw = {
+        "build_info": {
+            "purpose_str": "住宅大樓",
+            "purpose_other2": "住家用",
+            "build_type": 1,  # 預售屋
+            "age": "0年",
+            "all_house_num": "200戶",
+            "base_area_num": "800坪",
+        }
+    }
+    mapped_comm = map_community_detail(summary=comm_summary, data=comm_detail_raw)
+    # 第一層：100% 統一由 summary 注入
+    assert mapped_comm.external_community_id == "590011"
+    assert mapped_comm.community_name == "清單權威社區"
+    assert mapped_comm.region_name == "台中市"
+    assert mapped_comm.section_name == "西屯區"
+    assert mapped_comm.address == "台中市西屯區台灣大道"
+    assert mapped_comm.coordinates is not None
+    assert mapped_comm.coordinates.lat == 24.1600
+    assert mapped_comm.cover_image_url == "https://img.example.com/comm_summary.jpg"
+    # 第二層：100% 來自詳情 API
+    assert mapped_comm.building_type == "住宅大樓"
+    assert mapped_comm.build_purpose == "住家用"
+    assert mapped_comm.housing_status == "預售屋"
+    assert mapped_comm.total_households == 200
+    assert mapped_comm.base_area_pin == 800.0

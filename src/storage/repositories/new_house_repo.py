@@ -8,10 +8,7 @@ from typing import List, Optional, Set
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.new_house import (
-    NormalizedNewHouseDetail,
-    NormalizedNewHouseSummary,
-)
+from src.domain.new_house import NormalizedNewHouseDetail
 from src.storage.interfaces import INewHouseRepository
 from src.storage.models.new_house import NewHouseTable
 
@@ -34,57 +31,6 @@ class NewHouseRepository(INewHouseRepository):
         )
         res = await self.session.execute(stmt)
         return set(res.scalars().all())
-
-    async def upsert_from_summary(
-        self, summary: NormalizedNewHouseSummary, provider_id: str
-    ) -> NewHouseTable:
-        """從 NormalizedNewHouseSummary 新增或更新新建案基本資料"""
-        stmt = select(NewHouseTable).where(
-            NewHouseTable.provider_id == provider_id,
-            NewHouseTable.external_project_id == summary.external_project_id,
-        )
-        res = await self.session.execute(stmt)
-        record = res.scalar_one_or_none()
-
-        if record is None:
-            record = NewHouseTable(
-                id=str(uuid.uuid4()),
-                provider_id=provider_id,
-                external_project_id=summary.external_project_id,
-                project_name=summary.project_name,
-                build_type=summary.project_status,
-                region_name=summary.region_name,
-                section_name=summary.section_name,
-                address=summary.address,
-                min_unit_price_wan=summary.min_unit_price_wan,
-                max_unit_price_wan=summary.max_unit_price_wan,
-                min_area_pin=summary.min_area_pin,
-                max_area_pin=summary.max_area_pin,
-                developer_company=summary.developer,
-                cover_image_url=summary.cover_image_url,
-            )
-            self.session.add(record)
-        else:
-            record.project_name = summary.project_name
-            record.build_type = summary.project_status
-            record.region_name = summary.region_name
-            record.section_name = summary.section_name
-            record.address = summary.address
-            if summary.min_unit_price_wan is not None:
-                record.min_unit_price_wan = summary.min_unit_price_wan
-            if summary.max_unit_price_wan is not None:
-                record.max_unit_price_wan = summary.max_unit_price_wan
-            if summary.min_area_pin is not None:
-                record.min_area_pin = summary.min_area_pin
-            if summary.max_area_pin is not None:
-                record.max_area_pin = summary.max_area_pin
-            if summary.developer:
-                record.developer_company = summary.developer
-            if summary.cover_image_url:
-                record.cover_image_url = summary.cover_image_url
-
-        await self.session.flush()
-        return record
 
     async def upsert_from_detail(
         self, detail: NormalizedNewHouseDetail, provider_id: str
@@ -112,6 +58,9 @@ class NewHouseRepository(INewHouseRepository):
                 region_name=detail.region_name,
                 section_name=detail.section_name,
                 address=detail.address,
+                min_area_pin=detail.min_area_pin,
+                max_area_pin=detail.max_area_pin,
+                cover_image_url=detail.cover_image_url,
                 handover_time=detail.handover_time,
                 open_sell_date=detail.open_sell_date,
                 base_area_pin=detail.base_area_pin,
@@ -179,6 +128,12 @@ class NewHouseRepository(INewHouseRepository):
                 record.min_unit_price_wan = detail.min_unit_price_wan
             if detail.max_unit_price_wan is not None:
                 record.max_unit_price_wan = detail.max_unit_price_wan
+            if detail.min_area_pin is not None:
+                record.min_area_pin = detail.min_area_pin
+            if detail.max_area_pin is not None:
+                record.max_area_pin = detail.max_area_pin
+            if detail.cover_image_url:
+                record.cover_image_url = detail.cover_image_url
 
             # 車位規格更新
             if detail.parking:

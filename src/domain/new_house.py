@@ -78,6 +78,8 @@ class NormalizedNewHouseDetail(BaseModel):
     manage_fee_per_pin: Optional[int] = Field(None, ge=0, description="管理費單價純整數 (元/坪/月, 例如: 150)")
     min_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價下限 (萬元/坪)")
     max_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價上限 (萬元/坪)")
+    min_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數下限 (坪)")
+    max_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數上限 (坪)")
 
     # 車位規格值物件
     parking: NewHouseParkingSpec = Field(default_factory=NewHouseParkingSpec, description="車位規劃與設備規格")
@@ -93,6 +95,7 @@ class NormalizedNewHouseDetail(BaseModel):
     architect_company: CleanStr = Field(None, description="建築設計事務所")
     sales_agency_company: CleanStr = Field(None, description="企劃銷售 / 代銷公司")
     reception_address: CleanStr = Field(None, description="接待會館地址")
+    cover_image_url: CleanStr = Field(None, description="封面照片網址")
 
     # 社區跨領域關聯
     external_community_id: CleanStr = Field(None, description="關聯社區外部識別碼")
