@@ -8,13 +8,20 @@ from typing import Any, Dict, List
 
 from src.domain.new_house import (
     NewHouseLayoutSpec,
+    NewHouseParkingSpec,
     NormalizedNewHouseDetail,
     NormalizedNewHouseSummary,
 )
 from src.providers.source_591.normalizers import (
     clean_optional_str,
+    parse_charging_piles,
+    parse_coordinate,
     parse_currency_amount,
     parse_households_count,
+    parse_int_count,
+    parse_new_house_parking_price,
+    parse_parking_planning,
+    parse_parking_ratio,
     parse_percent,
     parse_pin,
     parse_range_float,
@@ -92,26 +99,111 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
     # 6. 總戶數 (純整數)
     total_households = parse_households_count(housing.get("households"))
 
+    # 7. 建物型態、法定用途、土地使用分區
+    building_type = clean_optional_str(housing.get("purpose_name"))
+    legal_purpose = clean_optional_str(housing.get("purpose_other_name"))
+    land_division = clean_optional_str(housing.get("land_division"))
+
+    # 8. 時程規劃: 完工交屋期程與公開銷售日期
+    handover_time = None
+    deal_time_raw = housing.get("deal_time_v2")
+    if isinstance(deal_time_raw, dict):
+        if not deal_time_raw.get("pending"):
+            handover_time = clean_optional_str(deal_time_raw.get("date"))
+    elif deal_time_raw:
+        handover_time = clean_optional_str(deal_time_raw)
+    if not handover_time:
+        dt_fallback = housing.get("deal_time")
+        if isinstance(dt_fallback, dict):
+            handover_time = clean_optional_str(dt_fallback.get("date"))
+
+    open_sell_date = None
+    sell_time_raw = housing.get("sell_time")
+    if isinstance(sell_time_raw, dict):
+        if not sell_time_raw.get("time_pending"):
+            open_sell_date = clean_optional_str(
+                sell_time_raw.get("date_origin")
+            ) or clean_optional_str(sell_time_raw.get("date"))
+    elif sell_time_raw:
+        open_sell_date = clean_optional_str(sell_time_raw)
+
+    # 9. 車位規劃與充電設備規格解析
+    park_price_raw = housing.get("park_price")
+    p_price_desc, min_p_price, max_p_price = parse_new_house_parking_price(park_price_raw)
+    p_ratio_desc, p_ratio_val = parse_parking_ratio(housing.get("park_ratio"))
+    plane_p_cnt, mech_p_cnt = parse_parking_planning(housing.get("park_planning"))
+    p_plan_desc = clean_optional_str(housing.get("park_planning"))
+    charging_desc, has_charging = parse_charging_piles(housing.get("park_piles"))
+
+    park_style = clean_optional_str(housing.get("park_style"))
+    if park_style in ("暫無", "無", "暫無資料"):
+        park_style = None
+
+    parking = NewHouseParkingSpec(
+        parking_price_desc=p_price_desc,
+        min_parking_price_wan=min_p_price,
+        max_parking_price_wan=max_p_price,
+        parking_ratio_desc=p_ratio_desc,
+        parking_ratio_val=p_ratio_val,
+        parking_planning_desc=p_plan_desc,
+        plane_parking_count=plane_p_cnt,
+        mechanical_parking_count=mech_p_cnt,
+        charging_piles_desc=charging_desc,
+        has_charging_piles=has_charging,
+        parking_style=park_style,
+    )
+
+    # 10. 社區跨領域外部關聯
+    external_community_id = None
+    cid_raw = housing.get("community_id")
+    if cid_raw is not None and str(cid_raw).strip() not in ("0", ""):
+        external_community_id = str(cid_raw).strip()
+    community_name = clean_optional_str(housing.get("community_name"))
+    community_age = parse_int_count(housing.get("community_age"))
+
+    # 11. 基地經緯度坐標
+    map_raw = housing.get("map")
+    lat_val = None
+    lng_val = None
+    if isinstance(map_raw, dict):
+        lat_val = parse_coordinate(map_raw.get("lat"))
+        lng_val = parse_coordinate(map_raw.get("lng"))
+    else:
+        lat_val = parse_coordinate(housing.get("lat"))
+        lng_val = parse_coordinate(housing.get("lng"))
+
     return NormalizedNewHouseDetail(
         provider_id="591",
         external_project_id=str(housing.get("hid")),
         project_name=str(housing.get("build_name") or "").strip(),
         build_type=clean_optional_str(housing.get("build_type_name")),
+        building_type=building_type,
+        legal_purpose=legal_purpose,
+        land_division=land_division,
         region_name=str(housing.get("region") or "").strip(),
         section_name=str(housing.get("section") or "").strip(),
         address=clean_optional_str(housing.get("address")) or "",
+        handover_time=handover_time,
+        open_sell_date=open_sell_date,
         base_area_pin=base_area_pin,
         public_ratio_pct=public_ratio_pct,
         total_households=total_households,
         manage_fee_per_pin=manage_fee_per_pin,
         min_unit_price_wan=min_price,
         max_unit_price_wan=max_price,
+        parking=parking,
         layouts=layouts,
         structural_engine=clean_optional_str(housing.get("structural_engine")),
         direction_rule=clean_optional_str(housing.get("direction_rule")),
         developer_company=clean_optional_str(housing.get("company")),
         builder_company=clean_optional_str(housing.get("build_company")),
         architect_company=clean_optional_str(housing.get("construction_company")),
+        sales_agency_company=clean_optional_str(housing.get("sell_company")),
         reception_address=clean_optional_str(housing.get("reception_address")),
+        external_community_id=external_community_id,
+        community_name=community_name,
+        community_age=community_age,
+        latitude=lat_val,
+        longitude=lng_val,
     )
 

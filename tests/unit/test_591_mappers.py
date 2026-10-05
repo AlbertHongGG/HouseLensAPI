@@ -337,3 +337,31 @@ class Test591NewHouseMappers:
         assert detail.layouts[0].rooms_count == 1
         assert detail.layouts[0].min_area_pin == 14.0
         assert detail.layouts[0].max_area_pin == 17.0
+
+        # 斷言本次補齊之規格與屬性
+        assert detail.building_type == "住宅大樓"
+        assert detail.legal_purpose == "住商用"
+        assert detail.land_division == "第四種商業區"
+        assert detail.handover_time == "預計2028年第一季度"
+        assert detail.open_sell_date == "2025-02-01"
+        assert detail.architect_company == "簡俊卿建築師事務所"
+        assert detail.sales_agency_company == "新聯陽實業機構-新聯信廣告股份有限公司"
+        assert detail.external_community_id == "5962516"
+        assert detail.community_name == "長虹MVP"
+        assert detail.community_age == 0
+        assert detail.latitude == 25.0444
+        assert detail.longitude == 121.50265
+
+        # 斷言車位規格值物件 (NewHouseParkingSpec)
+        assert detail.parking.parking_price_desc == "155~320萬"
+        assert detail.parking.min_parking_price_wan == 155.0
+        assert detail.parking.max_parking_price_wan == 320.0
+        assert detail.parking.parking_ratio_desc == "1:0.46"
+        assert detail.parking.parking_ratio_val == 0.46
+        assert detail.parking.parking_planning_desc == "平面式111個、機械式41個"
+        assert detail.parking.plane_parking_count == 111
+        assert detail.parking.mechanical_parking_count == 41
+        assert detail.parking.charging_piles_desc == "有充電設備（含預留）"
+        assert detail.parking.has_charging_piles is True
+        assert detail.parking.parking_style is None  # 大樓集合住宅 591 封包為「暫無」，防腐層清洗為 None
+

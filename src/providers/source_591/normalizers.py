@@ -494,3 +494,141 @@ def clean_parking_count(
     return None
 
 
+def parse_parking_planning(desc: Any) -> Tuple[Optional[int], Optional[int]]:
+    """解析車位規劃型態與數量，回傳 (平面車位數, 機械車位數)。
+
+    支援範例:
+        "平面式111個、機械式41個" -> (111, 41)
+        "平面式192個" -> (192, None)
+        "機械式50個" -> (None, 50)
+        "平面 1 個、機械 33 個" -> (1, 33)
+        "暫無" -> (None, None)
+    """
+    if desc is None:
+        return (None, None)
+    s = str(desc).strip()
+    if not s or s in ("暫無", "無", "暫無資料"):
+        return (None, None)
+
+    plane_cnt: Optional[int] = None
+    mech_cnt: Optional[int] = None
+
+    m_plane = re.search(r"平面(?:式)?\s*(\d+)\s*個", s)
+    if m_plane:
+        try:
+            plane_cnt = int(m_plane.group(1))
+        except (ValueError, TypeError):
+            pass
+
+    m_mech = re.search(r"機械(?:式)?\s*(\d+)\s*個", s)
+    if m_mech:
+        try:
+            mech_cnt = int(m_mech.group(1))
+        except (ValueError, TypeError):
+            pass
+
+    return (plane_cnt, mech_cnt)
+
+
+def parse_parking_ratio(ratio: Any) -> Tuple[Optional[str], Optional[float]]:
+    """解析車位配比，回傳 (標準字串, 純數值比率)。
+
+    支援範例:
+        "1:0.46" -> ("1:0.46", 0.46)
+        "1:1" -> ("1:1", 1.0)
+        "1:1.05" -> ("1:1.05", 1.05)
+    """
+    if ratio is None:
+        return (None, None)
+    s = str(ratio).strip()
+    if not s or s in ("暫無", "無", "暫無資料"):
+        return (None, None)
+
+    m = re.search(r"1\s*:\s*(\d+(?:\.\d+)?)", s)
+    if m:
+        try:
+            val = float(m.group(1))
+            return (s, val)
+        except (ValueError, TypeError):
+            return (s, None)
+
+    return (s, None)
+
+
+def parse_charging_piles(desc: Any) -> Tuple[Optional[str], Optional[bool]]:
+    """解析充電設備規劃，回傳 (標準描述, 是否具備充電設備或預留布林值)。
+
+    支援範例:
+        "有充電設備（含預留）" -> ("有充電設備（含預留）", True)
+        "無充電設備" -> ("無充電設備", False)
+        "" -> (None, None)
+    """
+    if desc is None:
+        return (None, None)
+    s = str(desc).strip()
+    if not s or s in ("暫無", "無", "暫無資料"):
+        return (None, None)
+
+    if "有充電" in s or "預留" in s:
+        return (s, True)
+    if "無充電" in s:
+        return (s, False)
+
+    return (s, None)
+
+
+def parse_coordinate(val: Any) -> Optional[float]:
+    """解析經緯度坐標浮點數。"""
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        f = float(val)
+        return f if f != 0.0 else None
+
+    s = str(val).strip()
+    if not s or s in ("暫無", "無", "0"):
+        return None
+
+    try:
+        f = float(s)
+        return f if f != 0.0 else None
+    except (ValueError, TypeError):
+        return None
+
+
+def parse_new_house_parking_price(
+    raw: Any,
+) -> Tuple[Optional[str], Optional[float], Optional[float]]:
+    """解析新建案車位開價，回傳 (描述字串, 最低價萬元, 最高價萬元)。
+
+    支援 591 封包結構:
+        {'pending': 0, 'price': '155~320', 'unit': '萬'} -> ("155~320萬", 155.0, 320.0)
+        {'pending': 0, 'price': '380', 'unit': '萬'} -> ("380萬", 380.0, 380.0)
+        {'pending': 1, 'price': '價格待定', 'unit': ''} -> ("價格待定", None, None)
+    """
+    if raw is None:
+        return (None, None, None)
+
+    pending = 0
+    price_val = ""
+    unit = "萬"
+
+    if isinstance(raw, dict):
+        pending = int(raw.get("pending") or 0)
+        price_val = str(raw.get("price") or "").strip()
+        unit = str(raw.get("unit") or "萬").strip()
+    else:
+        price_val = str(raw).strip()
+
+    if not price_val or price_val in ("暫無", "無", "暫無資料"):
+        return (None, None, None)
+
+    if pending == 1 or "待定" in price_val:
+        return ("價格待定", None, None)
+
+    min_p, max_p = parse_range_float(price_val)
+    desc = f"{price_val}{unit}" if unit and not price_val.endswith(unit) else price_val
+    return (desc, min_p, max_p)
+
+
+

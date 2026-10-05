@@ -106,33 +106,65 @@ class NewHouseRepository(INewHouseRepository):
                 external_project_id=detail.external_project_id,
                 project_name=detail.project_name,
                 build_type=detail.build_type,
+                building_type=detail.building_type,
+                legal_purpose=detail.legal_purpose,
+                land_division=detail.land_division,
                 region_name=detail.region_name,
                 section_name=detail.section_name,
                 address=detail.address,
+                handover_time=detail.handover_time,
+                open_sell_date=detail.open_sell_date,
                 base_area_pin=detail.base_area_pin,
                 public_ratio_pct=detail.public_ratio_pct,
                 total_households=detail.total_households,
                 manage_fee_per_pin=detail.manage_fee_per_pin,
                 min_unit_price_wan=detail.min_unit_price_wan,
                 max_unit_price_wan=detail.max_unit_price_wan,
+                min_parking_price_wan=detail.parking.min_parking_price_wan if detail.parking else None,
+                max_parking_price_wan=detail.parking.max_parking_price_wan if detail.parking else None,
+                parking_price_desc=detail.parking.parking_price_desc if detail.parking else None,
+                parking_ratio_desc=detail.parking.parking_ratio_desc if detail.parking else None,
+                parking_ratio_val=detail.parking.parking_ratio_val if detail.parking else None,
+                parking_planning_desc=detail.parking.parking_planning_desc if detail.parking else None,
+                plane_parking_count=detail.parking.plane_parking_count if detail.parking else None,
+                mechanical_parking_count=detail.parking.mechanical_parking_count if detail.parking else None,
+                charging_piles_desc=detail.parking.charging_piles_desc if detail.parking else None,
+                has_charging_piles=detail.parking.has_charging_piles if detail.parking else None,
+                parking_style=detail.parking.parking_style if detail.parking else None,
                 layouts=layouts_dump,
                 structural_engine=detail.structural_engine,
                 direction_rule=detail.direction_rule,
                 developer_company=detail.developer_company,
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
+                sales_agency_company=detail.sales_agency_company,
                 reception_address=detail.reception_address,
+                external_community_id=detail.external_community_id,
+                community_name=detail.community_name,
+                community_age=detail.community_age,
+                latitude=detail.latitude,
+                longitude=detail.longitude,
             )
             self.session.add(record)
         else:
             record.project_name = detail.project_name
             record.build_type = detail.build_type
+            if detail.building_type:
+                record.building_type = detail.building_type
+            if detail.legal_purpose:
+                record.legal_purpose = detail.legal_purpose
+            if detail.land_division:
+                record.land_division = detail.land_division
             if detail.region_name:
                 record.region_name = detail.region_name
             if detail.section_name:
                 record.section_name = detail.section_name
             if detail.address:
                 record.address = detail.address
+            if detail.handover_time:
+                record.handover_time = detail.handover_time
+            if detail.open_sell_date:
+                record.open_sell_date = detail.open_sell_date
 
             # 數值更新
             if detail.base_area_pin is not None:
@@ -148,11 +180,36 @@ class NewHouseRepository(INewHouseRepository):
             if detail.max_unit_price_wan is not None:
                 record.max_unit_price_wan = detail.max_unit_price_wan
 
+            # 車位規格更新
+            if detail.parking:
+                if detail.parking.min_parking_price_wan is not None:
+                    record.min_parking_price_wan = detail.parking.min_parking_price_wan
+                if detail.parking.max_parking_price_wan is not None:
+                    record.max_parking_price_wan = detail.parking.max_parking_price_wan
+                if detail.parking.parking_price_desc:
+                    record.parking_price_desc = detail.parking.parking_price_desc
+                if detail.parking.parking_ratio_desc:
+                    record.parking_ratio_desc = detail.parking.parking_ratio_desc
+                if detail.parking.parking_ratio_val is not None:
+                    record.parking_ratio_val = detail.parking.parking_ratio_val
+                if detail.parking.parking_planning_desc:
+                    record.parking_planning_desc = detail.parking.parking_planning_desc
+                if detail.parking.plane_parking_count is not None:
+                    record.plane_parking_count = detail.parking.plane_parking_count
+                if detail.parking.mechanical_parking_count is not None:
+                    record.mechanical_parking_count = detail.parking.mechanical_parking_count
+                if detail.parking.charging_piles_desc:
+                    record.charging_piles_desc = detail.parking.charging_piles_desc
+                if detail.parking.has_charging_piles is not None:
+                    record.has_charging_piles = detail.parking.has_charging_piles
+                if detail.parking.parking_style:
+                    record.parking_style = detail.parking.parking_style
+
             # 結構化房型
             if layouts_dump is not None:
                 record.layouts = layouts_dump
 
-            # 描述更新
+            # 描述與團隊更新
             if detail.structural_engine:
                 record.structural_engine = detail.structural_engine
             if detail.direction_rule:
@@ -163,8 +220,22 @@ class NewHouseRepository(INewHouseRepository):
                 record.builder_company = detail.builder_company
             if detail.architect_company:
                 record.architect_company = detail.architect_company
+            if detail.sales_agency_company:
+                record.sales_agency_company = detail.sales_agency_company
             if detail.reception_address:
                 record.reception_address = detail.reception_address
+
+            # 社區關聯與坐標更新
+            if detail.external_community_id:
+                record.external_community_id = detail.external_community_id
+            if detail.community_name:
+                record.community_name = detail.community_name
+            if detail.community_age is not None:
+                record.community_age = detail.community_age
+            if detail.latitude is not None:
+                record.latitude = detail.latitude
+            if detail.longitude is not None:
+                record.longitude = detail.longitude
 
         await self.session.flush()
         return record
@@ -185,6 +256,17 @@ class NewHouseRepository(INewHouseRepository):
         )
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
+
+    async def get_by_external_community_id(
+        self, provider_id: str, external_community_id: str
+    ) -> List[NewHouseTable]:
+        """根據外部關聯社區代碼反查其關聯之新建案清單"""
+        stmt = select(NewHouseTable).where(
+            NewHouseTable.provider_id == provider_id,
+            NewHouseTable.external_community_id == external_community_id,
+        )
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
 
     async def search(
         self,

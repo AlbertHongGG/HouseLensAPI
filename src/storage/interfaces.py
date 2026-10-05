@@ -192,6 +192,13 @@ class INewHouseRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_external_community_id(
+        self, provider_id: str, external_community_id: str
+    ) -> List[NewHouseTable]:
+        """根據外部關聯社區代碼反查其關聯之新建案清單"""
+        pass
+
+    @abstractmethod
     async def search(
         self,
         region: Optional[str] = None,
@@ -202,3 +209,4 @@ class INewHouseRepository(ABC):
     ) -> List[NewHouseTable]:
         """多條件檢索庫存新建案"""
         pass
+
