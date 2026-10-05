@@ -1,6 +1,5 @@
-"""HouseLensAPI - 中古屋領域服務抽象合約 (ISaleHouseProvider)"""
-
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from src.domain.common import PageResult
 from src.domain.sale_house import (
@@ -19,6 +18,10 @@ class ISaleHouseProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_sale_house_detail(self, house_id: str) -> NormalizedSalePropertyDetail:
+    async def get_sale_house_detail(
+        self,
+        house_id: str,
+        summary: Optional[NormalizedSaleListing] = None,
+    ) -> NormalizedSalePropertyDetail:
         """根據房屋唯一 ID 取得完整物件物理詳情與產權面積純數值規格"""
         pass

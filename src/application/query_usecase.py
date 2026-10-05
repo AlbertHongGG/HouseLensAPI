@@ -42,8 +42,8 @@ class QueryUseCase:
 
     async def list_properties(
         self,
-        region: Optional[str] = None,
-        section: Optional[str] = None,
+        region_name: Optional[str] = None,
+        section_name: Optional[str] = None,
         keyword: Optional[str] = None,
         min_price: Optional[int] = None,
         max_price: Optional[int] = None,
@@ -57,8 +57,8 @@ class QueryUseCase:
         async with self.db.session() as session:
             repo = PropertyRepository(session)
             return await repo.search(
-                region=region,
-                section=section,
+                region_name=region_name,
+                section_name=section_name,
                 keyword=keyword,
                 min_price_wan=min_price,
                 max_price_wan=max_price,

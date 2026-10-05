@@ -75,8 +75,8 @@ def list_sale_houses_cmd(
     try:
         properties = asyncio.run(
             uc.list_properties(
-                region=region,
-                section=section,
+                region_name=region,
+                section_name=section,
                 keyword=keyword,
                 min_price=min_price,
                 max_price=max_price,

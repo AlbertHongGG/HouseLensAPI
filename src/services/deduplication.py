@@ -49,14 +49,22 @@ class PropertyDeduplicationService:
         """評估傳入之中古屋清單或詳情是否在庫內已存在相同之物理實體"""
         community_name = candidate.community_name
         floor_current = candidate.floor_current
+        floor_total = candidate.floor_total
         rooms = candidate.rooms
         total_area_pin = candidate.total_area_pin
+        region_name = candidate.region_name
+        section_name = candidate.section_name
+        street = candidate.street
 
         matched = await repository.find_duplicate_candidate(
             community_name=community_name,
             floor_current=floor_current,
             rooms=rooms,
             total_area_pin=total_area_pin,
+            region_name=region_name,
+            section_name=section_name,
+            street=street,
+            floor_total=floor_total,
             area_tolerance_pct=self.area_tolerance_pct,
         )
 
@@ -75,6 +83,17 @@ class PropertyDeduplicationService:
         if community_name and matched.community_name == community_name:
             score += 0.4
             reasons.append(f"社區名稱完全相符: {community_name}")
+        elif not community_name and not matched.community_name:
+            if (
+                region_name
+                and matched.region_name == region_name
+                and section_name
+                and matched.section_name == section_name
+                and street
+                and matched.street == street
+            ):
+                score += 0.4
+                reasons.append(f"行政區與路街完全相符: {region_name}{section_name}{street}")
 
         if floor_current is not None and matched.floor_current is not None and floor_current == matched.floor_current:
             score += 0.3

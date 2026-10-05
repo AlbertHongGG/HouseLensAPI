@@ -175,7 +175,9 @@ class SyncUseCase:
                 return await repo.filter_existing_external_ids(provider_id, ids)
 
         async def fetch_detail(summary: NormalizedSaleListing) -> Optional[NormalizedSalePropertyDetail]:
-            return await provider.sale_house.get_sale_house_detail(summary.house_id)
+            return await provider.sale_house.get_sale_house_detail(
+                summary.external_house_id, summary=summary
+            )
 
         async def persist_batch(
             pairs: List[Tuple[NormalizedSaleListing, Optional[NormalizedSalePropertyDetail]]]
@@ -201,12 +203,12 @@ class SyncUseCase:
                         )
                         saved.append(prop)
                     else:
-                        logger.warning(f"中古屋房源項目 {item.house_id} ({item.title}) 詳情獲取失敗或已失效，略過入庫。")
+                        logger.warning(f"中古屋房源項目 {item.external_house_id} ({item.title}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedSaleListing, NormalizedSalePropertyDetail, PropertyTable](
             fetch_page_func=fetch_page,
-            extract_id_func=lambda s: s.house_id,
+            extract_id_func=lambda s: s.external_house_id,
             check_existing_func=check_existing,
             fetch_detail_func=fetch_detail,
             persist_batch_func=persist_batch,

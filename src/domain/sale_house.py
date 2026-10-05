@@ -30,18 +30,14 @@ class NormalizedSaleListing(BaseModel):
 
     # 分類與地理位置
     building_type: CleanStr = Field(None, description="建物型態 (如: 住宅、辦公)")
-    region: str = Field(..., description="縣市名稱 (如: 台北市)")
-    section: str = Field(..., description="行政區名稱 (如: 松山區)")
+    region_name: str = Field(..., description="縣市名稱 (如: 台北市)")
+    section_name: str = Field(..., description="行政區名稱 (如: 松山區)")
     street: CleanStr = Field(None, description="街道名稱 (如: 三民路)")
     address: CleanStr = Field(None, description="地址概況描述")
     community_id: CleanStr = Field(None, description="所屬社區 ID")
     community_name: CleanStr = Field(None, description="所屬社區名稱")
     has_parking: bool = Field(default=False, description="是否含車位")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
-
-    @property
-    def house_id(self) -> str:
-        return self.external_house_id
 
 
 class NormalizedSalePropertyDetail(BaseModel):
@@ -81,24 +77,14 @@ class NormalizedSalePropertyDetail(BaseModel):
     parking_desc: CleanStr = Field(None, description="車位型態說明")
 
     # 地理位置與結構化資訊
-    region: CleanStr = Field(None, description="縣市名稱")
-    section: CleanStr = Field(None, description="行政區名稱")
+    region_name: CleanStr = Field(None, description="縣市名稱")
+    section_name: CleanStr = Field(None, description="行政區名稱")
     street: CleanStr = Field(None, description="路街名稱")
     address: CleanStr = Field(None, description="完整地址描述")
     coordinates: Optional[GeoPoint] = Field(None, description="經緯度座標")
-    lat: Optional[float] = Field(None, description="緯度浮點數")
-    lng: Optional[float] = Field(None, description="經度浮點數")
+    community_id: CleanStr = Field(None, description="所屬社區 ID")
     community_name: CleanStr = Field(None, description="社區名稱")
-
-    @property
-    def house_id(self) -> str:
-        return self.external_house_id
-
-
-
-# 別名相容規範
-SaleListingSpec = NormalizedSaleListing
-SalePropertyDetailSpec = NormalizedSalePropertyDetail
+    cover_image_url: CleanStr = Field(None, description="封面照片網址")
 
 
 class SaleHouseSearchQuery(BaseSearchQuery):

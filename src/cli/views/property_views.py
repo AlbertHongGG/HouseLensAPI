@@ -121,7 +121,7 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     specs_table.add_row("權狀登記總坪:", total_area_str, "參考單價:", unit_price_str)
     specs_table.add_row("格局規劃:", layout_str, "建物型態/結構:", f"{p.building_type or '-'} / {p.building_structure or '-'}")
     specs_table.add_row("所在樓層:", floor_str, "屋齡/座向:", f"{age_str} / {p.orientation or '-'}")
-    specs_table.add_row("行政區地址:", f"{p.region or ''}{p.section or ''} {p.address or ''}", "地理座標:", coords_str)
+    specs_table.add_row("行政區地址:", f"{p.region_name or ''}{p.section_name or ''} {p.address or ''}", "地理座標:", coords_str)
     specs_table.add_row("管理費:", mgmt_fee_str, "公設比/現況:", f"{pub_ratio_str} / {p.current_state or '-'}")
     specs_table.add_row("帶租約現況:", lease_str, "車位規格說明:", p.parking_desc or "-")
 
@@ -207,8 +207,8 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
             "land_area_pin": p.land_area_pin,
             "parking_area_pin": p.parking_area_pin,
         },
-        "region": p.region,
-        "section": p.section,
+        "region_name": p.region_name,
+        "section_name": p.section_name,
         "street": p.street,
         "address": p.address,
         "lat": p.lat,

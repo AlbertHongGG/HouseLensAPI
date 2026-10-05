@@ -64,8 +64,8 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
             total_area_pin=46.29,
             rooms=3,
             living_rooms=2,
-            region="台北市",
-            section="松山區",
+            region_name="台北市",
+            section_name="松山區",
             community_name="鳴森大苑-碧硯閣",
             floor_current=2,
             floor_total=24,
@@ -81,8 +81,8 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
             total_area_pin=46.30,
             rooms=3,
             living_rooms=2,
-            region="台北市",
-            section="松山區",
+            region_name="台北市",
+            section_name="松山區",
             community_name="鳴森大苑-碧硯閣",
             floor_current=2,
             floor_total=24,
@@ -100,8 +100,8 @@ async def test_deduplication_service_candidate_evaluation(service_test_db: Datab
             price_wan=5800,
             total_area_pin=46.29,
             rooms=3,
-            region="台北市",
-            section="松山區",
+            region_name="台北市",
+            section_name="松山區",
             community_name="鳴森大苑-碧硯閣",
             floor_current=10,
         )
@@ -177,7 +177,7 @@ async def test_aggregator_service_sync_and_search_flow(service_test_db: Database
         assert p.price_wan > 0
 
     # 在庫查詢房屋物件
-    found_props = await service.search_properties(region="台北市")
+    found_props = await service.search_properties(region_name="台北市")
     assert len(found_props) >= 2
 
     # 3. 同步新建案 (限定 2 筆，標準兩階段)

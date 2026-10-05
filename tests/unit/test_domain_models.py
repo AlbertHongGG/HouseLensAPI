@@ -137,8 +137,8 @@ class TestSaleHouseModels:
             living_rooms=2,
             bathrooms=2,
             building_type="住宅",
-            region="台北市",
-            section="松山區",
+            region_name="台北市",
+            section_name="松山區",
             street="三民路",
             address="鳴森大苑-碧硯閣 松山區-三民路",
             community_id="5855864",
@@ -148,7 +148,7 @@ class TestSaleHouseModels:
             has_parking=True,
             cover_image_url="https://example.com/house.jpg",
         )
-        assert summary.house_id == "S20604856"
+        assert summary.external_house_id == "S20604856"
         assert summary.total_area_pin == 46.3
         assert summary.price_wan == 5258
         assert summary.has_parking is True
@@ -181,12 +181,11 @@ class TestSaleHouseModels:
             common_area_pin=11.17,
             land_area_pin=5.06,
             parking_area_pin=9.24,
-            region="台北市",
-            section="松山區",
+            region_name="台北市",
+            section_name="松山區",
             street="三民路",
             address="台北市松山區三民路80巷25號",
-            lat=25.056119,
-            lng=121.564513,
+            coordinates=GeoPoint(lat=25.056119, lng=121.564513),
         )
         assert detail.price_wan == 5258
         assert isinstance(detail.price_wan, int)
@@ -194,6 +193,8 @@ class TestSaleHouseModels:
         assert detail.floor_current == 2
         assert detail.building_age_years == 1.0
         assert detail.total_area_pin == 46.29
+        assert detail.coordinates is not None
+        assert detail.coordinates.lat == 25.056119
         assert not hasattr(detail, "remark")
 
     def test_sale_house_search_query_no_rooms(self):

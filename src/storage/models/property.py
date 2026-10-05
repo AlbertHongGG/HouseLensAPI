@@ -75,8 +75,8 @@ class PropertyTable(Base, TimestampMixin):
     parking_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位面積
 
     # 地理位置與座標
-    region: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
-    section: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
+    region_name: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
+    section_name: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
     street: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     address: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -92,7 +92,7 @@ class PropertyTable(Base, TimestampMixin):
 
     __table_args__ = (
         Index("ix_property_dedup", "community_name", "floor_current", "rooms"),
-        Index("ix_property_region_section", "region", "section"),
+        Index("ix_property_region_section", "region_name", "section_name"),
         Index("ix_property_price_wan", "price_wan"),
         Index("ix_property_building_age_years", "building_age_years"),
     )

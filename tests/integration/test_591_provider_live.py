@@ -67,16 +67,16 @@ async def test_591_sale_house_live_flow():
     assert len(res.items) > 0
     first_house = res.items[0]
     assert isinstance(first_house, NormalizedSaleListing)
-    assert first_house.house_id is not None
+    assert first_house.external_house_id is not None
     assert first_house.price_wan > 0
     assert first_house.title != ""
 
-    # 2. 獲取該房屋詳情
-    detail = await provider.sale_house.get_sale_house_detail(first_house.house_id)
+    # 2. 獲取該房屋詳情 (傳遞 summary 上下文)
+    detail = await provider.sale_house.get_sale_house_detail(first_house.external_house_id, summary=first_house)
     assert isinstance(detail, NormalizedSalePropertyDetail)
     assert detail.price_wan > 0
     assert detail.title != ""
-    assert detail.region is not None
+    assert detail.region_name is not None
 
     # 3. 測試 591 屋齡篩選 (5年以下: _5)
     query_age = SaleHouseSearchQuery(region_id=1, max_age_years=5, page=1)

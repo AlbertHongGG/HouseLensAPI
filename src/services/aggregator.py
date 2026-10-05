@@ -97,10 +97,12 @@ class HouseAggregatorService:
         async def fetch_house_detail(summary):
             async with sem:
                 try:
-                    detail = await provider.sale_house.get_sale_house_detail(summary.house_id)
+                    detail = await provider.sale_house.get_sale_house_detail(
+                        summary.external_house_id, summary=summary
+                    )
                     return (summary, detail)
                 except Exception as e:
-                    logger.warning(f"獲取房屋 {summary.house_id} 詳情失敗: {e}")
+                    logger.warning(f"獲取房屋 {summary.external_house_id} 詳情失敗: {e}")
                     return (summary, None)
 
         enriched_pairs = await asyncio.gather(
@@ -200,8 +202,8 @@ class HouseAggregatorService:
 
     async def search_properties(
         self,
-        region: Optional[str] = None,
-        section: Optional[str] = None,
+        region_name: Optional[str] = None,
+        section_name: Optional[str] = None,
         keyword: Optional[str] = None,
         min_price: Optional[int] = None,
         max_price: Optional[int] = None,
@@ -215,8 +217,8 @@ class HouseAggregatorService:
         async with self.db.session() as session:
             repo = PropertyRepository(session)
             return await repo.search(
-                region=region,
-                section=section,
+                region_name=region_name,
+                section_name=section_name,
                 keyword=keyword,
                 min_price_wan=min_price,
                 max_price_wan=max_price,

@@ -113,13 +113,15 @@ class Test591SaleHouseMappers:
         # Item 1 is a real property
         real_mapped = map_sale_house_summary(items[1])
         assert isinstance(real_mapped, NormalizedSaleListing)
-        assert real_mapped.house_id == "S20604856"
+        assert real_mapped.external_house_id == "S20604856"
         assert real_mapped.price_wan == 5258
         assert abs(real_mapped.total_area_pin - 46.29) < 0.1
         assert real_mapped.rooms == 3
         assert real_mapped.living_rooms == 2
         assert real_mapped.building_type == "住宅"
         assert real_mapped.has_parking is True
+        assert real_mapped.region_name is not None
+        assert real_mapped.section_name is not None
         assert not hasattr(real_mapped, "linkman")
         assert not hasattr(real_mapped, "browse_count")
 
@@ -129,7 +131,7 @@ class Test591SaleHouseMappers:
         detail = map_sale_house_detail(data_block)
 
         assert isinstance(detail, NormalizedSalePropertyDetail)
-        assert detail.house_id == "S20604856"
+        assert detail.external_house_id == "S20604856"
         assert detail.price_wan == 5258
         assert isinstance(detail.price_wan, int)
         assert detail.rooms == 3
@@ -156,8 +158,18 @@ class Test591SaleHouseMappers:
         assert detail.parking_area_pin == 9.24
 
         # Coordinates
-        assert detail.lat == 25.056119
-        assert detail.lng == 121.5645131
+        assert detail.coordinates is not None
+        assert detail.coordinates.lat == 25.056119
+        assert detail.coordinates.lng == 121.5645131
+
+        # Summary context injection test
+        raw_list = load_captured_json("房屋物件清單 Respond.json")
+        summary_candidate = map_sale_house_summary(raw_list.get("data", {}).get("items", [])[1])
+        assert summary_candidate is not None
+        detail_enriched = map_sale_house_detail(data_block, summary=summary_candidate)
+        assert detail_enriched.community_name == summary_candidate.community_name
+        assert detail_enriched.community_id == summary_candidate.community_id
+        assert detail_enriched.cover_image_url == summary_candidate.cover_image_url
 
 
 class Test591AgeMapper:

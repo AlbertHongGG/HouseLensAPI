@@ -120,20 +120,24 @@ class IPropertyRepository(ABC):
     @abstractmethod
     async def find_duplicate_candidate(
         self,
-        community_name: Optional[str],
-        floor_current: Optional[int],
-        rooms: Optional[int],
-        total_area_pin: Optional[float],
+        community_name: Optional[str] = None,
+        floor_current: Optional[int] = None,
+        rooms: Optional[int] = None,
+        total_area_pin: Optional[float] = None,
+        region_name: Optional[str] = None,
+        section_name: Optional[str] = None,
+        street: Optional[str] = None,
+        floor_total: Optional[int] = None,
         area_tolerance_pct: float = 0.02,
     ) -> Optional[PropertyTable]:
-        """依社區、樓層純整數、房數純整數與坪數誤差 (預設 ±2%) 尋找庫內可能之重複物件"""
+        """依社區（第一級）或行政區路街總樓層（第二級無社區物件）、樓層純整數、房數純整數與坪數誤差 (預設 ±2%) 尋找庫內可能之重複物件"""
         pass
 
     @abstractmethod
     async def search(
         self,
-        region: Optional[str] = None,
-        section: Optional[str] = None,
+        region_name: Optional[str] = None,
+        section_name: Optional[str] = None,
         keyword: Optional[str] = None,
         min_price_wan: Optional[int] = None,
         max_price_wan: Optional[int] = None,

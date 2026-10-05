@@ -87,8 +87,8 @@ async def test_sync_sale_houses_multi_page_accumulation(sync_test_db: DatabaseMa
                 price_wan=2500,
                 unit_price_wan=80.0,
                 total_area_pin=31.25,
-                region="台北市",
-                section="大安區",
+                region_name="台北市",
+                section_name="大安區",
                 address="台北市大安區和平東路二段",
                 rooms=3,
                 living_rooms=2,
@@ -98,7 +98,7 @@ async def test_sync_sale_houses_multi_page_accumulation(sync_test_db: DatabaseMa
         ]
         return PageResult.create(items=items, total_records=30, page=query.page, page_size=10)
 
-    async def mock_detail(house_id: str) -> NormalizedSalePropertyDetail:
+    async def mock_detail(house_id: str, summary: Optional[NormalizedSaleListing] = None) -> NormalizedSalePropertyDetail:
         return NormalizedSalePropertyDetail(
             external_house_id=house_id,
             title=f"詳細規格_{house_id}",
@@ -106,6 +106,8 @@ async def test_sync_sale_houses_multi_page_accumulation(sync_test_db: DatabaseMa
             unit_price_wan=80.0,
             total_area_pin=31.25,
             main_area_pin=22.0,
+            region_name="台北市",
+            section_name="大安區",
             address="台北市大安區和平東路二段",
             building_age_years=5.0,
         )
@@ -294,23 +296,22 @@ async def test_sync_all_with_unified_options(sync_test_db):
                 price_wan=2500,
                 unit_price_wan=80.0,
                 total_area_pin=31.25,
-                region="台北市",
-                section="大安區",
+                region_name="台北市",
+                section_name="大安區",
             )
             for i in range(5)
         ]
         return PageResult.create(items=items, total_records=5, page=q.page, page_size=q.page_size)
 
-    async def mock_detail_sale(hid: str):
+    async def mock_detail_sale(hid: str, summary: Optional[NormalizedSaleListing] = None):
         return NormalizedSalePropertyDetail(
             external_house_id=hid,
-            provider_id="mock_591",
             title=f"中古屋_{hid}",
             price_wan=2500,
             total_area_pin=31.25,
             region_name="台北市",
             section_name="大安區",
-            full_address="台北市大安區和平東路",
+            address="台北市大安區和平東路",
             building_age_years=6.0,
         )
 
@@ -392,19 +393,18 @@ async def test_sync_sale_houses_skips_failed_details_and_accumulates(sync_test_d
                 price_wan=2000,
                 unit_price_wan=60.0,
                 total_area_pin=30.0,
-                region="台北市",
-                section="內湖區",
+                region_name="台北市",
+                section_name="內湖區",
             )
             for i in range(start, start + 5)
         ]
         return PageResult.create(items=items, total_records=20, page=q.page, page_size=5)
 
-    async def mock_detail(hid: str):
+    async def mock_detail(hid: str, summary: Optional[NormalizedSaleListing] = None):
         if hid == "H_2":
             raise RuntimeError("591 API 回傳業務失敗: 物件未找到")
         return NormalizedSalePropertyDetail(
             external_house_id=hid,
-            provider_id="mock_591",
             title=f"詳情_{hid}",
             price_wan=2000,
             unit_price_wan=60.0,

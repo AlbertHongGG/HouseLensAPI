@@ -53,7 +53,9 @@ class MockSaleHouseProvider(ISaleHouseProvider):
     async def search_sale_houses(self, query: SaleHouseSearchQuery) -> PageResult[NormalizedSaleListing]:
         return PageResult.create(items=[], total_records=0, page=1, page_size=20)
 
-    async def get_sale_house_detail(self, house_id: str) -> NormalizedSalePropertyDetail:
+    async def get_sale_house_detail(
+        self, house_id: str, summary: Optional[NormalizedSaleListing] = None
+    ) -> NormalizedSalePropertyDetail:
         return NormalizedSalePropertyDetail(
             external_house_id=house_id,
             title="測試房屋",
@@ -173,7 +175,7 @@ async def test_mock_provider_flow():
     assert community_detail.community_id == "1001"
 
     house_detail = await provider.sale_house.get_sale_house_detail("S12345")
-    assert house_detail.house_id == "S12345"
+    assert house_detail.external_house_id == "S12345"
     assert house_detail.price_wan == 2000
 
     new_house_detail = await provider.new_house.get_new_house_detail("9999")

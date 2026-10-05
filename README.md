@@ -346,8 +346,8 @@ uv run houselens test 591 --format json
 | `common_area_pin` | Float | 共有部分 (坪) | 詳情 `baseInfo.areaIntro[共有部分].value` | 轉 float |
 | `land_area_pin` | Float | 土地持分 (坪) | 詳情 `baseInfo.areaIntro[土地持分坪數].value` | 轉 float |
 | `parking_area_pin` | Float | 車位面積 (坪) | 詳情 `baseInfo.areaIntro[車位面積].value` | 轉 float |
-| `region` | String(32) | 縣市 | 清單 `items[].region`<br>詳情 `baseInfo.address.region` | 如「台北市」 |
-| `section` | String(32) | 行政區 | 清單 `items[].section`<br>詳情 `baseInfo.address.section` | 如「松山區」 |
+| `region_name` | String(32) | 縣市 | 清單 `items[].region`<br>詳情 `baseInfo.address.region` | 如「台北市」 |
+| `section_name` | String(32) | 行政區 | 清單 `items[].section`<br>詳情 `baseInfo.address.section` | 如「松山區」 |
 | `street` | String(64) | 街道 | 清單 `items[].street_name`<br>詳情 `baseInfo.address.street` | 如「三民路」 |
 | `address` | String(256) | 完整地址 | 清單 `items[].address`<br>詳情 `baseInfo.address` 組合 | 結構化組合完整地址 |
 | `lat` / `lng` | Float | 經緯度 | 詳情 `baseInfo.address.lat`, `lng` | 轉 float |

@@ -1,6 +1,6 @@
 """HouseLensAPI - 591 中古屋領域服務實作 (591 Sale House Provider)"""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from src.core.interfaces.sale_house import ISaleHouseProvider
 from src.domain.common import PageResult
@@ -84,7 +84,11 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
             page_size=len(items_raw) if items_raw else 20,
         )
 
-    async def get_sale_house_detail(self, house_id: str) -> NormalizedSalePropertyDetail:
+    async def get_sale_house_detail(
+        self,
+        house_id: str,
+        summary: Optional[NormalizedSaleListing] = None,
+    ) -> NormalizedSalePropertyDetail:
         """根據房屋唯一代號取得清洗完畢之 NormalizedSalePropertyDetail"""
         clean_id = house_id.lstrip("S") if house_id.startswith("S") else house_id
         params = {
@@ -95,4 +99,4 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
 
         res = await self._client.get("house", "/v1/app/gateway/sale/detail", params=params, headers=headers)
         data_block = res.get("data") or {}
-        return map_sale_house_detail(data_block)
+        return map_sale_house_detail(data_block, summary=summary)
