@@ -7,7 +7,7 @@ Provider 模組必須自行將外部各平台之字串與特化格式清洗正�
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
-from src.domain.common import BaseSearchQuery
+from src.domain.common import BaseSearchQuery, CleanStr
 
 
 class NewHouseLayoutSpec(BaseModel):
@@ -32,8 +32,8 @@ class NormalizedNewHouseSummary(BaseModel):
     max_unit_price_wan: Optional[float] = Field(None, ge=0.0, description="開價單價上限 (萬元/坪)")
     min_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數下限 (坪)")
     max_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數上限 (坪)")
-    developer: Optional[str] = Field(None, description="投資興建公司")
-    cover_image_url: Optional[str] = Field(None, description="封面照片網址")
+    developer: CleanStr = Field(None, description="投資興建公司")
+    cover_image_url: CleanStr = Field(None, description="封面照片網址")
 
 
 class NormalizedNewHouseDetail(BaseModel):
@@ -41,7 +41,7 @@ class NormalizedNewHouseDetail(BaseModel):
 
     hid: int = Field(..., description="建案 HID")
     project_name: str = Field(..., description="建案名稱")
-    build_type: str = Field(..., description="建案狀態 (預售屋/新成屋)")
+    build_type: CleanStr = Field(None, description="建案狀態 (預售屋/新成屋)")
     region: str = Field(..., description="縣市名稱")
     section: str = Field(..., description="行政區名稱")
     address: str = Field(..., description="基地位置地址")
@@ -58,12 +58,12 @@ class NormalizedNewHouseDetail(BaseModel):
     layouts: List[NewHouseLayoutSpec] = Field(default_factory=list, description="結構化房型坪數清單")
 
     # 團隊與工法描述
-    structural_engine: Optional[str] = Field(None, description="建築結構工法")
-    direction_rule: Optional[str] = Field(None, description="座向規劃")
-    developer_company: Optional[str] = Field(None, description="投資興建公司")
-    builder_company: Optional[str] = Field(None, description="營造公司")
-    architect_company: Optional[str] = Field(None, description="建築設計事務所")
-    reception_address: Optional[str] = Field(None, description="接待會館地址")
+    structural_engine: CleanStr = Field(None, description="建築結構工法")
+    direction_rule: CleanStr = Field(None, description="座向規劃")
+    developer_company: CleanStr = Field(None, description="投資興建公司")
+    builder_company: CleanStr = Field(None, description="營造公司")
+    architect_company: CleanStr = Field(None, description="建築設計事務所")
+    reception_address: CleanStr = Field(None, description="接待會館地址")
 
 
 class NewHouseSearchQuery(BaseSearchQuery):
@@ -71,3 +71,4 @@ class NewHouseSearchQuery(BaseSearchQuery):
 
     is_presale: bool = Field(default=True, description="是否包含預售屋")
     is_new_construction: bool = Field(default=True, description="是否包含新成屋")
+

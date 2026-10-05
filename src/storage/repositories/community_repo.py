@@ -152,11 +152,10 @@ class CommunityRepository(ICommunityRepository):
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
                 cover_image_url=detail.cover_image_url,
-                base_area_num=detail.base_area_num,
             )
             self.session.add(record)
         else:
-            record.name = detail.community_name
+            record.name = detail.community_name or record.name
             if detail.building_type:
                 record.building_type = detail.building_type
             if detail.build_purpose:
@@ -177,55 +176,34 @@ class CommunityRepository(ICommunityRepository):
                 record.lat = lat
                 record.lng = lng
 
-            # 數值更新
+            # 均價、屋齡與封面圖更新 (若 detail 有值則更新，若無則保留 summary)
             if detail.avg_unit_price_wan is not None:
                 record.avg_unit_price_wan = detail.avg_unit_price_wan
             if detail.building_age_years is not None:
                 record.building_age_years = detail.building_age_years
-            if detail.total_households is not None:
-                record.total_households = detail.total_households
-            if detail.base_area_num is not None:
-                record.base_area_num = detail.base_area_num
-                record.base_area_pin = detail.base_area_num
-            elif detail.base_area_pin is not None:
-                record.base_area_pin = detail.base_area_pin
-                record.base_area_num = detail.base_area_pin
-            if detail.public_ratio_pct is not None:
-                record.public_ratio_pct = detail.public_ratio_pct
-            if detail.parking_count is not None:
-                record.parking_count = detail.parking_count
-            if detail.parking_ratio_pct is not None:
-                record.parking_ratio_pct = detail.parking_ratio_pct
-            if detail.manage_fee_per_pin is not None:
-                record.manage_fee_per_pin = detail.manage_fee_per_pin
-
-            # 描述更新
-            if detail.floor_plan:
-                record.floor_plan = detail.floor_plan
-            if detail.structure:
-                record.structure = detail.structure
-            if detail.park_type_str:
-                record.park_type_str = detail.park_type_str
-            if detail.park_price:
-                record.park_price = detail.park_price
-            if detail.land_division:
-                record.land_division = detail.land_division
-            if detail.direction_rule:
-                record.direction_rule = detail.direction_rule
-            if detail.landscape_name:
-                record.landscape_name = detail.landscape_name
-            if detail.postulate_name:
-                record.postulate_name = detail.postulate_name
-            if detail.facilities:
-                record.facilities = detail.facilities
-            if detail.developer_company:
-                record.developer_company = detail.developer_company
-            if detail.builder_company:
-                record.builder_company = detail.builder_company
-            if detail.architect_company:
-                record.architect_company = detail.architect_company
             if detail.cover_image_url:
                 record.cover_image_url = detail.cover_image_url
+
+            # 建築硬體規格與規劃 (detail 為權威快照，無條件覆蓋賦值，使 None 正確覆蓋舊髒值)
+            record.total_households = detail.total_households
+            record.base_area_pin = detail.base_area_pin
+            record.public_ratio_pct = detail.public_ratio_pct
+            record.parking_count = detail.parking_count
+            record.parking_ratio_pct = detail.parking_ratio_pct
+            record.manage_fee_per_pin = detail.manage_fee_per_pin
+
+            record.floor_plan = detail.floor_plan
+            record.structure = detail.structure
+            record.park_type_str = detail.park_type_str
+            record.park_price = detail.park_price
+            record.land_division = detail.land_division
+            record.direction_rule = detail.direction_rule
+            record.landscape_name = detail.landscape_name
+            record.postulate_name = detail.postulate_name
+            record.facilities = detail.facilities
+            record.developer_company = detail.developer_company
+            record.builder_company = detail.builder_company
+            record.architect_company = detail.architect_company
 
         await self.session.flush()
         return record

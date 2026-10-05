@@ -13,7 +13,7 @@ uv sync
 ```
 
 ### 2. 執行自動化測試
-全套 77 項單元測試（涵蓋領域模型規格、591 封包正規化轉換、倉儲層、消歧去重服務與串流同步管線）：
+全套 91 項自動化測試（涵蓋領域模型規格、591 封包正規化轉換、倉儲層、消歧去重服務與串流同步管線）：
 ```bash
 uv run pytest tests/ -v
 ```
@@ -269,7 +269,7 @@ uv run houselens test 591 --format json
 ### 1. `communities` (社區)
 
 對應來源：591 社區清單 API (`/v1/search/list`) & 社區詳情 API (`/v1/app/gateway/community/info`)  
-*架構原則：劃分單一事實來源（Single Source of Truth），基礎地理、成交均價與身分 100% 來自「清單」API，詳細建築硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。*
+*架構原則：劃分單一事實來源（Single Source of Truth），基礎地理、成交均價與身分 100% 來自「清單」API，詳細建築硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。全文字欄位空字串 `""` 與佔位雜質一律在防腐層正規化為 SQL `NULL`，杜絕雙重空值問題。*
 
 | 欄位 | 型別 | 說明 | 591 API Body 路徑 | 轉換規則 / 備註 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -278,8 +278,8 @@ uv run houselens test 591 --format json
 | `source_id` | String(64) | 來源社區 ID | 清單 `items[].id` | 轉字串（唯一索引） |
 | `name` | String(128) | 社區名稱 | 清單 `items[].name` | 去前後空白 |
 | `housing_status` | String(32) | 成屋/建案狀態 | 清單 `housing_text`<br>詳情 `build_info.build_type` 代碼 | 如「預售屋」、「新成屋」、「中古屋」 |
-| `building_type` | String(64) | 建物實體型態 | 詳情 `build_info.purpose_str` | 如「住宅大樓」、「華廈」、「透天」、「商辦」 |
-| `build_purpose` | String(64) | 法定使用用途 | 詳情 `build_info.purpose_other2` | 如「住家用」、「住商用」、「商業用」 |
+| `building_type` | String(64) | 建物實體型態 | 詳情 `build_info.purpose_str` | 如「住宅大樓」、「華廈」、「透天」、「商辦」；空值轉 NULL |
+| `build_purpose` | String(64) | 法定使用用途 | 詳情 `build_info.purpose_other2` | 如「住家用」、「住商用」、「商業用」；空值轉 NULL |
 | `region_name` | String(32) | 縣市 | 清單 `items[].region` | 如「台北市」 |
 | `section_name` | String(32) | 行政區 | 清單 `items[].section` | 如「松山區」 |
 | `address` | String(256) | 地址 | 清單 `items[].simple_address` 組合 | 清單組合縣市與行政區 |
@@ -287,18 +287,18 @@ uv run houselens test 591 --format json
 | `avg_unit_price_wan` | Float | 成交均價 (萬/坪) | 清單 `items[].price` | 清單直取實價登錄成交均價，轉 float |
 | `building_age_years` | Float | 屋齡 (年) | 詳情 `build_info.age.content` | `1年` $\to$ `1.0`；`全新` $\to$ `0.0` |
 | `total_households` | Int | 總戶數 | 詳情 `build_info.all_house_num.content` | 轉 int |
-| `base_area_num` | Float | 基地面積 (坪) | 詳情 `build_info.base_area_num` | 轉 float（支援 `base_area_pin` 別名） |
-| `land_division` | String(128) | 土地使用分區 | 詳情 `build_info.land_division` | 如「第三種住宅區」 |
-| `park_price` | String(64) | 車位價格 | 詳情 `build_info.park_price` | 如「290~330萬」 |
+| `base_area_pin` | Float | 基地面積 (坪) | 詳情 `build_info.base_area_num` | 轉 float (全系統唯一統一坪數命名規範) |
+| `land_division` | String(128) | 土地使用分區 | 詳情 `build_info.land_division` | 如「第三種住宅區」；空值轉 NULL |
+| `park_price` | String(64) | 車位價格 | 詳情 `build_info.park_price` | 如「290~330萬」；修正 591 統計缺陷「0~320萬」為「最高 320萬」 |
 | `public_ratio_pct` | Float | 公設比 (%) | 詳情 `build_info.ratio` | 如 `30%` $\to$ `30.0` |
-| `parking_count` | Int | 車位總數 | 詳情 `build_info.all_park_num` | 轉 int |
+| `parking_count` | Int | 車位總數 | 詳情 `build_info.all_park_num` | 轉 int；平台未登錄之假性 0 轉 NULL |
 | `parking_ratio_pct` | Float | 車位比率 | 詳情 `build_info.park_rate` | 如 `1:1.07` $\to$ `1.07` |
 | `manage_fee_per_pin` | Int | 管理費 (元/坪/月) | 詳情 `build_info.manage_cost.price` | 轉 int |
 | `shopping_district` | String(64) | 所屬商圈 | 清單 `items[].shop_name` | 清單直取商圈字串 |
 | `transport` | String(128) | 鄰近站點 | 清單 `items[].station_name` | 清單直取交通站點字串 |
 | `floor_plan` | String(64) | 樓層規劃 | 詳情 `build_info.floor` | 如「地上24層,地下4層」 |
-| `structure` | String(64) | 結構工法 | 詳情 `build_info.structural_engine` | 如「SRC造」 |
-| `park_type_str` | String(64) | 車位型態 | 詳情 `build_info.park_type_str` | 如「坡道平面」 |
+| `structure` | String(64) | 結構工法 | 詳情 `build_info.structural_engine` | 如「SRC造」；空值轉 NULL |
+| `park_type_str` | String(64) | 車位型態 | 詳情 `build_info.park_type_str` | 如「坡道平面」；空值轉 NULL |
 | `direction_rule` | String(64) | 座向規劃 | 詳情 `build_info.direction_rule` | 如「朝北、朝南」 |
 | `landscape_name` | String(128) | 景觀設計 | 詳情 `build_info.landscape_name` | 詳情 build_info 直取 |
 | `postulate_name` | String(128) | 公設設計 | 詳情 `build_info.postulate_name` | 詳情 build_info 直取 |

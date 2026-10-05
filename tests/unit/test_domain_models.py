@@ -76,15 +76,15 @@ class TestCommunityModels:
             community_name="鳴森大苑-鳴森苑",
             region_name="台北市",
             section_name="松山區",
-            full_address="台北市松山區延壽街72巷...",
+            address="台北市松山區延壽街72巷...",
             coordinates=GeoPoint(lat=25.056, lng=121.564),
             avg_unit_price_wan=141.0,
             building_age_years=1.0,
             building_type="住宅大樓",
             build_purpose="住宅",
             housing_status="新成屋",
-            living_circle_name="民生社區",
-            nearest_station="南京三民站",
+            shopping_district="民生社區",
+            transport="南京三民站",
             cover_image_url="https://example.com/cover.jpg",
         )
         assert summary.community_id == "5934204"
@@ -93,6 +93,8 @@ class TestCommunityModels:
         assert summary.address == "台北市松山區延壽街72巷..."
         assert summary.housing_status == "新成屋"
         assert summary.building_type == "住宅大樓"
+        assert summary.shopping_district == "民生社區"
+        assert summary.transport == "南京三民站"
 
     def test_community_detail_instantiation(self):
         detail = NormalizedCommunityDetail(
@@ -109,10 +111,11 @@ class TestCommunityModels:
             facilities=["接待大廳", "空中花園"],
             manage_fee_per_pin=150,
             total_households=290,
-            base_area_num=450.0,
+            base_area_pin=450.0,
             public_ratio_pct=32.0,
         )
         assert detail.community_id == "5934204"
+        assert detail.base_area_pin == 450.0
         assert len(detail.facilities) == 2
         assert detail.direction_rule == "朝北、朝南"
         assert detail.manage_fee_per_pin == 150

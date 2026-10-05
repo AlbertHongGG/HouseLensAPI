@@ -148,7 +148,7 @@ async def test_sync_communities_multi_page_accumulation(sync_test_db: DatabaseMa
                 community_name=f"測試社區_{(query.page - 1) * 10 + i}",
                 region_name="台北市",
                 section_name="信義區",
-                full_address="台北市信義區信義路五段",
+                address="台北市信義區信義路五段",
             )
             for i in range(10)
         ]
@@ -261,7 +261,7 @@ async def test_sync_all_with_unified_options(sync_test_db):
                 community_name=f"社區_{i}",
                 region_name="台北市",
                 section_name="信義區",
-                full_address="台北市信義區信義路",
+                address="台北市信義區信義路",
             )
             for i in range(5)
         ]

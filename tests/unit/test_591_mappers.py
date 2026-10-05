@@ -73,7 +73,7 @@ class Test591CommunityMappers:
         # 地理與身分資訊 100% 來自 summary
         assert detail.community_id == summary.community_id
         assert detail.community_name == summary.community_name
-        assert detail.address == summary.full_address
+        assert detail.address == summary.address
         assert detail.region_name == summary.region_name
         assert detail.section_name == summary.section_name
         assert detail.coordinates == summary.coordinates
@@ -93,7 +93,6 @@ class Test591CommunityMappers:
         assert detail.avg_unit_price_wan == 94.0
         assert detail.park_type_str == "平面式"
         assert detail.park_price == "360~420萬"
-        assert detail.base_area_num == 1446.0
         assert detail.base_area_pin == 1446.0
         assert detail.land_division == "第三種住宅區"
         assert detail.landscape_name == "境業設計工程有限公司"

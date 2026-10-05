@@ -50,7 +50,7 @@ async def test_591_community_live_flow():
     assert isinstance(detail, NormalizedCommunityDetail)
     assert detail.community_id == first_comm.community_id
     assert detail.community_name != ""
-    assert detail.address == first_comm.full_address
+    assert detail.address == first_comm.address
     assert detail.region_name == first_comm.region_name
     assert detail.coordinates == first_comm.coordinates
 

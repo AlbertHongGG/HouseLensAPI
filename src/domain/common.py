@@ -3,16 +3,59 @@
 定義座標系統、結構化地址與標準泛型分頁查詢/結果模型。
 """
 
-from typing import Any, Dict, Generic, List, Optional, Self, TypeVar, Union
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated, Any, Dict, Generic, List, Optional, Self, TypeVar, Union
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
 T = TypeVar("T")
+
+
+def sanitize_optional_str(val: Any) -> Optional[str]:
+    """領域模型不變量純化器：強制清除前後空白，並將空字串、空白與常見無效佔位符統一純化為 None。
+
+    支援過濾: "", "   ", "-", "--", "---", "無", "暫無", "未提供", "待定", "價格待定", "None", "null"
+    """
+    if val is None:
+        return None
+
+    s = str(val).strip()
+    if not s:
+        return None
+
+    invalid_placeholders = {
+        "-",
+        "--",
+        "---",
+        "無",
+        "暫無",
+        "暫無資料",
+        "暫無數據",
+        "暂无",
+        "暂无数据",
+        "未提供",
+        "待定",
+        "價格待定",
+        "不詳",
+        "未知",
+        "None",
+        "none",
+        "null",
+        "NULL",
+    }
+    if s in invalid_placeholders:
+        return None
+
+    return s
+
+
+# 核心領域強型別：自衛性非空文字型別 (自動防禦空字串與佔位符)
+CleanStr = Annotated[Optional[str], BeforeValidator(sanitize_optional_str)]
 
 
 class GeoPoint(BaseModel):
     """標準 WGS-84 地理經緯度座標"""
     lat: float = Field(..., description="緯度 (Latitude)")
     lng: float = Field(..., description="經度 (Longitude)")
+
 
 
 class StructuredAddress(BaseModel):

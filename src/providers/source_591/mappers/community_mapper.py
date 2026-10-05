@@ -12,6 +12,9 @@ from src.domain.community import (
 )
 from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 from src.providers.source_591.normalizers import (
+    clean_optional_str,
+    clean_park_price,
+    clean_parking_count,
     parse_currency_amount,
     parse_int_count,
     parse_percent,
@@ -42,28 +45,28 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
     photo_obj = item.get("photo_src") or {}
     cover_url: Optional[str] = None
     if isinstance(photo_obj, dict):
-        cover_url = photo_obj.get("src")
+        cover_url = clean_optional_str(photo_obj.get("src"))
     elif isinstance(photo_obj, str):
-        cover_url = photo_obj
+        cover_url = clean_optional_str(photo_obj)
 
-    region = str(item.get("region") or "")
-    section = str(item.get("section") or "")
-    simple_addr = str(item.get("simple_address") or "")
+    region = str(item.get("region") or "").strip()
+    section = str(item.get("section") or "").strip()
+    simple_addr = str(item.get("simple_address") or "").strip()
     full_addr = f"{region}{section}{simple_addr}"
 
     return NormalizedCommunitySummary(
         community_id=str(item.get("id")),
-        community_name=str(item.get("name") or ""),
+        community_name=str(item.get("name") or "").strip(),
         region_name=region,
         section_name=section,
-        full_address=full_addr,
+        address=full_addr,
         coordinates=coords,
         avg_unit_price_wan=avg_price,
         building_type=None,
-        build_purpose=item.get("build_purpose_simple"),
-        housing_status=item.get("housing_text"),
-        living_circle_name=item.get("shop_name"),
-        nearest_station=item.get("station_name"),
+        build_purpose=clean_optional_str(item.get("build_purpose_simple")),
+        housing_status=clean_optional_str(item.get("housing_text")),
+        shopping_district=clean_optional_str(item.get("shop_name")),
+        transport=clean_optional_str(item.get("station_name")),
         cover_image_url=cover_url,
     )
 
@@ -91,24 +94,21 @@ def map_community_detail(
     total_households = parse_int_count(house_raw)
 
     park_num_raw = build_info.get("all_park_num")
-    parking_count = parse_int_count(park_num_raw)
+    park_raw = build_info.get("park")
+    park_rate_raw = build_info.get("park_rate")
+    parking_count = clean_parking_count(
+        count_raw=park_num_raw,
+        park_raw=park_raw,
+        rate_raw=park_rate_raw,
+    )
 
-    # 車位價格描述 (如: {"price": "290~330", "unit": "萬"} -> "290~330萬")
-    park_price_obj = build_info.get("park_price")
-    park_price: Optional[str] = None
-    if isinstance(park_price_obj, dict):
-        p_val = park_price_obj.get("price")
-        p_unit = park_price_obj.get("unit") or "萬"
-        if p_val:
-            park_price = f"{p_val}{p_unit}"
-    elif park_price_obj:
-        park_price = str(park_price_obj).strip() or None
+    # 車位價格正規化清洗 (修正 591 實價登錄 0~X萬 統計缺陷為 最高 X萬)
+    park_price = clean_park_price(build_info.get("park_price"))
 
-    # 車位型態
-    park_type_str = build_info.get("park_type_str")
+    # 車位型態空值純化
+    park_type_str = clean_optional_str(build_info.get("park_type_str"))
 
     # 車位配比與公設比解析
-    park_rate_raw = build_info.get("park_rate")
     park_ratio = None
     if park_rate_raw and ":" in str(park_rate_raw):
         try:
@@ -127,21 +127,21 @@ def map_community_detail(
     manage_fee = parse_currency_amount(manage_raw)
 
     # 基地面積純浮點數 (坪)
-    base_area_num = parse_pin(build_info.get("base_area_num"))
+    base_area_pin = parse_pin(build_info.get("base_area_num"))
 
     # 土地使用分區
-    land_division = build_info.get("land_division")
+    land_division = clean_optional_str(build_info.get("land_division"))
 
     # 三維正交解耦映射 (直取 build_info 單一區塊)
     # 1. 建物實體型態 (如: 住宅大樓、華廈、透天、商辦)
-    building_type = build_info.get("purpose_str")
+    building_type = clean_optional_str(build_info.get("purpose_str"))
 
     # 2. 法定使用用途 (如: 住家用、住商用、商業用)
-    build_purpose = build_info.get("purpose_other2") or summary.build_purpose
+    build_purpose = clean_optional_str(build_info.get("purpose_other2")) or summary.build_purpose
 
     # 3. 成屋/建案狀態 (如: 預售屋、新成屋、中古屋)
     raw_status_code = build_info.get("build_type")
-    raw_status_str = (build_info.get("build_type_str") or "").strip()
+    raw_status_str = clean_optional_str(build_info.get("build_type_str"))
     if raw_status_str:
         housing_status = raw_status_str
     elif raw_status_code == 1:
@@ -154,9 +154,12 @@ def map_community_detail(
         housing_status = summary.housing_status
 
     # 公設清單
-    facility_list = build_info.get("facility") or []
-    if isinstance(facility_list, str):
-        facility_list = [f.strip() for f in facility_list.split(",") if f.strip()]
+    facility_raw = build_info.get("facility") or []
+    facility_list = []
+    if isinstance(facility_raw, str):
+        facility_list = [f.strip() for f in facility_raw.split(",") if f.strip()]
+    elif isinstance(facility_raw, list):
+        facility_list = [str(f).strip() for f in facility_raw if clean_optional_str(f)]
 
     return NormalizedCommunityDetail(
         # --- 基礎識別、地理資訊與市場行情：100% 取自清單 (summary，成交均價單一事實來源) ---
@@ -164,7 +167,7 @@ def map_community_detail(
         community_name=summary.community_name,
         region_name=summary.region_name,
         section_name=summary.section_name,
-        address=summary.full_address,
+        address=summary.address,
         coordinates=summary.coordinates,
         avg_unit_price_wan=summary.avg_unit_price_wan,
         cover_image_url=summary.cover_image_url,
@@ -181,16 +184,17 @@ def map_community_detail(
         parking_ratio_pct=park_ratio,
         public_ratio_pct=public_ratio,
         manage_fee_per_pin=manage_fee,
-        base_area_num=base_area_num,
+        base_area_pin=base_area_pin,
         land_division=land_division,
         building_age_years=building_age,
-        structure=build_info.get("structural_engine"),
-        direction_rule=build_info.get("direction_rule"),
-        floor_plan_desc=build_info.get("floor"),
+        structure=clean_optional_str(build_info.get("structural_engine")),
+        direction_rule=clean_optional_str(build_info.get("direction_rule")),
+        floor_plan=clean_optional_str(build_info.get("floor")),
         facilities=facility_list,
-        developer_company=build_info.get("company"),
-        builder_company=build_info.get("build_company"),
-        architect_company=build_info.get("construction_company"),
-        landscape_name=build_info.get("landscape_name"),
-        postulate_name=build_info.get("postulate_name"),
+        developer_company=clean_optional_str(build_info.get("company")),
+        builder_company=clean_optional_str(build_info.get("build_company")),
+        architect_company=clean_optional_str(build_info.get("construction_company")),
+        landscape_name=clean_optional_str(build_info.get("landscape_name")),
+        postulate_name=clean_optional_str(build_info.get("postulate_name")),
     )
+

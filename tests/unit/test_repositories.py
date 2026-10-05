@@ -47,12 +47,12 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             housing_status="新成屋",
             region_name="台北市",
             section_name="松山區",
-            full_address="台北市松山區延壽街76之1號",
+            address="台北市松山區延壽街76之1號",
             coordinates=GeoPoint(lat=25.0569, lng=121.5651),
             avg_unit_price_wan=129.0,
             building_age_years=1.0,
-            living_circle_name="民生社區",
-            nearest_station="南京三民站",
+            shopping_district="民生社區",
+            transport="南京三民站",
         )
         saved = await repo.upsert_from_summary(summary, provider_id="591")
         assert saved.id is not None
@@ -84,7 +84,6 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             cover_image_url="https://example.com/cover.jpg",
             park_type_str="平面式",
             park_price="360~420萬",
-            base_area_num=450.0,
             land_division="第三之二種住宅區",
             landscape_name="境業設計",
             postulate_name="境業設計",
@@ -101,7 +100,6 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         assert updated.cover_image_url == "https://example.com/cover.jpg"
         assert updated.park_type_str == "平面式"
         assert updated.park_price == "360~420萬"
-        assert updated.base_area_num == 450.0
         assert updated.base_area_pin == 450.0
         assert updated.land_division == "第三之二種住宅區"
         assert updated.landscape_name == "境業設計"
@@ -298,7 +296,7 @@ async def test_repository_filter_existing_external_ids(test_db: DatabaseManager)
                 community_name="測試社區A",
                 region_name="台北市",
                 section_name="大安區",
-                full_address="台北市大安區新生南路",
+                address="台北市大安區新生南路",
             ),
             provider_id="591",
         )

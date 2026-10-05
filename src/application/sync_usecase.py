@@ -89,6 +89,7 @@ class SyncUseCase:
         domain_total: int = 1,
     ) -> List[CommunityTable]:
         """串流式同步社區領域資料 (逐頁快篩跳過、詳情補齊與即時提交)"""
+        await self.db.init_db()
         rep = reporter or SilentProgressReporter()
         provider = self.registry.get_provider(provider_id)
 
@@ -159,6 +160,7 @@ class SyncUseCase:
         domain_total: int = 1,
     ) -> List[PropertyTable]:
         """串流式同步中古屋資料 (逐頁快篩跳過、詳情補齊與去重消歧即時提交)"""
+        await self.db.init_db()
         rep = reporter or SilentProgressReporter()
         provider = self.registry.get_provider(provider_id)
 
@@ -243,6 +245,7 @@ class SyncUseCase:
         domain_total: int = 1,
     ) -> List[NewHouseTable]:
         """串流式同步新建案資料 (逐頁快篩跳過、詳情補齊與即時提交)"""
+        await self.db.init_db()
         rep = reporter or SilentProgressReporter()
         provider = self.registry.get_provider(provider_id)
 

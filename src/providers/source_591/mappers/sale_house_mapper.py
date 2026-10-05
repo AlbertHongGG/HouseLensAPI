@@ -14,6 +14,7 @@ from src.domain.sale_house import (
 from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 from src.providers.source_591.mappers.sale_house_validator import Source591SaleHouseValidator
 from src.providers.source_591.normalizers import (
+    clean_optional_str,
     parse_boolean,
     parse_currency_amount,
     parse_floor,
@@ -73,7 +74,7 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListi
     return NormalizedSaleListing(
         provider_id="591",
         external_house_id=canonical_hid,
-        title=str(item.get("title") or ""),
+        title=str(item.get("title") or "").strip(),
         price_wan=price_wan,
         unit_price_wan=unit_price_wan,
         total_area_pin=total_area_pin,
@@ -83,15 +84,15 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListi
         living_rooms=living,
         bathrooms=baths,
         building_age_years=None,  # 591 清單端點無屋齡欄位，詳情端點補齊
-        building_type=item.get("kindStr"),
-        region=str(item.get("region") or ""),
-        section=str(item.get("section") or ""),
-        street=item.get("street_name"),
-        address=item.get("address"),
-        community_id=item.get("community_id"),
-        community_name=comm_name,
+        building_type=clean_optional_str(item.get("kindStr")),
+        region=str(item.get("region") or "").strip(),
+        section=str(item.get("section") or "").strip(),
+        street=clean_optional_str(item.get("street_name")),
+        address=clean_optional_str(item.get("address")),
+        community_id=clean_optional_str(item.get("community_id")),
+        community_name=clean_optional_str(comm_name),
         has_parking=str(item.get("cartplace")) == "1",
-        cover_image_url=item.get("photo_src"),
+        cover_image_url=clean_optional_str(item.get("photo_src")),
     )
 
 
@@ -156,10 +157,10 @@ def map_sale_house_detail(data: Dict[str, Any]) -> NormalizedSalePropertyDetail:
     balconies = parse_int_count(info_dict.get("陽台"))
 
     # 8. 結構化地址組裝
-    region_str = address_info.get("region") or ""
-    section_str = address_info.get("section") or ""
-    street_str = address_info.get("street") or ""
-    addr_str = address_info.get("addr") or ""
+    region_str = str(address_info.get("region") or "").strip()
+    section_str = str(address_info.get("section") or "").strip()
+    street_str = str(address_info.get("street") or "").strip()
+    addr_str = str(address_info.get("addr") or "").strip()
     num_str = f"{address_info.get('addr_number')}號" if address_info.get("addr_number") else ""
     full_address = f"{region_str}{section_str}{street_str}{addr_str}{num_str}"
 
@@ -168,7 +169,7 @@ def map_sale_house_detail(data: Dict[str, Any]) -> NormalizedSalePropertyDetail:
 
     return NormalizedSalePropertyDetail(
         external_house_id=canonical_id,
-        title=str(base_info.get("title") or ""),
+        title=str(base_info.get("title") or "").strip(),
         price_wan=price_wan,
         unit_price_wan=unit_price,
         total_area_pin=total_area,
@@ -187,17 +188,18 @@ def map_sale_house_detail(data: Dict[str, Any]) -> NormalizedSalePropertyDetail:
         public_ratio_pct=public_ratio,
         management_fee_monthly=manage_fee,
         has_lease=has_lease,
-        building_type=data.get("kindStr"),
-        building_structure=info_dict.get("型態"),
-        orientation=info_dict.get("朝向"),
-        purpose=info_dict.get("用途"),
-        current_state=info_dict.get("現況"),
-        parking_desc=base_info.get("parking"),
-        region=region_str or None,
-        section=section_str or None,
-        street=street_str or None,
-        address=full_address or None,
+        building_type=clean_optional_str(data.get("kindStr")),
+        building_structure=clean_optional_str(info_dict.get("型態")),
+        orientation=clean_optional_str(info_dict.get("朝向")),
+        purpose=clean_optional_str(info_dict.get("用途")),
+        current_state=clean_optional_str(info_dict.get("現況")),
+        parking_desc=clean_optional_str(base_info.get("parking")),
+        region=clean_optional_str(region_str),
+        section=clean_optional_str(section_str),
+        street=clean_optional_str(street_str),
+        address=clean_optional_str(full_address),
         coordinates=GeoPoint(lat=lat, lng=lng) if lat is not None and lng is not None else None,
         lat=lat,
         lng=lng,
     )
+

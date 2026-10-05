@@ -12,6 +12,7 @@ from src.domain.new_house import (
     NormalizedNewHouseSummary,
 )
 from src.providers.source_591.normalizers import (
+    clean_optional_str,
     parse_currency_amount,
     parse_households_count,
     parse_percent,
@@ -28,17 +29,17 @@ def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
 
     return NormalizedNewHouseSummary(
         source_hid=int(item.get("hid")),
-        project_name=item.get("build_name") or "",
-        project_status=item.get("build_type_name") or "",
-        region_name=item.get("region") or "",
-        section_name=item.get("section") or "",
-        address=item.get("address") or "",
+        project_name=str(item.get("build_name") or "").strip(),
+        project_status=str(item.get("build_type_name") or "").strip(),
+        region_name=str(item.get("region") or "").strip(),
+        section_name=str(item.get("section") or "").strip(),
+        address=clean_optional_str(item.get("address")) or "",
         min_unit_price_wan=min_unit_price,
         max_unit_price_wan=max_unit_price,
         min_area_pin=min_area,
         max_area_pin=max_area,
-        developer=item.get("company"),
-        cover_image_url=item.get("photo_src"),
+        developer=clean_optional_str(item.get("company")),
+        cover_image_url=clean_optional_str(item.get("photo_src")),
     )
 
 
@@ -92,11 +93,11 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
 
     return NormalizedNewHouseDetail(
         hid=int(housing.get("hid")),
-        project_name=housing.get("build_name") or "",
-        build_type=housing.get("build_type_name") or "",
-        region=housing.get("region") or "",
-        section=housing.get("section") or "",
-        address=housing.get("address") or "",
+        project_name=str(housing.get("build_name") or "").strip(),
+        build_type=clean_optional_str(housing.get("build_type_name")),
+        region=str(housing.get("region") or "").strip(),
+        section=str(housing.get("section") or "").strip(),
+        address=clean_optional_str(housing.get("address")) or "",
         base_area_pin=base_area_pin,
         public_ratio_pct=public_ratio_pct,
         total_households=total_households,
@@ -104,10 +105,11 @@ def map_new_house_detail(data: Dict[str, Any]) -> NormalizedNewHouseDetail:
         min_unit_price_wan=min_price,
         max_unit_price_wan=max_price,
         layouts=layouts,
-        structural_engine=housing.get("structural_engine"),
-        direction_rule=housing.get("direction_rule"),
-        developer_company=housing.get("company"),
-        builder_company=housing.get("build_company"),
-        architect_company=housing.get("construction_company"),
-        reception_address=housing.get("reception_address"),
+        structural_engine=clean_optional_str(housing.get("structural_engine")),
+        direction_rule=clean_optional_str(housing.get("direction_rule")),
+        developer_company=clean_optional_str(housing.get("company")),
+        builder_company=clean_optional_str(housing.get("build_company")),
+        architect_company=clean_optional_str(housing.get("construction_company")),
+        reception_address=clean_optional_str(housing.get("reception_address")),
     )
+

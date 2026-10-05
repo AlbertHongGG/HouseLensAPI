@@ -40,8 +40,7 @@ class CommunityTable(Base, TimestampMixin):
     avg_unit_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 成交均價 (萬元/坪)
     building_age_years: Mapped[Optional[float]] = mapped_column(Float, nullable=True, index=True)  # 屋齡 (年)
     total_households: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 總戶數
-    base_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積 (坪)
-    base_area_num: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積純浮點數 (坪)
+    base_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積純浮點數 (坪)
     public_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 公設比 (%)
     parking_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 車位數量
     parking_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比 (%)
@@ -53,7 +52,7 @@ class CommunityTable(Base, TimestampMixin):
     floor_plan: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     park_type_str: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    park_price: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 車位價格 (萬元)
+    park_price: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 車位價格描述 (如: 290~330萬, 最高 320萬)
     land_division: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # 土地使用分區
     direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     landscape_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
