@@ -1,6 +1,7 @@
 """HouseLensAPI - 591 Mappers 導出包"""
 
 from src.providers.source_591.mappers.community_mapper import (
+    Source591CommunityPhotosDTO,
     map_community_detail,
     map_community_summary,
 )
@@ -21,6 +22,7 @@ from src.providers.source_591.mappers.sale_house_validator import Source591SaleH
 __all__ = [
     "map_community_summary",
     "map_community_detail",
+    "Source591CommunityPhotosDTO",
     "map_sale_house_summary",
     "map_sale_house_detail",
     "Source591CommunityEntryDTO",

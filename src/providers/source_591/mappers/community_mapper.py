@@ -3,7 +3,7 @@
 將原始 591 社區封包在模組內部完全清洗，直接輸出 NormalizedCommunitySummary 與 NormalizedCommunityDetail。
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from src.domain.common import GeoPoint
 from src.domain.community import (
@@ -21,6 +21,104 @@ from src.providers.source_591.normalizers import (
     parse_pin,
     parse_unit_price,
 )
+
+
+class Source591CommunityPhotosDTO:
+    """591 社區相簿防腐資料傳輸物件 (ACL DTO)
+
+    專屬處理 /v1/app/gateway/community/info 回應中之 data.banners.community_images：
+    - 大類巡訪：優先檢索 type == 'all'（全部圖片），相容遍歷各分組圖片
+    - 排序保證：標記為 type == 'logo'（封面）的第一張相片強制置頂至第一順位 (index 0)
+    - 畫質選取：優先選取 maxphoto (900px/1200px 高畫質水印大圖)，其次 bigphoto，再其次 photo
+    - 去重與去雜：排除 is_video == 1，URL 去除重複並保證既有順序
+    - 防腐解包：支援外層傳入完整 response、data 字典或 banners 字典
+    """
+
+    def __init__(self, raw: Optional[Any] = None):
+        if isinstance(raw, list):
+            self._banners = {"community_images": raw}
+        elif isinstance(raw, dict):
+            if "data" in raw and isinstance(raw["data"], dict):
+                inner = raw["data"]
+            else:
+                inner = raw
+
+            if "banners" in inner and isinstance(inner["banners"], dict):
+                self._banners = inner["banners"]
+            else:
+                self._banners = inner
+        else:
+            self._banners = {}
+
+    @property
+    def cover_url(self) -> Optional[str]:
+        """傳回封面高畫質照片 URL (若無標記封面則傳回第一張相片)"""
+        urls = self.image_urls
+        return urls[0] if urls else None
+
+    @property
+    def image_urls(self) -> List[str]:
+        """傳回標準按序排列的高畫質照片 URL 列表 (封面保證置頂)"""
+        community_images = self._banners.get("community_images")
+        if not isinstance(community_images, list):
+            return []
+
+        cover_urls: List[str] = []
+        regular_urls: List[str] = []
+        seen: set = set()
+
+        # 1. 尋找 type == 'all' 的大類群組
+        all_group = None
+        for grp in community_images:
+            if isinstance(grp, dict) and grp.get("type") == "all":
+                all_group = grp
+                break
+
+        if all_group:
+            target_subgroups = all_group.get("images") or all_group.get("list") or []
+        else:
+            target_subgroups = community_images
+
+        # 2. 遍歷相片並萃取（支援階層子群組或直接相片項目）
+        for item in target_subgroups:
+            if not isinstance(item, dict):
+                continue
+
+            sub_imgs = item.get("images") or item.get("list")
+            is_logo_subgroup = item.get("type") == "logo"
+
+            if isinstance(sub_imgs, list):
+                photos_to_process = [(img, is_logo_subgroup) for img in sub_imgs if isinstance(img, dict)]
+            else:
+                photos_to_process = [(item, is_logo_subgroup)]
+
+            for img, is_logo in photos_to_process:
+                # 排除影片
+                if str(img.get("is_video")) in ("1", "true", "True"):
+                    continue
+
+                # 優先提取最高畫質: maxphoto > bigphoto > photo
+                raw_url = (
+                    img.get("maxphoto")
+                    or img.get("bigphoto")
+                    or img.get("photo")
+                    or img.get("smallphoto")
+                )
+                if not raw_url or not str(raw_url).strip():
+                    continue
+
+                url = str(raw_url).strip()
+                if url in seen:
+                    continue
+                seen.add(url)
+
+                if is_logo:
+                    cover_urls.append(url)
+                else:
+                    regular_urls.append(url)
+
+        return cover_urls + regular_urls
+
 
 
 def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
@@ -166,6 +264,13 @@ def map_community_detail(
     share_info = data.get("share_info") or {}
     community_url = clean_optional_str(share_info.get("url"))
 
+    # 社區相簿圖片清單防腐整合 (取自 data.banners.community_images)
+    photos_dto = Source591CommunityPhotosDTO(data)
+    image_urls = photos_dto.image_urls
+
+    # 高畫質封面圖：若清單已有封面則保留，若清單無封面則由相簿封面回填
+    cover_image = summary.cover_image_url or photos_dto.cover_url
+
     return NormalizedCommunityDetail(
         # --- 基礎識別、地理資訊與市場行情：100% 取自清單 (summary，成交均價單一事實來源) ---
         provider_id=summary.provider_id,
@@ -176,7 +281,8 @@ def map_community_detail(
         address=summary.address,
         coordinates=summary.coordinates,
         avg_unit_price_wan=summary.avg_unit_price_wan,
-        cover_image_url=summary.cover_image_url,
+        cover_image_url=cover_image,
+        image_urls=image_urls,
         url=community_url,
         shopping_district=summary.shopping_district,
         transport=summary.transport,

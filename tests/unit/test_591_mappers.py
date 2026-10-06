@@ -17,6 +17,7 @@ from src.domain.sale_house import (
     NormalizedSalePropertyDetail,
 )
 from src.providers.source_591.mappers.community_mapper import (
+    Source591CommunityPhotosDTO,
     map_community_detail,
     map_community_summary,
 )
@@ -121,6 +122,93 @@ class Test591CommunityMappers:
         assert detail.land_division == "第三種住宅區"
         assert detail.landscape_designer == "境業設計工程有限公司"
         assert detail.public_facility_designer == "境業設計工程有限公司"
+
+        # 相簿圖片清單
+        assert len(detail.image_urls) > 0
+        assert detail.cover_image_url is not None
+
+    def test_community_photos_dto_extraction_and_sorting(self):
+        # 模擬 591 社區相簿封包結構 (data.banners.community_images)
+        mock_raw_images = [
+            {
+                "type": "logo",
+                "name": "社區外觀",
+                "images": [
+                    {
+                        "photo": "https://img.591.com.tw/logo_std.jpg",
+                        "bigphoto": "https://img.591.com.tw/logo_big.jpg",
+                        "maxphoto": "https://img.591.com.tw/logo_max.jpg",
+                        "is_video": 0,
+                    }
+                ],
+            },
+            {
+                "type": "all",
+                "name": "全部",
+                "images": [
+                    {
+                        "type": "circum",
+                        "name": "周邊環境",
+                        "images": [
+                            {
+                                "photo": "https://img.591.com.tw/circum_std.jpg",
+                                "maxphoto": "https://img.591.com.tw/circum_max.jpg",
+                                "is_video": 0,
+                            },
+                            {
+                                "photo": "https://img.591.com.tw/video_thumb.jpg",
+                                "maxphoto": "https://img.591.com.tw/video_max.jpg",
+                                "is_video": 1,  # 影片應被過濾排除
+                            },
+                        ],
+                    },
+                    {
+                        "type": "logo",
+                        "name": "社區外觀",
+                        "images": [
+                            {
+                                "photo": "https://img.591.com.tw/logo_std.jpg",
+                                "maxphoto": "https://img.591.com.tw/logo_max.jpg",
+                                "is_video": 0,
+                            }
+                        ],
+                    },
+                    {
+                        "type": "traffic",
+                        "name": "交通配套",
+                        "images": [
+                            {
+                                "photo": "https://img.591.com.tw/traffic_std.jpg",
+                                "bigphoto": "https://img.591.com.tw/traffic_big.jpg",
+                                "maxphoto": "",  # maxphoto 為空時 fallback 到 bigphoto
+                                "is_video": 0,
+                            }
+                        ],
+                    },
+                ],
+            },
+        ]
+
+        dto = Source591CommunityPhotosDTO(mock_raw_images)
+        # 1. logo 封面置頂於索引 0
+        assert dto.cover_url == "https://img.591.com.tw/logo_max.jpg"
+        assert dto.image_urls[0] == "https://img.591.com.tw/logo_max.jpg"
+        # 2. 影片排除、fallback 正常、去重保序
+        assert dto.image_urls == [
+            "https://img.591.com.tw/logo_max.jpg",
+            "https://img.591.com.tw/circum_max.jpg",
+            "https://img.591.com.tw/traffic_big.jpg",
+        ]
+
+        # 3. 容錯處理：None 與空結構輸入
+        empty_dto = Source591CommunityPhotosDTO(None)
+        assert empty_dto.image_urls == []
+        assert empty_dto.cover_url is None
+
+        dict_wrapper_dto = Source591CommunityPhotosDTO({"banners": {"community_images": []}})
+        assert dict_wrapper_dto.image_urls == []
+        assert dict_wrapper_dto.cover_url is None
+
 
 
 class Test591SaleHouseMappers:

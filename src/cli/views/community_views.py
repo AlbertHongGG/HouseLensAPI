@@ -98,6 +98,8 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     details_table.add_row("座向規則:", c.orientation or "-", "景觀/公設設計:", f"{c.landscape_designer or '-'} / {c.public_facility_designer or '-'}")
     details_table.add_row("投資建設:", c.developer_company or "-", "營造廠:", c.builder_company or "-")
     details_table.add_row("建築設計:", c.architect_company or "-", "", "")
+    photo_count_str = f"{len(c.image_urls)} 張" if c.image_urls else "無"
+    details_table.add_row("相簿照片數量:", photo_count_str, "封面照片連結:", c.cover_image_url or "-")
     details_table.add_row("原始網址:", c.url or "-", "", "")
 
     # 公設清單
@@ -151,6 +153,7 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
         "builder_company": c.builder_company,
         "architect_company": c.architect_company,
         "cover_image_url": c.cover_image_url,
+        "image_urls": c.image_urls or [],
         "url": c.url,
         "updated_at": c.updated_at.isoformat() if c.updated_at else None,
     }

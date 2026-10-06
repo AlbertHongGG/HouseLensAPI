@@ -355,12 +355,10 @@ uv run houselens link-communities -l 50 --format json
     3. 相簿圖片微服務端點：`/v1/ware/photos?id={id}&type=2`（負責取得房屋分組相簿與實景高畫質大圖）。
   * 透過 `asyncio.gather` 並行調用，總耗時與單一請求相當（0 額外耗時），且輔助微服務具備安全降級與容錯隔離，確保主資料流程堅不可摧。
 * **相簿防腐層 ACL 與封面排序置頂不變量 (Photos ACL & Cover First Invariant)**：
-  * 相簿防腐 DTO 自動排除影片群組（`key == "video"`），專注提取真實房屋實景相簿與格局圖。
-  * 封面排序保證：標記為 `isCover == 1` 的照片強制置頂至第一順位（index 0），同時作為客觀實體之 `cover_image_url`。
-  * 清洗萃取 1000px 高畫質圖並自動去除重複 URL，以標準字串陣列 `image_urls: List[str]` 持久化儲存。
-* **資料庫結構自動增補遷移機制 (SQLite Lightweight Auto-Migration)**：
-  * 本地 SQLite 引擎具備自我修復機制，在 `init_db()` 及 Session 連線建立時自動檢查現有資料表結構。
-  * 若偵測到新版欄位（如 `cover_image_url`、`image_urls`）缺失，自動執行安全的 `ALTER TABLE ... ADD COLUMN` 動態增補，徹底免疫「no such column」問題，平滑相容既有資料庫。
+  * 中古屋與社區相簿均建立專屬防腐 DTO（`Source591PhotosDTO` 與 `Source591CommunityPhotosDTO`）。
+  * 自動排除影片項目（`is_video == 1` 或 `key == "video"`），專注提取實景照片、環境圖、格局圖。
+  * 封面排序保證：中古屋標記為 `isCover == 1` 或社區子分組標記為 `type == "logo"` 的照片強制置頂至第一順位（index 0），同時作為實體之 `cover_image_url`。
+  * 畫質優先選取大圖（社區優先選取 `maxphoto` 900px/1200px 水印大圖，中古屋選取 1000px 大圖）並自動去除重複 URL，統一以標準字串陣列 `image_urls: List[str]` 持久化儲存。
 * **串流微批次同步管線 (Streaming Micro-batch Pipeline)**：
   * 逐頁探索、快篩已入庫、併發取得自足規格、即時微批次持久化入庫，兼顧記憶體控制、失敗重試隔離與目標筆數跨頁累加。
 
@@ -393,7 +391,8 @@ uv run houselens link-communities -l 50 --format json
 | `avg_unit_price_wan` | Float | 成交均價 (萬/坪) | 清單 `items[].price` | 【第一層：清單】清單直取實價登錄成交均價，轉 float |
 | `shopping_district` | String(64) | 所屬商圈 | 清單 `items[].shop_name` | 【第一層：清單】清單直取商圈字串 |
 | `transport` | String(128) | 鄰近站點 | 清單 `items[].station_name` | 【第一層：清單】清單直取交通站點字串 |
-| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src.src` | 【第一層：清單】清單直取外觀縮圖 URL |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src.src` | 【第一層：清單】清單直取外觀縮圖 URL，或回填相簿封面 |
+| `image_urls` | JSON | 社區相簿照片清單 | 詳情 `banners.community_images` | 【第二層：詳情】相片 URL 字串陣列，優先選取 900px/1200px 大圖，排除影片並置頂 logo 封面 |
 | `url` | String(512) | 原始社區網址 | 詳情 `share_info.url` | 【第二層：詳情】來源平台社區對應完整網址 |
 | `housing_status` | String(32) | 成屋/建案狀態 | 詳情 `build_info.build_type` / `build_type_str` | 【第二層：詳情】如「預售屋」、「新成屋」、「中古屋」 |
 | `building_type` | String(64) | 建物實體型態 | 詳情 `build_info.purpose_str` | 【第二層：詳情】如「住宅大樓」、「華廈」、「透天」、「商辦」；空值轉 NULL |

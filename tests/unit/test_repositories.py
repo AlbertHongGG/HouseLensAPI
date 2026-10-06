@@ -90,6 +90,7 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             land_division="第三之二種住宅區",
             landscape_designer="境業設計",
             public_facility_designer="境業設計",
+            image_urls=["https://img.example.com/c1.jpg", "https://img.example.com/c2.jpg"],
         )
         updated = await repo.upsert_from_detail(detail, provider_id="591")
         assert updated.id == saved.id
@@ -101,6 +102,7 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         assert updated.manage_fee_per_pin == 150
         assert updated.facilities == ["接待大廳", "空中花園"]
         assert updated.cover_image_url == "https://example.com/cover.jpg"
+        assert updated.image_urls == ["https://img.example.com/c1.jpg", "https://img.example.com/c2.jpg"]
         assert updated.parking_type == "平面式"
         assert updated.min_parking_price_wan == 360.0
         assert updated.max_parking_price_wan == 420.0

@@ -23,7 +23,6 @@ class DatabaseManager:
         self.echo = echo
         self._engine: Optional[AsyncEngine] = None
         self._sessionmaker: Optional[async_sessionmaker[AsyncSession]] = None
-        self._schema_checked: bool = False
 
     @property
     def db_url(self) -> str:
@@ -37,7 +36,6 @@ class DatabaseManager:
             self.echo = echo
         self._engine = None
         self._sessionmaker = None
-        self._schema_checked = False
 
     @property
     def engine(self) -> AsyncEngine:
@@ -61,34 +59,10 @@ class DatabaseManager:
             )
         return self._sessionmaker
 
-    @staticmethod
-    def _migrate_sqlite_columns(connection) -> None:
-        """針對既有 SQLite 資料表執行輕量安全欄位增補 (Auto-migration)"""
-        from sqlalchemy import inspect, text
-
-        inspector = inspect(connection)
-        tables = set(inspector.get_table_names())
-
-        if "properties" in tables:
-            cols = {col["name"] for col in inspector.get_columns("properties")}
-            if "cover_image_url" not in cols:
-                connection.execute(text("ALTER TABLE properties ADD COLUMN cover_image_url VARCHAR(1000)"))
-            if "image_urls" not in cols:
-                connection.execute(text("ALTER TABLE properties ADD COLUMN image_urls JSON"))
-
-        if "property_listings" in tables:
-            cols = {col["name"] for col in inspector.get_columns("property_listings")}
-            if "cover_image_url" not in cols:
-                connection.execute(text("ALTER TABLE property_listings ADD COLUMN cover_image_url VARCHAR(1000)"))
-            if "image_urls" not in cols:
-                connection.execute(text("ALTER TABLE property_listings ADD COLUMN image_urls JSON"))
-
     async def init_db(self) -> None:
-        """非同步初始化資料庫，建立所有尚未建立之資料表並進行輕量結構補齊"""
+        """非同步初始化資料庫，建立所有資料表"""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            await conn.run_sync(self._migrate_sqlite_columns)
-        self._schema_checked = True
 
     async def drop_all(self) -> None:
         """非同步清空資料庫，供測試或重置使用"""
@@ -98,9 +72,6 @@ class DatabaseManager:
     @asynccontextmanager
     async def session(self) -> AsyncGenerator[AsyncSession, None]:
         """取得具備交易自動管理之非同步 Session context manager"""
-        if not self._schema_checked:
-            await self.init_db()
-
         async with self.session_factory() as s:
             try:
                 yield s

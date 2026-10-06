@@ -66,6 +66,7 @@ class CommunityTable(Base, TimestampMixin):
     architect_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
 
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    image_urls: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
     url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     __table_args__ = (

@@ -69,6 +69,7 @@ class NormalizedCommunityDetail(BaseModel):
     landscape_designer: CleanStr = Field(None, description="景觀設計公司/設計師")
     public_facility_designer: CleanStr = Field(None, description="公設設計公司/設計師")
     cover_image_url: CleanStr = Field(None, description="封面圖片網址")
+    image_urls: List[str] = Field(default_factory=list, description="社區實景相簿圖片清單")
     url: CleanStr = Field(None, description="原始社區網址")
     facilities: List[str] = Field(default_factory=list, description="公共設施清單")
     developer_company: CleanStr = Field(None, description="投資興建公司")

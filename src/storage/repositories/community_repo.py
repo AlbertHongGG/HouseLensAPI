@@ -156,6 +156,7 @@ class CommunityRepository(ICommunityRepository):
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
                 cover_image_url=detail.cover_image_url,
+                image_urls=detail.image_urls,
                 url=detail.url,
             )
             self.session.add(record)
@@ -212,6 +213,13 @@ class CommunityRepository(ICommunityRepository):
             record.developer_company = detail.developer_company
             record.builder_company = detail.builder_company
             record.architect_company = detail.architect_company
+
+            if detail.cover_image_url:
+                record.cover_image_url = detail.cover_image_url
+            if detail.image_urls:
+                record.image_urls = detail.image_urls
+            if detail.url:
+                record.url = detail.url
 
         await self.session.flush()
         return record
