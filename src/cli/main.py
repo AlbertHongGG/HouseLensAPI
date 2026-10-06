@@ -17,6 +17,7 @@ import typer
 
 from src.cli.commands.db_cmd import db_app
 from src.cli.commands.get_cmd import get_app
+from src.cli.commands.link_cmd import link_communities_cmd
 from src.cli.commands.list_cmd import list_app
 from src.cli.commands.provider_cmd import provider_app
 from src.cli.commands.sync_cmd import sync_app
@@ -47,6 +48,12 @@ app.command(
     "test",
     help="測試各來源 Provider 之 API 端點健康度並錄製完整網路流量至 .tmp",
 )(run_api_diagnostics_cmd)
+
+# 掛載單一指令: link-communities
+app.command(
+    "link-communities",
+    help="掃描庫存未關聯社區之中古屋，聚合去重並透過兩階段消歧補齊社區實體與外鍵",
+)(link_communities_cmd)
 
 
 def version_callback(value: bool):

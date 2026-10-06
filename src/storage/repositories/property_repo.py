@@ -4,8 +4,8 @@
 """
 
 import uuid
-from typing import List, Optional, Set
-from sqlalchemy import or_, select
+from typing import Any, Dict, List, Optional, Set
+from sqlalchemy import or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -516,3 +516,52 @@ class PropertyRepository(IPropertyRepository):
         stmt = stmt.order_by(PropertyTable.updated_at.desc()).limit(limit).offset(offset)
         res = await self.session.execute(stmt)
         return list(res.scalars().all())
+
+    async def get_unlinked_community_properties(
+        self,
+        provider_id: Optional[str] = None,
+        region_name: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[PropertyTable]:
+        """查詢尚未關聯內部社區 UUID、但具備外部社區代碼或社區名稱之中古屋物件"""
+        conds = [
+            PropertyTable.community_uuid.is_(None),
+            or_(
+                PropertyTable.external_community_id.is_not(None),
+                PropertyTable.community_name.is_not(None),
+            ),
+        ]
+        if provider_id:
+            conds.append(PropertyTable.provider_id == provider_id)
+        if region_name:
+            conds.append(PropertyTable.region_name == region_name)
+
+        stmt = select(PropertyTable).where(*conds).order_by(PropertyTable.created_at.desc())
+        if limit:
+            stmt = stmt.limit(limit)
+
+        res = await self.session.execute(stmt)
+        return list(res.scalars().all())
+
+    async def batch_update_community_links(
+        self,
+        property_ids: List[str],
+        community_uuid: str,
+        external_community_id: Optional[str] = None,
+    ) -> int:
+        """批次將特定房屋實體清單綁定至指定社區 UUID (並可選回填外部社區代碼)"""
+        if not property_ids:
+            return 0
+
+        values_to_update: Dict[str, Any] = {"community_uuid": community_uuid}
+        if external_community_id:
+            values_to_update["external_community_id"] = external_community_id
+
+        stmt = (
+            update(PropertyTable)
+            .where(PropertyTable.id.in_(property_ids))
+            .values(**values_to_update)
+        )
+        res = await self.session.execute(stmt)
+        await self.session.flush()
+        return res.rowcount

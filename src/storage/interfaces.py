@@ -154,6 +154,26 @@ class IPropertyRepository(ABC):
         """多條件檢索庫存中古屋物件"""
         pass
 
+    @abstractmethod
+    async def get_unlinked_community_properties(
+        self,
+        provider_id: Optional[str] = None,
+        region_name: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[PropertyTable]:
+        """查詢尚未關聯內部社區 UUID、但具備外部社區代碼或社區名稱之中古屋物件"""
+        pass
+
+    @abstractmethod
+    async def batch_update_community_links(
+        self,
+        property_ids: List[str],
+        community_uuid: str,
+        external_community_id: Optional[str] = None,
+    ) -> int:
+        """批次將特定房屋實體清單綁定至指定社區 UUID (並可選回填外部社區代碼)"""
+        pass
+
 
 class INewHouseRepository(ABC):
     """新建案持久化倉儲抽象介面"""

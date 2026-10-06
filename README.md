@@ -233,6 +233,40 @@ uv run houselens test 591 --format json
 
 ---
 
+### 7. 中古屋社區消歧與外鍵補齊 (link-communities)
+
+掃描庫存尚未建立社區外鍵 (`community_uuid IS NULL`) 之中古屋物件，以記憶體 DISTINCT 聚合最小化請求池，透過兩階段消歧比對與兩層式 SSOT 規範探索補齊社區實體並回填外鍵關聯。
+
+#### 設計原理與架構規範
+* **兩層式 SSOT 入庫保證**：社區的經緯度坐標 `lat/lng`、標準地址與封面圖等第一層屬性 100% 來自清單 API。遠端補齊時，系統強制先透過清單端點探索取得第一層 `NormalizedCommunitySummary` 快照，再呼叫詳情端點補齊第二層規格入庫，保證資料庫 `communities` 節點 100% 完整無遺漏。
+* **第一階段 (本地快速對齊)**：優先以 `external_community_id` 或同縣市/同行政區完全吻合之名稱反查本地庫存，0 次 HTTP 請求極速綁定。
+* **第二階段 (遠端探索與嚴格消歧)**：對本地無記錄者，調用來源端點檢索社區清單。嚴格比對行政區相符性與名稱完全一致性；同區出現 2 個以上相似社區時主動標記為歧義並略過，客觀無社區實體（如獨立透天、老公寓）自動跳過，絕不硬猜或誤配髒資料。
+
+#### 參數選項
+
+| 參數 / 選項 | 簡寫 | 類型 | 預設值 | 說明 |
+| :--- | :--- | :--- | :--- | :--- |
+| `--provider` | `-p` | Option | `591` | 來源平台代碼 |
+| `--region` | `-r` | Option | None | 限定特定行政縣市 (如「台北市」、「新北市」) |
+| `--limit` | `-l` | Option | None | 掃描處理之中古屋筆數上限 |
+| `--dry-run` | - | Option | `False` | 乾跑預演模式 (僅分析比對與輸出報表，不寫入資料庫) |
+| `--format` | `-f` | Option | `text` | 輸出格式：彩色終端表格 (`text`) 或 JSON 總結 (`json`) |
+
+#### 常用範例
+
+```bash
+# 預先乾跑預演：檢視台北市未綁社區之房屋消歧比對報表 (零資料庫寫入)
+uv run houselens link-communities -r 台北市 --dry-run
+
+# 正式執行全庫未關聯房屋之社區補齊與外鍵綁定
+uv run houselens link-communities
+
+# 限定處理前 50 筆房屋並輸出 JSON 格式報告
+uv run houselens link-communities -l 50 --format json
+```
+
+---
+
 ## 核心架構與消歧去重機制
 
 * **全領域外部身分統一命名規範 (Canonical External Identity)**：

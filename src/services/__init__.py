@@ -1,6 +1,13 @@
 """HouseLensAPI - 服務層套件 (Services Package)"""
 
 from src.services.aggregator import HouseAggregatorService
+from src.services.community_resolver import (
+    CommunityMatchResult,
+    CommunityResolutionOptions,
+    CommunityResolutionReport,
+    CommunityResolutionService,
+    MatchStatus,
+)
 from src.services.deduplication import (
     DeduplicationResult,
     PropertyDeduplicationService,
@@ -12,5 +19,10 @@ __all__ = [
     "PropertyDeduplicationService",
     "DeduplicationResult",
     "is_area_compatible",
+    "CommunityResolutionService",
+    "CommunityResolutionOptions",
+    "CommunityResolutionReport",
+    "CommunityMatchResult",
+    "MatchStatus",
 ]
 
