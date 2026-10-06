@@ -134,3 +134,33 @@ def test_cli_sync_all_options():
     assert "--status" in res_help.output
 
 
+def test_cli_test_commands_help_and_list():
+    """驗證 test 指令集包含 suite, endpoint, list 子指令且能正常檢索規格"""
+    res_help = runner.invoke(app, ["test", "--help"])
+    assert res_help.exit_code == 0
+    assert "suite" in res_help.output
+    assert "endpoint" in res_help.output
+    assert "list" in res_help.output
+
+    res_ep_help = runner.invoke(app, ["test", "endpoint", "--help"])
+    assert res_ep_help.exit_code == 0
+    assert "--target-id" in res_ep_help.output
+    assert "--params" in res_ep_help.output
+    assert "--output-file" in res_ep_help.output
+
+    # 測試 list 指令
+    res_list = runner.invoke(app, ["test", "list", "591"])
+    assert res_list.exit_code == 0
+    assert "sale_detail" in res_list.output
+    assert "community_detail" in res_list.output
+
+    # 測試 list json
+    res_list_json = runner.invoke(app, ["test", "list", "591", "--format", "json"])
+    assert res_list_json.exit_code == 0
+    data = json.loads(res_list_json.output)
+    assert isinstance(data, list)
+    ep_ids = [item["endpoint_id"] for item in data]
+    assert "sale_detail" in ep_ids
+
+
+

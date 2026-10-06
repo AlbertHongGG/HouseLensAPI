@@ -26,6 +26,15 @@ class DiagnosticDomain(str, Enum):
     SYSTEM = "system"
 
 
+class ProbeExecutionContext(BaseModel):
+    """探針執行時之動態上下文與自訂參數"""
+    target_id: Optional[str] = Field(None, description="目標物件/實體 ID (例如 S20846137 或 5855864)")
+    extra_params: Dict[str, Any] = Field(default_factory=dict, description="自訂覆蓋或追加之 Query 參數")
+    extra_headers: Dict[str, str] = Field(default_factory=dict, description="自訂覆蓋或追加之 HTTP 標頭")
+    custom_context: Dict[str, Any] = Field(default_factory=dict, description="跨探針共享或內部狀態上下文")
+
+
+
 class DiagnosticMetadata(BaseModel):
     """API 診斷探針執行元數據"""
     provider_id: str = Field(..., description="來源提供者唯一代碼 (如 591)")

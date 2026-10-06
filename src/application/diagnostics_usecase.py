@@ -21,6 +21,7 @@ from src.domain.diagnostics import (
     DiagnosticDomain,
     DiagnosticRunSummary,
     DiagnosticStatus,
+    ProbeExecutionContext,
 )
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,32 @@ class JsonArtifactWriter(IDiagnosticArtifactWriter):
         target_file.write_text(content, encoding="utf-8")
         return target_file
 
+    def write_single_probe_artifact(
+        self,
+        provider_id: str,
+        artifact: DiagnosticArtifact,
+        custom_file_path: Optional[Path] = None,
+    ) -> Path:
+        """寫入單一端點測試 JSON 記錄檔至指定路徑或預設 single_probes 目錄"""
+        content = json.dumps(artifact.model_dump(), indent=2, ensure_ascii=False)
+        if custom_file_path is not None:
+            target_path = Path(custom_file_path)
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            target_path.write_text(content, encoding="utf-8")
+            return target_path
+
+        target_dir = self.base_dir / provider_id / "single_probes"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        safe_time = (
+            artifact.metadata.timestamp.replace(":", "-")
+            .replace("+", "_")
+            .replace(".", "_")
+        )
+        endpoint_id = artifact.metadata.endpoint_id
+        target_file = target_dir / f"{endpoint_id}_{safe_time}.json"
+        target_file.write_text(content, encoding="utf-8")
+        return target_file
+
 
 class DiagnosticsUseCase:
     """API 診斷與全端點健康檢測業務案例"""
@@ -80,7 +107,22 @@ class DiagnosticsUseCase:
         delay_seconds: float = 1.0,
         on_progress: Optional[Callable[[IProbeEndpoint, DiagnosticArtifact, int, int], None]] = None,
     ) -> List[DiagnosticRunSummary]:
-        """依序執行目標 Provider 之全部探針並錄製流量
+        """相容執行套件檢測"""
+        return await self.run_suite(
+            provider_id=provider_id,
+            domain=domain,
+            delay_seconds=delay_seconds,
+            on_progress=on_progress,
+        )
+
+    async def run_suite(
+        self,
+        provider_id: Optional[str] = None,
+        domain: Optional[DiagnosticDomain] = None,
+        delay_seconds: float = 1.0,
+        on_progress: Optional[Callable[[IProbeEndpoint, DiagnosticArtifact, int, int], None]] = None,
+    ) -> List[DiagnosticRunSummary]:
+        """依序執行目標 Provider 之全部探針套件並錄製流量
 
         Args:
             provider_id: 指定來源代碼 (例如 '591')，若為 None 則依序測試全部註冊來源
@@ -118,6 +160,90 @@ class DiagnosticsUseCase:
 
         return summaries
 
+    async def run_endpoint(
+        self,
+        provider_id: str,
+        endpoint_id: str,
+        target_id: Optional[str] = None,
+        extra_params: Optional[Dict[str, Any]] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+        custom_file_path: Optional[Path] = None,
+    ) -> tuple[DiagnosticArtifact, Path]:
+        """執行特定 Provider 的單一 API 端點功能性測試並錄製流量快照
+
+        Args:
+            provider_id: 目標來源外掛代碼 (例如 '591')
+            endpoint_id: 端點代碼 (例如 'sale_detail')
+            target_id: 自訂目標物件/實體 ID (例如 'S20846137')
+            extra_params: 自訂覆蓋或追加之 Query 參數
+            extra_headers: 自訂覆蓋或追加之 HTTP 標頭
+            custom_file_path: 自訂落盤檔案路徑
+
+        Returns:
+            tuple[DiagnosticArtifact, Path]: 診斷快照實體與落盤檔案路徑
+        """
+        provider = self._registry.get(provider_id)
+        if not provider:
+            raise ValueError(
+                f"未找到已註冊的來源提供者: '{provider_id}'，可用: {self._registry.list_available()}"
+            )
+
+        probe = provider.diagnostics.get_probe(endpoint_id)
+        if not probe:
+            available_ids = [p.endpoint_id for p in provider.diagnostics.get_probes()]
+            raise ValueError(
+                f"來源 '{provider_id}' 未包含端點 '{endpoint_id}'。可用端點代碼: {available_ids}"
+            )
+
+        exec_context = ProbeExecutionContext(
+            target_id=target_id,
+            extra_params=extra_params or {},
+            extra_headers=extra_headers or {},
+        )
+
+        async with httpx.AsyncClient(timeout=httpx.Timeout(20.0), follow_redirects=True) as client:
+            artifact = await probe.execute(client, context=exec_context)
+
+        saved_path = self._writer.write_single_probe_artifact(
+            provider_id=provider.provider_id,
+            artifact=artifact,
+            custom_file_path=custom_file_path,
+        )
+        return artifact, saved_path
+
+    def list_probes(
+        self,
+        provider_id: Optional[str] = None,
+        domain: Optional[DiagnosticDomain] = None,
+    ) -> List[tuple[IHouseSourceProvider, IProbeEndpoint]]:
+        """查詢已註冊之來源與探針規格清單
+
+        Args:
+            provider_id: 指定來源代碼，若為 None 則列出所有來源
+            domain: 篩選業務領域
+
+        Returns:
+            List[tuple[IHouseSourceProvider, IProbeEndpoint]]: 來源與探針元組清單
+        """
+        target_providers: List[IHouseSourceProvider] = []
+        if provider_id:
+            provider = self._registry.get(provider_id)
+            if not provider:
+                raise ValueError(
+                    f"未找到已註冊的來源提供者: '{provider_id}'，可用: {self._registry.list_available()}"
+                )
+            target_providers.append(provider)
+        else:
+            target_providers.extend(self._registry.get_all())
+
+        results: List[tuple[IHouseSourceProvider, IProbeEndpoint]] = []
+        for p in target_providers:
+            probes = p.diagnostics.get_probes(domain=domain)
+            for probe in probes:
+                results.append((p, probe))
+
+        return results
+
     async def _run_single_provider(
         self,
         provider: IHouseSourceProvider,
@@ -144,10 +270,9 @@ class DiagnosticsUseCase:
         async with httpx.AsyncClient(timeout=httpx.Timeout(20.0), follow_redirects=True) as client:
             for idx, probe in enumerate(probes):
                 try:
-                    artifact = await probe.execute(client)
+                    artifact = await probe.execute(client, context=None)
                 except Exception as exc:
                     logger.error("探針執行未預期異常: %s - %s", probe.endpoint_id, exc)
-                    # 容錯回退產生失敗快照
                     from src.domain.diagnostics import (
                         DiagnosticMetadata,
                         DiagnosticRequestSnapshot,
@@ -214,3 +339,4 @@ class DiagnosticsUseCase:
         # 落盤批次總結報告
         self._writer.write_summary(run_dir, summary)
         return summary
+

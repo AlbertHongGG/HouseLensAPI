@@ -323,3 +323,127 @@ async def test_diagnostics_usecase_execution(tmp_path: Path):
     assert len(saved_run_dirs) == 1
     assert (saved_run_dirs[0] / "mock_ep.json").exists()
     assert (saved_run_dirs[0] / "summary.json").exists()
+
+
+@pytest.mark.asyncio
+async def test_diagnostics_usecase_run_endpoint_success(tmp_path: Path):
+    """驗證 DiagnosticsUseCase.run_endpoint 參數化單端點測試與自訂落盤"""
+    mock_probe = MagicMock()
+    mock_probe.endpoint_id = "sale_detail"
+    mock_probe.domain = DiagnosticDomain.SALE
+    mock_probe.name = "中古屋詳細資訊 API"
+    mock_probe.description = "測試詳情端點"
+    mock_probe.requires_target_id = True
+    mock_probe.default_target_id = "20604856"
+
+    meta = DiagnosticMetadata(
+        provider_id="mock_prov",
+        provider_name="Mock Provider",
+        endpoint_id="sale_detail",
+        domain="sale",
+        name="中古屋詳細資訊 API",
+        description="測試詳情端點",
+        status=DiagnosticStatus.SUCCESS,
+        status_code=200,
+        latency_ms=12.5,
+        timestamp="2026-10-07T03:00:00",
+    )
+    artifact = DiagnosticArtifact(
+        metadata=meta,
+        request=DiagnosticRequestSnapshot(method="GET", url="https://example.com/detail?id=20846137"),
+        response=DiagnosticResponseSnapshot(status_code=200, latency_ms=12.5, body={"house_id": "20846137"}),
+    )
+    mock_probe.execute = AsyncMock(return_value=artifact)
+
+    mock_diag = MagicMock()
+    mock_diag.provider_id = "mock_prov"
+    mock_diag.provider_name = "Mock Provider"
+    mock_diag.get_probe.return_value = mock_probe
+    mock_diag.get_probes.return_value = [mock_probe]
+
+    mock_provider = MagicMock(spec=IHouseSourceProvider)
+    mock_provider.provider_id = "mock_prov"
+    mock_provider.provider_name = "Mock Provider"
+    mock_provider.diagnostics = mock_diag
+
+    custom_registry = ProviderRegistry()
+    custom_registry.register_instance(mock_provider)
+
+    writer = JsonArtifactWriter(base_dir=tmp_path)
+    use_case = DiagnosticsUseCase(provider_registry=custom_registry, writer=writer)
+
+    custom_output = tmp_path / "custom_dir" / "my_custom_sale.json"
+    result_artifact, saved_path = await use_case.run_endpoint(
+        provider_id="mock_prov",
+        endpoint_id="sale_detail",
+        target_id="S20846137",
+        extra_params={"debug": 1},
+        custom_file_path=custom_output,
+    )
+
+    assert result_artifact.metadata.status == DiagnosticStatus.SUCCESS
+    assert saved_path == custom_output
+    assert custom_output.exists()
+    content = json.loads(custom_output.read_text(encoding="utf-8"))
+    assert content["metadata"]["endpoint_id"] == "sale_detail"
+    assert content["response"]["body"]["house_id"] == "20846137"
+
+    # 驗證傳給 probe.execute 的 context
+    mock_probe.execute.assert_awaited_once()
+    _, kwargs = mock_probe.execute.call_args
+    exec_ctx = kwargs.get("context")
+    assert exec_ctx is not None
+    assert exec_ctx.target_id == "S20846137"
+    assert exec_ctx.extra_params == {"debug": 1}
+
+
+def test_diagnostics_usecase_list_probes():
+    """驗證 DiagnosticsUseCase.list_probes 查詢探針清單規格"""
+    mock_probe = MagicMock()
+    mock_probe.endpoint_id = "sale_detail"
+    mock_probe.domain = DiagnosticDomain.SALE
+
+    mock_diag = MagicMock()
+    mock_diag.get_probes.return_value = [mock_probe]
+
+    mock_provider = MagicMock(spec=IHouseSourceProvider)
+    mock_provider.provider_id = "mock_prov"
+    mock_provider.diagnostics = mock_diag
+
+    custom_registry = ProviderRegistry()
+    custom_registry.register_instance(mock_provider)
+
+    use_case = DiagnosticsUseCase(provider_registry=custom_registry)
+    probes = use_case.list_probes(provider_id="mock_prov")
+    assert len(probes) == 1
+    p, probe = probes[0]
+    assert p.provider_id == "mock_prov"
+    assert probe.endpoint_id == "sale_detail"
+
+
+@pytest.mark.asyncio
+async def test_591_sale_detail_probe_target_id_cleaning():
+    """驗證 591 SaleHouseDetailProbe 正確清理前綴 S/H 並傳遞至 URL 參數"""
+    from src.domain.diagnostics import ProbeExecutionContext
+    from src.providers.source_591.diagnostics import SaleHouseDetailProbe
+
+    probe = SaleHouseDetailProbe()
+    assert probe.requires_target_id is True
+    assert probe.default_target_id == "20604856"
+
+    mock_client = AsyncMock(spec=httpx.AsyncClient)
+    mock_resp = MagicMock(spec=httpx.Response)
+    mock_resp.status_code = 200
+    mock_resp.headers = {}
+    mock_resp.json.return_value = {"status": 1}
+    mock_client.headers = {}
+    mock_client.request.return_value = mock_resp
+
+    # 傳入包含 'S' 前綴的物件 ID
+    ctx = ProbeExecutionContext(target_id="S20846137")
+    artifact = await probe.execute(mock_client, context=ctx)
+
+    assert artifact.metadata.status == DiagnosticStatus.SUCCESS
+    # 檢查請求參數中的 id 是否已去除 S
+    assert artifact.request.params["id"] == "20846137"
+

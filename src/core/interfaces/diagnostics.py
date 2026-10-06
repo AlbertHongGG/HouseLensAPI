@@ -9,7 +9,11 @@ from abc import ABC, abstractmethod
 from typing import Any, List, Optional
 import httpx
 
-from src.domain.diagnostics import DiagnosticArtifact, DiagnosticDomain
+from src.domain.diagnostics import (
+    DiagnosticArtifact,
+    DiagnosticDomain,
+    ProbeExecutionContext,
+)
 
 
 class IProbeEndpoint(ABC):
@@ -39,8 +43,22 @@ class IProbeEndpoint(ABC):
         """端點測試用途描述"""
         pass
 
+    @property
+    def requires_target_id(self) -> bool:
+        """此端點是否為詳情類型且支援指定目標 ID (預設 False)"""
+        return False
+
+    @property
+    def default_target_id(self) -> Optional[str]:
+        """若未提供目標 ID 時之預設測試種子 ID (預設 None)"""
+        return None
+
     @abstractmethod
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
         """執行端點探針測試並回傳完整流量快照與判定結果"""
         pass
 
@@ -65,6 +83,11 @@ class IProviderDiagnostics(ABC):
         """取得該來源註冊之所有探針，可依領域進行篩選"""
         pass
 
+    @abstractmethod
+    def get_probe(self, endpoint_id: str) -> Optional[IProbeEndpoint]:
+        """依端點唯一代碼檢索特定探針實例"""
+        pass
+
 
 class IDiagnosticArtifactWriter(ABC):
     """診斷報告落地儲存合約"""
@@ -83,3 +106,14 @@ class IDiagnosticArtifactWriter(ABC):
     def write_summary(self, target_dir: Any, summary: Any) -> Any:
         """寫入批次執行總結報告 summary.json"""
         pass
+
+    @abstractmethod
+    def write_single_probe_artifact(
+        self,
+        provider_id: str,
+        artifact: DiagnosticArtifact,
+        custom_file_path: Optional[Any] = None,
+    ) -> Any:
+        """寫入單一端點測試 JSON 記錄檔至指定路徑或預設 single_probes 目錄"""
+        pass
+

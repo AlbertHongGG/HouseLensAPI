@@ -15,6 +15,7 @@ from src.domain.diagnostics import (
     DiagnosticDomain,
     DiagnosticMetadata,
     DiagnosticStatus,
+    ProbeExecutionContext,
 )
 from src.providers.source_591.client import (
     CANONICAL_DOMAINS,
@@ -70,6 +71,28 @@ class Base591Probe(IProbeEndpoint):
             error_message=None,
         )
 
+    def _merge_params(
+        self,
+        base_params: Dict[str, Any],
+        context: Optional[ProbeExecutionContext],
+    ) -> Dict[str, Any]:
+        """合併預設參數與外部上下文提供之額外 Query 參數"""
+        merged = dict(base_params)
+        if context and context.extra_params:
+            merged.update(context.extra_params)
+        return merged
+
+    def _merge_headers(
+        self,
+        base_headers: Dict[str, str],
+        context: Optional[ProbeExecutionContext],
+    ) -> Dict[str, str]:
+        """合併預設標頭與外部上下文提供之自訂 HTTP 標頭"""
+        merged = dict(base_headers)
+        if context and context.extra_headers:
+            merged.update(context.extra_headers)
+        return merged
+
 
 class CommunityListProbe(Base591Probe):
     """社區物件清單 API 探針"""
@@ -90,17 +113,25 @@ class CommunityListProbe(Base591Probe):
     def description(self) -> str:
         return "測試 591 社區列表端點連線與回傳資料結構"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
         url = f"{CANONICAL_DOMAINS['market']}/v1/search/list"
-        params = {
-            "page": 1,
-            "page_size": 5,
-            "regionid": 1,
-            "is_sale": 0,
-            "post_type": "8,2",
-            "cm91dGU": "L2NvbW11bml0eS9ob21l",
-            **DEFAULT_591_QUERY_PARAMS,
-        }
+        params = self._merge_params(
+            {
+                "page": 1,
+                "page_size": 5,
+                "regionid": 1,
+                "is_sale": 0,
+                "post_type": "8,2",
+                "cm91dGU": "L2NvbW11bml0eS9ob21l",
+                **DEFAULT_591_QUERY_PARAMS,
+            },
+            context,
+        )
+        headers = self._merge_headers(DEFAULT_591_HEADERS, context)
         metadata = self._create_metadata_template()
         artifact = await DiagnosticTransportRecorder.capture(
             client=client,
@@ -108,7 +139,7 @@ class CommunityListProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
         # 動態提取社區 ID 供詳情探針使用
@@ -147,16 +178,35 @@ class CommunityDetailProbe(Base591Probe):
     def description(self) -> str:
         return "測試 591 單一社區完整資料端點連線 (支援動態 ID 與種子回退)"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
-        target_id = self._context.get("community_id", SEED_COMMUNITY_ID)
+    @property
+    def requires_target_id(self) -> bool:
+        return True
+
+    @property
+    def default_target_id(self) -> Optional[str]:
+        return SEED_COMMUNITY_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        raw_target_id = (
+            context.target_id
+            if context and context.target_id
+            else self._context.get("community_id", SEED_COMMUNITY_ID)
+        )
+        target_id = str(raw_target_id).strip()
         url = f"{CANONICAL_DOMAINS['market']}/v1/app/gateway/community/info"
-        params = {
+        base_params = {
             "id": target_id,
             "cm91dGU": "L2NvbW11bml0eS9kZXRhaWw=",
             **DEFAULT_591_QUERY_PARAMS,
         }
+        params = self._merge_params(base_params, context)
         headers = dict(DEFAULT_591_HEADERS)
         headers["cm91dgu"] = "L2NvbW11bml0eS9kZXRhaWw="
+        headers = self._merge_headers(headers, context)
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -187,9 +237,13 @@ class SaleHouseListProbe(Base591Probe):
     def description(self) -> str:
         return "測試 591 中古屋多條件列表端點連線與回傳資料結構"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
         url = f"{CANONICAL_DOMAINS['house']}/v1/app/gateway/sale/list"
-        params = {
+        base_params = {
             "searchtype": "1",
             "type": "sale",
             "news": "3",
@@ -205,8 +259,10 @@ class SaleHouseListProbe(Base591Probe):
             "cm91dGU": "L3NhbGVob3VzZS9saXN0",
             **DEFAULT_591_QUERY_PARAMS,
         }
+        params = self._merge_params(base_params, context)
         headers = dict(DEFAULT_591_HEADERS)
         headers["cm91dgu"] = "L3NhbGVob3VzZS9saXN0"
+        headers = self._merge_headers(headers, context)
         metadata = self._create_metadata_template()
         artifact = await DiagnosticTransportRecorder.capture(
             client=client,
@@ -252,18 +308,44 @@ class SaleHouseDetailProbe(Base591Probe):
 
     @property
     def description(self) -> str:
-        return "測試 591 中古屋物件詳情端點連線 (支援動態 ID 與種子回退)"
+        return "測試 591 中古屋物件詳情端點連線 (支援自訂 target_id、動態 ID 與種子回退)"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
-        target_id = self._context.get("sale_id", SEED_SALE_ID)
+    @property
+    def requires_target_id(self) -> bool:
+        return True
+
+    @property
+    def default_target_id(self) -> Optional[str]:
+        return SEED_SALE_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        raw_target_id = (
+            context.target_id
+            if context and context.target_id
+            else self._context.get("sale_id", SEED_SALE_ID)
+        )
+        # 規格化去除外部傳入可能帶有的 'S' 或 'H' 前綴 (例如 S20846137 -> 20846137)
+        clean_id = str(raw_target_id).strip()
+        if clean_id.upper().startswith("S"):
+            clean_id = clean_id[1:]
+        elif clean_id.upper().startswith("H"):
+            clean_id = clean_id[1:]
+
+        target_id = clean_id
         url = f"{CANONICAL_DOMAINS['house']}/v1/app/gateway/sale/detail"
-        params = {
+        base_params = {
             "id": target_id,
             "cm91dGU": "L3NhbGVob3VzZS9kZXRhaWw=",
             **DEFAULT_591_QUERY_PARAMS,
         }
+        params = self._merge_params(base_params, context)
         headers = dict(DEFAULT_591_HEADERS)
         headers["cm91dgu"] = "L3NhbGVob3VzZS9kZXRhaWw="
+        headers = self._merge_headers(headers, context)
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -294,9 +376,13 @@ class NewHouseListProbe(Base591Probe):
     def description(self) -> str:
         return "測試 591 新建案列表端點連線與回傳結構"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
         url = f"{CANONICAL_DOMAINS['newhouse']}/v1/list-search"
-        params = {
+        base_params = {
             "regionid": 1,
             "searchtype": 1,
             "p": 1,
@@ -304,8 +390,10 @@ class NewHouseListProbe(Base591Probe):
             "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdsaXN0",
             **DEFAULT_591_QUERY_PARAMS,
         }
+        params = self._merge_params(base_params, context)
         headers = dict(DEFAULT_591_HEADERS)
         headers["cm91dgu"] = "L25ld2hvdXNlL2hvdXNpbmdsaXN0"
+        headers = self._merge_headers(headers, context)
         metadata = self._create_metadata_template()
         artifact = await DiagnosticTransportRecorder.capture(
             client=client,
@@ -352,17 +440,36 @@ class NewHouseDetailProbe(Base591Probe):
     def description(self) -> str:
         return "測試 591 新建案規格詳情端點連線 (支援動態 ID 與種子回退)"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
-        target_id = self._context.get("new_house_id", SEED_NEW_HOUSE_ID)
+    @property
+    def requires_target_id(self) -> bool:
+        return True
+
+    @property
+    def default_target_id(self) -> Optional[str]:
+        return SEED_NEW_HOUSE_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        raw_target_id = (
+            context.target_id
+            if context and context.target_id
+            else self._context.get("new_house_id", SEED_NEW_HOUSE_ID)
+        )
+        target_id = str(raw_target_id).strip()
         url = f"{CANONICAL_DOMAINS['newhouse']}/v1/detail/base-info"
-        params = {
+        base_params = {
             "id": target_id,
             "short_video": 1,
             "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw=",
             **DEFAULT_591_QUERY_PARAMS,
         }
+        params = self._merge_params(base_params, context)
         headers = dict(DEFAULT_591_HEADERS)
         headers["cm91dgu"] = "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw="
+        headers = self._merge_headers(headers, context)
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -393,13 +500,19 @@ class HealthPingProbe(Base591Probe):
     def description(self) -> str:
         return "發送極輕量查詢檢測 591 伺服器通道通訊狀態"
 
-    async def execute(self, client: httpx.AsyncClient) -> DiagnosticArtifact:
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
         url = f"{CANONICAL_DOMAINS['market']}/v1/search/list"
-        params = {
+        base_params = {
             "page": 1,
             "page_size": 1,
             "regionid": 1,
         }
+        params = self._merge_params(base_params, context)
+        headers = self._merge_headers(DEFAULT_591_HEADERS, context)
         metadata = self._create_metadata_template()
         return await DiagnosticTransportRecorder.capture(
             client=client,
@@ -407,7 +520,7 @@ class HealthPingProbe(Base591Probe):
             method="GET",
             url=url,
             params=params,
-            headers=DEFAULT_591_HEADERS,
+            headers=headers,
         )
 
 
@@ -441,3 +554,11 @@ class Source591Diagnostics(IProviderDiagnostics):
             return all_probes
 
         return [probe for probe in all_probes if probe.domain == domain]
+
+    def get_probe(self, endpoint_id: str) -> Optional[IProbeEndpoint]:
+        """依端點唯一代碼檢索特定探針實例"""
+        for probe in self.get_probes():
+            if probe.endpoint_id == endpoint_id:
+                return probe
+        return None
+
