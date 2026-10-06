@@ -96,6 +96,7 @@ class NormalizedNewHouseDetail(BaseModel):
     sales_agency_company: CleanStr = Field(None, description="企劃銷售 / 代銷公司")
     reception_address: CleanStr = Field(None, description="接待會館地址")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
+    image_urls: List[str] = Field(default_factory=list, description="建案相簿照片網址清單")
     url: CleanStr = Field(None, description="原始建案網址")
 
     # 社區跨領域關聯

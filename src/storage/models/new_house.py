@@ -75,6 +75,7 @@ class NewHouseTable(Base, TimestampMixin):
     sales_agency_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     reception_address: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    image_urls: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
     url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     # 社區跨領域關聯

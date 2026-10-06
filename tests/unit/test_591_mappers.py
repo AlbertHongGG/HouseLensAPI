@@ -22,6 +22,7 @@ from src.providers.source_591.mappers.community_mapper import (
     map_community_summary,
 )
 from src.providers.source_591.mappers.new_house_mapper import (
+    Source591NewHousePhotosDTO,
     map_new_house_detail,
     map_new_house_summary,
 )
@@ -600,4 +601,120 @@ class Test591NewHouseMappers:
         assert detail.parking.charging_piles_desc == "有充電設備（含預留）"
         assert detail.parking.has_charging_piles is True
         assert detail.parking.parking_type is None  # 大樓集合住宅 591 封包為「暫無」，防腐層清洗為 None
+        assert detail.image_urls == []
+
+    def test_new_house_photos_dto_extraction_and_sorting(self):
+        # 模擬 591 新建案相簿封包結構 (/v1/detail/photos)
+        mock_raw_photos = {
+            "status": 1,
+            "data": [
+                {
+                    "id": "video",
+                    "name": "影音",
+                    "total": 1,
+                    "items": [
+                        {
+                            "id": 9991,
+                            "cate": "video",
+                            "src_img": "https://img.591.com.tw/video_thumb.jpg",
+                            "video_url": "https://youtu.be/xxx",
+                        }
+                    ],
+                },
+                {
+                    "id": "circum",
+                    "name": "周邊環境",
+                    "total": 2,
+                    "items": [
+                        {
+                            "id": 1001,
+                            "cate": "circum",
+                            "src_img": "https://img.591.com.tw/circum1.jpg",
+                        },
+                        {
+                            "id": 1002,
+                            "cate": "circum",
+                            "src_img": "",
+                            "big_img": "https://img.591.com.tw/circum2_big.jpg",  # fallback
+                        },
+                    ],
+                },
+                {
+                    "id": "logo",
+                    "name": "封面",
+                    "total": 1,
+                    "items": [
+                        {
+                            "id": 8888,
+                            "cate": "logo",
+                            "src_img": "https://img.591.com.tw/logo_cover.jpg",
+                        }
+                    ],
+                },
+                {
+                    "id": "realistic",
+                    "name": "樣品屋",
+                    "total": 1,
+                    "items": [
+                        {
+                            "id": 1001,  # 重複相片 URL 應去重
+                            "cate": "realistic",
+                            "src_img": "https://img.591.com.tw/circum1.jpg",
+                        }
+                    ],
+                },
+            ],
+        }
+
+        dto = Source591NewHousePhotosDTO(mock_raw_photos)
+        # 1. 排除 video
+        assert "https://img.591.com.tw/video_thumb.jpg" not in dto.image_urls
+        # 2. logo 封面強制置頂於索引 0
+        assert dto.cover_url == "https://img.591.com.tw/logo_cover.jpg"
+        assert dto.image_urls[0] == "https://img.591.com.tw/logo_cover.jpg"
+        # 3. 去重保序且 fallback 正常
+        assert dto.image_urls == [
+            "https://img.591.com.tw/logo_cover.jpg",
+            "https://img.591.com.tw/circum1.jpg",
+            "https://img.591.com.tw/circum2_big.jpg",
+        ]
+
+        # 4. 容錯處理：None 與空輸入
+        empty_dto = Source591NewHousePhotosDTO(None)
+        assert empty_dto.image_urls == []
+        assert empty_dto.cover_url is None
+
+    def test_new_house_detail_atomic_merging_with_photos(self):
+        mock_detail_raw = {
+            "housing": {
+                "hid": 140092,
+                "build_name": "國泰央泱",
+                "region": "新北市",
+                "section": "新店區",
+                "address": "央北重劃區",
+                "cover": "",  # 無封面
+            }
+        }
+        mock_photos_data = [
+            {
+                "id": "logo",
+                "items": [
+                    {"src_img": "https://img.591.com.tw/cathay_logo.jpg", "cate": "logo"}
+                ],
+            },
+            {
+                "id": "realistic",
+                "items": [
+                    {"src_img": "https://img.591.com.tw/cathay_room.jpg", "cate": "realistic"}
+                ],
+            },
+        ]
+        detail = map_new_house_detail(mock_detail_raw, photos_data=mock_photos_data)
+        assert detail.image_urls == [
+            "https://img.591.com.tw/cathay_logo.jpg",
+            "https://img.591.com.tw/cathay_room.jpg",
+        ]
+        # detail 無封面時，自動回填相簿封面
+        assert detail.cover_image_url == "https://img.591.com.tw/cathay_logo.jpg"
+
 

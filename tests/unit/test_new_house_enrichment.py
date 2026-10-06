@@ -207,6 +207,8 @@ class TestNewHouseRepositoryAndViews:
             community_age=0,
             lat=25.0135,
             lng=121.4658,
+            cover_image_url="https://img.example.com/cover.jpg",
+            image_urls=["https://img.example.com/nh1.jpg", "https://img.example.com/nh2.jpg"],
         )
 
         async with test_db.session() as session:
@@ -224,6 +226,8 @@ class TestNewHouseRepositoryAndViews:
             assert record.sales_agency_company == "甲山林廣告"
             assert record.external_community_id == "556677"
             assert record.lat == 25.0135
+            assert record.cover_image_url == "https://img.example.com/cover.jpg"
+            assert record.image_urls == ["https://img.example.com/nh1.jpg", "https://img.example.com/nh2.jpg"]
 
             # 2. 透過社區外部 ID 反查
             results = await repo.get_by_external_community_id("591", "556677")
@@ -239,6 +243,7 @@ class TestNewHouseRepositoryAndViews:
             assert "住宅大樓" in output_text
             assert "李祖原建築師事務所" in output_text
             assert "甲山林廣告" in output_text
+            assert "相簿照片數量" in output_text
 
             # 4. 測試字典結構 (JSON 輸出)
             d = new_house_to_dict(record)
@@ -247,5 +252,7 @@ class TestNewHouseRepositoryAndViews:
             assert d["parking"]["min_parking_price_wan"] == 180.0
             assert d["parking"]["plane_parking_count"] == 100
             assert d["external_community_id"] == "556677"
+            assert d["image_urls"] == ["https://img.example.com/nh1.jpg", "https://img.example.com/nh2.jpg"]
 
         await test_db.close()
+

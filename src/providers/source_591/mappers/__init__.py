@@ -6,6 +6,7 @@ from src.providers.source_591.mappers.community_mapper import (
     map_community_summary,
 )
 from src.providers.source_591.mappers.new_house_mapper import (
+    Source591NewHousePhotosDTO,
     map_new_house_detail,
     map_new_house_summary,
 )
@@ -29,6 +30,8 @@ __all__ = [
     "Source591PhotosDTO",
     "map_new_house_summary",
     "map_new_house_detail",
+    "Source591NewHousePhotosDTO",
     "Source591AgeMapper",
     "Source591SaleHouseValidator",
 ]
+

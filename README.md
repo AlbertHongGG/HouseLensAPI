@@ -355,10 +355,11 @@ uv run houselens link-communities -l 50 --format json
     3. 相簿圖片微服務端點：`/v1/ware/photos?id={id}&type=2`（負責取得房屋分組相簿與實景高畫質大圖）。
   * 透過 `asyncio.gather` 並行調用，總耗時與單一請求相當（0 額外耗時），且輔助微服務具備安全降級與容錯隔離，確保主資料流程堅不可摧。
 * **相簿防腐層 ACL 與封面排序置頂不變量 (Photos ACL & Cover First Invariant)**：
-  * 中古屋與社區相簿均建立專屬防腐 DTO（`Source591PhotosDTO` 與 `Source591CommunityPhotosDTO`）。
-  * 自動排除影片項目（`is_video == 1` 或 `key == "video"`），專注提取實景照片、環境圖、格局圖。
-  * 封面排序保證：中古屋標記為 `isCover == 1` 或社區子分組標記為 `type == "logo"` 的照片強制置頂至第一順位（index 0），同時作為實體之 `cover_image_url`。
-  * 畫質優先選取大圖（社區優先選取 `maxphoto` 900px/1200px 水印大圖，中古屋選取 1000px 大圖）並自動去除重複 URL，統一以標準字串陣列 `image_urls: List[str]` 持久化儲存。
+  * 中古屋、社區與新建案三大領域均建立專屬防腐 DTO（`Source591PhotosDTO`、`Source591CommunityPhotosDTO` 與 `Source591NewHousePhotosDTO`）。
+  * 自動排除影片項目（`is_video == 1`、`key == "video"` 或帶有 `video_url`），專注提取實景照片、環境圖、格局圖。
+  * 封面排序保證：中古屋標記為 `isCover == 1`、社區子分組標記為 `type == "logo"`、新建案標記為 `id/cate == "logo"` 的照片強制置頂至第一順位（index 0），同時做為實體之 `cover_image_url`。
+  * 畫質優先選取最高解析度原圖（社區優先選取 `maxphoto`，新建案優先選取 `src_img` 900px/1200px 水印大圖，中古屋選取 1000px 大圖）並自動去除重複 URL，跨領域統一以標準字串陣列 `image_urls: List[str]` 持久化儲存。
+
 * **串流微批次同步管線 (Streaming Micro-batch Pipeline)**：
   * 逐頁探索、快篩已入庫、併發取得自足規格、即時微批次持久化入庫，兼顧記憶體控制、失敗重試隔離與目標筆數跨頁累加。
 
@@ -507,8 +508,8 @@ uv run houselens link-communities -l 50 --format json
 | `housing_status` | String(64) | 期程狀態 | 清單 `items[].build_type_name` | 【第一層：清單】如「預售屋」、「新成屋」 |
 | `region_name` | String(32) | 縣市 | 清單 `items[].region` | 【第一層：清單】如「台北市」，索引 |
 | `section_name` | String(32) | 行政區 | 清單 `items[].section` | 【第一層：清單】如「萬華區」，索引 |
-| `address` | String(256) | 基地地址 | 清單 `items[].address` | 【第一層：清單】基地詳細地址 |
-| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | 【第一層：清單】外觀縮圖 URL |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | 【第一層：清單】外觀縮圖 URL，或回填相簿封面 |
+| `image_urls` | JSON | 建案相簿照片清單 | 相簿微服務 `/v1/detail/photos` | 【第二層：微服務】相片 URL 字串陣列，優先選取 900px/1200px 大圖，排除影片並置頂 logo 封面 |
 | `url` | String(512) | 原始物件網址 | 詳情 `meta.og_url` | 【第二層：詳情】來源平台建案原始展示網址 |
 | `building_type` | String(64) | 建物型態 | 詳情 `housing.purpose_name` | 【第二層：詳情】如「住宅大樓」、「華廈」、「透天」、「電梯公寓」；空值轉 NULL |
 | `purpose` | String(64) | 法定用途 | 詳情 `housing.purpose_other_name` | 【第二層：詳情】如「住商用」、「住家用」、「商業用」；空值轉 NULL |

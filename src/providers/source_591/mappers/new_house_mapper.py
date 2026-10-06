@@ -29,6 +29,98 @@ from src.providers.source_591.normalizers import (
 )
 
 
+class Source591NewHousePhotosDTO:
+    """591 新建案相簿防腐資料傳輸物件 (ACL DTO)
+
+    專屬處理 /v1/detail/photos 回應中之相簿分組列表 (List of Groups)：
+    - 分組巡訪：遍歷各相片分組（logo, plan, traffic, 3d, realistic, circum, ad 等）
+    - 影片排除：排除 id == 'video' 分組與項目帶有 video_type 或 video_url 者
+    - 排序保證：標記為 id == 'logo' 或 cate == 'logo'（封面）的第一張相片強制置頂至第一順位 (index 0)
+    - 畫質選取：優先選取 src_img (900px/1200px 高畫質水印原圖)，其次 big_img (750px)，再其次 small_img
+    - 去重保序：URL 去除重複並保證既有分類先後順序
+    - 防腐解包：支援外層傳入完整 response、data 陣列或個別相片列表
+    """
+
+    def __init__(self, raw: Optional[Any] = None):
+        if isinstance(raw, list):
+            self._groups = raw
+        elif isinstance(raw, dict):
+            if "data" in raw and isinstance(raw["data"], list):
+                self._groups = raw["data"]
+            elif "data" in raw and isinstance(raw["data"], dict) and "photos" in raw["data"]:
+                p_obj = raw["data"]["photos"]
+                self._groups = [{"id": "all", "items": p_obj.get("items", [])}] if isinstance(p_obj, dict) else []
+            else:
+                self._groups = []
+        else:
+            self._groups = []
+
+    @property
+    def cover_url(self) -> Optional[str]:
+        """傳回封面高畫質照片 URL (若無標記封面則傳回第一張有效相片)"""
+        urls = self.image_urls
+        return urls[0] if urls else None
+
+    @property
+    def image_urls(self) -> List[str]:
+        """傳回標準按序排列的高畫質照片 URL 列表 (封面保證置頂)"""
+        if not isinstance(self._groups, list):
+            return []
+
+        cover_urls: List[str] = []
+        regular_urls: List[str] = []
+        seen: set = set()
+
+        for grp in self._groups:
+            if not isinstance(grp, dict):
+                continue
+
+            grp_id = str(grp.get("id") or "").lower()
+            # 排除影音分組
+            if grp_id == "video":
+                continue
+
+            is_logo_grp = grp_id == "logo"
+            items = grp.get("items")
+            if not isinstance(items, list):
+                continue
+
+            for it in items:
+                if not isinstance(it, dict):
+                    continue
+
+                # 排除影片項目
+                if it.get("cate") == "video":
+                    continue
+                if it.get("video_type") and str(it.get("video_type")) not in ("None", "", "0"):
+                    continue
+                if it.get("video_url") and str(it.get("video_url")).strip():
+                    continue
+
+                # 優先提取最高畫質: src_img > big_img > small_img
+                raw_url = (
+                    it.get("src_img")
+                    or it.get("big_img")
+                    or it.get("small_img")
+                    or it.get("photo")
+                )
+                if not raw_url or not str(raw_url).strip():
+                    continue
+
+                url = str(raw_url).strip()
+                if url in seen:
+                    continue
+                seen.add(url)
+
+                is_logo_item = is_logo_grp or it.get("cate") == "logo"
+                if is_logo_item:
+                    cover_urls.append(url)
+                else:
+                    regular_urls.append(url)
+
+        return cover_urls + regular_urls
+
+
 def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
     """將 591 list-search item 正規化為 NormalizedNewHouseSummary"""
     min_unit_price, max_unit_price = parse_range_float(item.get("price"))
@@ -54,14 +146,16 @@ def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
 def map_new_house_detail(
     data: Dict[str, Any],
     summary: Optional[NormalizedNewHouseSummary] = None,
+    photos_data: Optional[Any] = None,
 ) -> NormalizedNewHouseDetail:
-    """將 591 detail/base-info 回應正規化為 NormalizedNewHouseDetail。
+    """將 591 detail/base-info 與 photos 回應正規化為 NormalizedNewHouseDetail。
 
     兩層式跨領域統一架構：
     - 第一層 (身分與地理空間標識)：100% 統一自清單 API (summary)。
-    - 第二層 (深層建築規劃與規格)：100% 統一自詳情 API (data.housing)。
+    - 第二層 (深層建築規劃與規格)：100% 統一自詳情 API (data.housing) 與相簿微服務。
     """
     housing = data.get("housing") or {}
+    photos_dto = Source591NewHousePhotosDTO(photos_data)
 
     # 第一層：身分與地理空間標識 (統一由 summary 提供)
     ext_id = summary.external_project_id if summary else str(housing.get("hid"))
@@ -70,7 +164,13 @@ def map_new_house_detail(
     r_name = summary.region_name if summary else str(housing.get("region") or "").strip()
     s_name = summary.section_name if summary else str(housing.get("section") or "").strip()
     addr = summary.address if summary else (clean_optional_str(housing.get("address")) or "")
-    cover_url = summary.cover_image_url if summary else clean_optional_str(housing.get("cover"))
+    cover_url = (
+        (summary.cover_image_url if summary else None)
+        or clean_optional_str(housing.get("cover"))
+        or photos_dto.cover_url
+    )
+    image_urls = photos_dto.image_urls
+
 
     # 1. 房型與坪數結構化解析
     layout_v2_raw = housing.get("layout_v2") or []
@@ -238,5 +338,6 @@ def map_new_house_detail(
         community_age=community_age,
         lat=lat_val,
         lng=lng_val,
+        image_urls=image_urls,
     )
 

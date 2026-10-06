@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from typing import Any, Dict, Optional
 
 from src.core.interfaces.new_house import INewHouseProvider
@@ -12,6 +14,8 @@ from src.providers.source_591.mappers.new_house_mapper import (
     map_new_house_detail,
     map_new_house_summary,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Source591NewHouseProvider(INewHouseProvider):
@@ -64,12 +68,31 @@ class Source591NewHouseProvider(INewHouseProvider):
         external_project_id: str,
         summary: Optional[NormalizedNewHouseSummary] = None,
     ) -> NormalizedNewHouseDetail:
-        """根據建案外部 ID 取得完整新建案詳情"""
-        params = {
+        """根據建案外部 ID 取得完整新建案詳情 (BFF 雙端點非同步並行聚合)"""
+        params_base = {
             "id": external_project_id,
             "short_video": 1,
             "cm91dGU": "L25ld2hvdXNlL2hvdXNpbmdkZXRhaWw=",
         }
-        res = await self._client.get("newhouse", "/v1/detail/base-info", params=params)
-        data_block = res.get("data") or {}
-        return map_new_house_detail(data=data_block, summary=summary)
+        params_photos = {
+            "id": external_project_id,
+            "short_video": 1,
+        }
+
+        # 1. 宣告兩端點非同步任務
+        task_base = self._client.get("newhouse", "/v1/detail/base-info", params=params_base)
+        task_photos = self._fetch_photos_safe(params_photos)
+
+        # 2. 並行請求聚合 (0 額外耗時)
+        res_base, res_photos = await asyncio.gather(task_base, task_photos)
+
+        data_block = res_base.get("data") or {}
+        return map_new_house_detail(data=data_block, summary=summary, photos_data=res_photos)
+
+    async def _fetch_photos_safe(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """安全抓取相簿微服務資料 (非核心輔助資料降級容錯)"""
+        try:
+            return await self._client.get("newhouse", "/v1/detail/photos", params=params)
+        except Exception as e:
+            logger.warning("調用新建案相簿微服務端點失敗 (ID: %s): %s", params.get("id"), e)
+            return None

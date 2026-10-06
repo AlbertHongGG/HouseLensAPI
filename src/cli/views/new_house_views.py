@@ -172,6 +172,8 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     team_table.add_row("建築設計:", nh.architect_company or "-", "企劃銷售:", nh.sales_agency_company or "-")
     team_table.add_row("關聯社區:", comm_s, "社區屋齡:", f"{nh.community_age} 年" if nh.community_age is not None else "-")
     team_table.add_row("基地經緯度:", coord_s, "原始網址:", nh.url or "-")
+    photos_cnt_s = f"{len(nh.image_urls)} 張" if nh.image_urls else "無照片"
+    team_table.add_row("相簿照片數量:", photos_cnt_s, "封面照片連結:", nh.cover_image_url or "-")
 
     team_panel = Panel(
         team_table,
@@ -261,6 +263,8 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
         "lat": nh.lat,
         "lng": nh.lng,
         "cover_image_url": nh.cover_image_url,
+        "image_urls": nh.image_urls or [],
         "url": nh.url,
         "updated_at": nh.updated_at.isoformat() if nh.updated_at else None,
     }
+
