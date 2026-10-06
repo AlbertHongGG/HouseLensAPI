@@ -1,5 +1,5 @@
-"""HouseLensAPI - 591 中古屋領域服務實作 (591 Sale House Provider)"""
-
+import asyncio
+import logging
 from typing import Any, Dict, Optional
 
 from src.core.interfaces.sale_house import ISaleHouseProvider
@@ -15,6 +15,8 @@ from src.providers.source_591.mappers.sale_house_mapper import (
     map_sale_house_detail,
     map_sale_house_summary,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Source591SaleHouseProvider(ISaleHouseProvider):
@@ -89,14 +91,39 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
         house_id: str,
         summary: Optional[NormalizedSaleListing] = None,
     ) -> NormalizedSalePropertyDetail:
-        """根據房屋唯一代號取得清洗完畢之 NormalizedSalePropertyDetail"""
+        """根據房屋唯一代號取得清洗完畢之 NormalizedSalePropertyDetail (雙端點併發聚合)"""
         clean_id = house_id.lstrip("S") if house_id.startswith("S") else house_id
-        params = {
+        detail_params = {
             "id": clean_id,
             "cm91dGU": "L3NhbGVob3VzZS9kZXRhaWw=",
         }
-        headers = {"cm91dgu": "L3NhbGVob3VzZS9kZXRhaWw="}
+        detail_headers = {"cm91dgu": "L3NhbGVob3VzZS9kZXRhaWw="}
 
-        res = await self._client.get("house", "/v1/app/gateway/sale/detail", params=params, headers=headers)
-        data_block = res.get("data") or {}
-        return map_sale_house_detail(data_block, summary=summary)
+        # 雙端點併發聚合：同時發送主詳情與社區入口微服務
+        detail_task = self._client.get(
+            "house",
+            "/v1/app/gateway/sale/detail",
+            params=detail_params,
+            headers=detail_headers,
+        )
+        comm_entry_task = self._client.fetch_sale_community_entry(clean_id)
+
+        results = await asyncio.gather(detail_task, comm_entry_task, return_exceptions=True)
+        detail_res, comm_entry_res = results[0], results[1]
+
+        if isinstance(detail_res, Exception):
+            raise detail_res
+
+        detail_data = detail_res.get("data") or {}
+
+        comm_entry_data = None
+        if not isinstance(comm_entry_res, Exception):
+            comm_entry_data = comm_entry_res.get("data")
+        else:
+            logger.warning("取得中古屋社區入口微服務失敗 (ID: %s): %s", clean_id, comm_entry_res)
+
+        return map_sale_house_detail(
+            detail_data,
+            summary=summary,
+            community_entry=comm_entry_data if isinstance(comm_entry_data, dict) else None,
+        )

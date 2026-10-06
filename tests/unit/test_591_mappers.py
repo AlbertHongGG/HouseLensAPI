@@ -25,6 +25,7 @@ from src.providers.source_591.mappers.new_house_mapper import (
     map_new_house_summary,
 )
 from src.providers.source_591.mappers.sale_house_mapper import (
+    Source591CommunityEntryDTO,
     map_sale_house_detail,
     map_sale_house_summary,
 )
@@ -274,6 +275,70 @@ class Test591SaleHouseMappers:
         assert summary.floor_total == 5
         assert summary.external_community_id == "5855864"
         assert summary.community_name == "陽明山莊"
+
+    def test_sale_community_entry_dto_four_modes(self):
+        # 模式 1: 官方代碼 + 名稱 (房仲有勾選)
+        mode1_raw = {"info": {"cid": 5855864, "community_name": "鳴森大苑-碧硯閣", "street_keyword": "延壽街"}}
+        dto1 = Source591CommunityEntryDTO(mode1_raw)
+        assert dto1.cid == 5855864
+        assert dto1.normalized_community_id == "5855864"
+        assert dto1.normalized_community_name == "鳴森大苑-碧硯閣"
+        assert dto1.street_keyword == "延壽街"
+
+        # 模式 2: 無代碼 (cid == 0) 但有真實名稱 (房仲未勾選官方庫，本案核心)
+        mode2_raw = {"info": {"cid": 0, "community_name": "吉美富徠", "condition": {"keyword": "瑞安街149巷"}}}
+        dto2 = Source591CommunityEntryDTO(mode2_raw)
+        assert dto2.cid == 0
+        assert dto2.normalized_community_id is None  # 嚴格杜絕魔術數字 '0'
+        assert dto2.normalized_community_name == "吉美富徠"
+        assert dto2.street_keyword == "瑞安街149巷"
+
+        # 模式 3: 獨立老舊公寓/透天別墅 (cid == 0, community_name == "")
+        mode3_raw = {"info": {"cid": 0, "community_name": "", "name": "周邊街道實價登錄"}}
+        dto3 = Source591CommunityEntryDTO(mode3_raw)
+        assert dto3.cid == 0
+        assert dto3.normalized_community_id is None
+        assert dto3.normalized_community_name is None
+
+        # 模式 4: 空資料容錯 (data: [] 或 None)
+        dto4_empty = Source591CommunityEntryDTO([])
+        assert dto4_empty.cid is None
+        assert dto4_empty.normalized_community_id is None
+        assert dto4_empty.normalized_community_name is None
+
+        dto4_none = Source591CommunityEntryDTO(None)
+        assert dto4_none.cid is None
+        assert dto4_none.normalized_community_id is None
+        assert dto4_none.normalized_community_name is None
+
+    def test_sale_house_detail_atomic_merging_with_community_entry(self):
+        mock_detail_raw = {
+            "id": "20846137",
+            "baseInfo": {
+                "title": "瑞安靜巷吉美富徠低公設純住",
+                "price": "7,880萬",
+                "area": "88.27",
+            },
+        }
+
+        # 1. 結合模式 2 社區入口資訊 (無 ID，有名稱「吉美富徠」)
+        entry_mode2 = {"info": {"cid": 0, "community_name": "吉美富徠"}}
+        detail2 = map_sale_house_detail(mock_detail_raw, community_entry=entry_mode2)
+        assert detail2.external_house_id == "S20846137"
+        assert detail2.external_community_id is None  # ID 為 None
+        assert detail2.community_name == "吉美富徠"  # 真實名稱保留！
+
+        # 2. 結合模式 1 社區入口資訊 (有 ID，有名稱)
+        entry_mode1 = {"info": {"cid": 5855864, "community_name": "鳴森大苑-碧硯閣"}}
+        detail1 = map_sale_house_detail(mock_detail_raw, community_entry=entry_mode1)
+        assert detail1.external_community_id == "5855864"
+        assert detail1.community_name == "鳴森大苑-碧硯閣"
+
+        # 3. 結合模式 3 (無社區建物)
+        entry_mode3 = {"info": {"cid": 0, "community_name": ""}}
+        detail3 = map_sale_house_detail(mock_detail_raw, community_entry=entry_mode3)
+        assert detail3.external_community_id is None
+        assert detail3.community_name is None
 
 
 class Test591AgeMapper:

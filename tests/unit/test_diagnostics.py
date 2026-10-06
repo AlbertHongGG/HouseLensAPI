@@ -238,7 +238,7 @@ def test_591_diagnostics_probes():
     assert diag.provider_id == "591"
 
     probes = diag.get_probes()
-    assert len(probes) == 7
+    assert len(probes) == 8
 
     endpoint_ids = [p.endpoint_id for p in probes]
     assert "health_ping" in endpoint_ids
@@ -246,12 +246,13 @@ def test_591_diagnostics_probes():
     assert "community_detail" in endpoint_ids
     assert "sale_list" in endpoint_ids
     assert "sale_detail" in endpoint_ids
+    assert "sale_community_entry" in endpoint_ids
     assert "new_house_list" in endpoint_ids
     assert "new_house_detail" in endpoint_ids
 
     # 領域篩選檢驗
     sale_probes = diag.get_probes(domain=DiagnosticDomain.SALE)
-    assert len(sale_probes) == 2
+    assert len(sale_probes) == 3
     for sp in sale_probes:
         assert sp.domain == DiagnosticDomain.SALE
 

@@ -119,6 +119,15 @@ class Source591Client:
 
         return data
 
+    async def fetch_sale_community_entry(self, sale_id: str) -> Dict[str, Any]:
+        """取得中古屋詳情頁社區入口資訊卡片 (微服務端點)
+
+        端點: GET https://bff-house.591.com.tw/v1/sale/detail/community/entry?id={sale_id}
+        """
+        clean_id = sale_id.lstrip("S") if sale_id.startswith("S") else sale_id
+        params = {"id": clean_id}
+        return await self.get("house", "/v1/sale/detail/community/entry", params=params)
+
     async def close(self):
         """關閉連線池"""
         if self._client and not self._client.is_closed:

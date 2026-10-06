@@ -184,8 +184,8 @@ class PropertyRepository(IPropertyRepository):
 
         lat = detail.coordinates.lat if detail.coordinates else None
         lng = detail.coordinates.lng if detail.coordinates else None
-        comm_name = summary.community_name if summary else detail.community_name
-        ext_comm_id = summary.external_community_id if summary and summary.external_community_id else detail.external_community_id
+        comm_name = detail.community_name or (summary.community_name if summary else None)
+        ext_comm_id = detail.external_community_id or (summary.external_community_id if summary else None)
 
         # 3. 查詢關聯社區實體內部外鍵 (UUID)
         matched_community_uuid: Optional[str] = None

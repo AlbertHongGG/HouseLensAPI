@@ -206,27 +206,49 @@ class CommunityResolutionService:
                     region=target.region_name,
                     section=target.section_name,
                     keyword=target.community_name,
-                    limit=5,
+                    limit=10,
                 )
+                # 優先第一級：全字精確吻合
                 exact_local = [
                     c for c in local_candidates
                     if self._is_name_exact_match(c.name, target.community_name)
                 ]
+                matched_local = None
                 if len(exact_local) == 1:
-                    matched = exact_local[0]
+                    matched_local = exact_local[0]
+                elif len(exact_local) > 1:
+                    return CommunityMatchResult(
+                        status=MatchStatus.AMBIGUOUS,
+                        reason=f"本地資料庫同區存在 {len(exact_local)} 個同名社區，主動防護跳過",
+                    )
+                else:
+                    # 次級：主幹包含吻合
+                    stem_local = [
+                        c for c in local_candidates
+                        if self._is_name_stem_match(c.name, target.community_name)
+                    ]
+                    if len(stem_local) == 1:
+                        matched_local = stem_local[0]
+                    elif len(stem_local) > 1:
+                        return CommunityMatchResult(
+                            status=MatchStatus.AMBIGUOUS,
+                            reason=f"本地資料庫同區存在 {len(stem_local)} 個主幹相符社區，主動防護跳過",
+                        )
+
+                if matched_local:
                     if not dry_run:
                         await prop_repo.batch_update_community_links(
                             property_ids=target.property_ids,
-                            community_uuid=matched.id,
-                            external_community_id=matched.external_community_id,
+                            community_uuid=matched_local.id,
+                            external_community_id=matched_local.external_community_id,
                         )
                     return CommunityMatchResult(
                         status=MatchStatus.LOCAL_LINKED,
-                        matched_community_uuid=matched.id,
-                        matched_external_id=matched.external_community_id,
-                        matched_name=matched.name,
+                        matched_community_uuid=matched_local.id,
+                        matched_external_id=matched_local.external_community_id,
+                        matched_name=matched_local.name,
                         confidence_score=0.95,
-                        reason="本地資料庫依同行政區名稱完全相符命中",
+                        reason="本地資料庫依同行政區名稱相符命中",
                     )
 
         # --- 階段二：遠端清單探索與兩層式入庫 (Remote Two-Tier Discovery) ---
@@ -279,28 +301,41 @@ class CommunityResolutionService:
             if id_matches:
                 matched_summary = id_matches[0]
         else:
-            # 依同行政區與名稱完全吻合比對
-            exact_name_matches = [
-                it for it in items
-                if self._is_name_exact_match(it.community_name, target.community_name)
-            ]
-
-            # 進一步校驗行政區
+            # 依同行政區與名稱雙層消歧比對
             if target.section_name:
-                section_matches = [
-                    it for it in exact_name_matches
+                section_candidates = [
+                    it for it in items
                     if it.section_name == target.section_name or (it.address and target.section_name in it.address)
                 ]
             else:
-                section_matches = exact_name_matches
+                section_candidates = items
 
-            if len(section_matches) == 1:
-                matched_summary = section_matches[0]
-            elif len(section_matches) > 1:
+            # 優先第一級：同區全字精確吻合
+            exact_matches = [
+                it for it in section_candidates
+                if self._is_name_exact_match(it.community_name, target.community_name)
+            ]
+
+            if len(exact_matches) == 1:
+                matched_summary = exact_matches[0]
+            elif len(exact_matches) > 1:
                 return CommunityMatchResult(
                     status=MatchStatus.AMBIGUOUS,
-                    reason=f"同名同區存在 {len(section_matches)} 個不同社區代碼，主動防護跳過",
+                    reason=f"同名同區存在 {len(exact_matches)} 個不同社區代碼，主動防護跳過",
                 )
+            else:
+                # 次級：同區主幹包含吻合 (處理案名前綴如 'Forest Park 吉美富徠')
+                stem_matches = [
+                    it for it in section_candidates
+                    if self._is_name_stem_match(it.community_name, target.community_name)
+                ]
+                if len(stem_matches) == 1:
+                    matched_summary = stem_matches[0]
+                elif len(stem_matches) > 1:
+                    return CommunityMatchResult(
+                        status=MatchStatus.AMBIGUOUS,
+                        reason=f"同區主幹相符存在 {len(stem_matches)} 個不同社區代碼，主動防護跳過",
+                    )
 
         if not matched_summary:
             return CommunityMatchResult(
@@ -345,12 +380,26 @@ class CommunityResolutionService:
         )
 
     @staticmethod
-    def _is_name_exact_match(name_a: Optional[str], name_b: Optional[str]) -> bool:
-        """嚴格名稱相符性檢驗 (剔除標點符號與空白，但拒絕任意子字串模糊匹配)"""
+    def _clean_name(s: str) -> str:
+        """清理社區名稱字串 (去除空白與常見標點符號)"""
+        return s.replace(" ", "").replace("-", "").replace("—", "").replace("(", "").replace(")", "").strip()
+
+    @classmethod
+    def _is_name_exact_match(cls, name_a: Optional[str], name_b: Optional[str]) -> bool:
+        """嚴格全字精確吻合檢驗"""
         if not name_a or not name_b:
             return False
+        return cls._clean_name(name_a) == cls._clean_name(name_b)
 
-        def clean(s: str) -> str:
-            return s.replace(" ", "").replace("-", "").replace("—", "").replace("(", "").replace(")", "").strip()
-
-        return clean(name_a) == clean(name_b)
+    @classmethod
+    def _is_name_stem_match(cls, official_name: Optional[str], target_name: Optional[str]) -> bool:
+        """主幹包含吻合檢驗 (一方完全包含另一方，且長度需大於等於 2)"""
+        if not official_name or not target_name:
+            return False
+        c_official = cls._clean_name(official_name)
+        c_target = cls._clean_name(target_name)
+        if len(c_target) >= 2 and c_target in c_official:
+            return True
+        if len(c_official) >= 2 and c_official in c_target:
+            return True
+        return False

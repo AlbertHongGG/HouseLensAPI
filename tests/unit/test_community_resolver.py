@@ -362,3 +362,111 @@ async def test_dry_run_mode_leaves_database_unmodified(resolver_test_db: Databas
         p_stmt = select(PropertyTable).where(PropertyTable.external_house_id == "S4004")
         p_res = await session.execute(p_stmt)
         assert p_res.scalar_one().community_uuid is None
+
+
+@pytest.mark.asyncio
+async def test_stem_matching_disambiguation_for_case_like_forest_park(resolver_test_db: DatabaseManager):
+    """測試案例驗證：無外部代碼但有名稱 (如 '吉美富徠')，遠端為 'Forest Park 吉美富徠' (同區唯一主幹包含吻合)，
+    成功兩層式入庫並反向回填 external_community_id。
+    """
+    async with resolver_test_db.session() as session:
+        prop_repo = PropertyRepository(session)
+        prop = await prop_repo.upsert_from_summary(
+            NormalizedSaleListing(
+                provider_id="591",
+                external_house_id="S20846137",
+                title="瑞安靜巷吉美富徠低公設純住",
+                price_wan=7880,
+                total_area_pin=88.27,
+                region_name="台北市",
+                section_name="大安區",
+                external_community_id=None,  # 模式 2: 無外部代碼
+                community_name="吉美富徠",   # 有真實名稱
+            ),
+            provider_id="591",
+        )
+        prop.community_uuid = None
+        await session.flush()
+
+    mock_comm_provider = MagicMock()
+    # 候選 1: 大安區 Forest Park 吉美富徠 (目標匹配項)
+    cand_target = NormalizedCommunitySummary(
+        provider_id="591",
+        external_community_id="104143",
+        community_name="Forest Park 吉美富徠",
+        region_name="台北市",
+        section_name="大安區",
+        address="台北市大安區瑞安街149巷6號",
+        coordinates=GeoPoint(lat=25.0298, lng=121.5392),
+    )
+    # 候選 2: 中山區 吉美富徠 馥樂 (不同行政區，自動過濾)
+    cand_other_sec = NormalizedCommunitySummary(
+        provider_id="591",
+        external_community_id="5988258",
+        community_name="吉美富徠 馥樂",
+        region_name="台北市",
+        section_name="中山區",
+        address="台北市中山區",
+    )
+    # 候選 3: 大安區 吉美大安花園 (不包含主幹 '吉美富徠'，自動過濾)
+    cand_daan_other = NormalizedCommunitySummary(
+        provider_id="591",
+        external_community_id="3675868",
+        community_name="吉美大安花園",
+        region_name="台北市",
+        section_name="大安區",
+        address="台北市大安區",
+    )
+
+    async def mock_search(q: CommunitySearchQuery):
+        return PageResult.create(
+            items=[cand_target, cand_other_sec, cand_daan_other],
+            total_records=3,
+            page=1,
+            page_size=20,
+        )
+
+    async def mock_detail(ext_id: str, summary: NormalizedCommunitySummary):
+        return NormalizedCommunityDetail(
+            provider_id="591",
+            external_community_id=ext_id,
+            community_name=summary.community_name,
+            region_name=summary.region_name,
+            section_name=summary.section_name,
+            address=summary.address,
+            coordinates=summary.coordinates,
+            total_households_count=42,
+        )
+
+    mock_comm_provider.search_communities = AsyncMock(side_effect=mock_search)
+    mock_comm_provider.get_community_detail = AsyncMock(side_effect=mock_detail)
+
+    reg = ProviderRegistry()
+    reg.register_instance(DummyCommunityProvider(mock_comm_provider))
+
+    service = CommunityResolutionService(provider_registry=reg, database=resolver_test_db)
+    options = CommunityResolutionOptions(provider_id="591")
+    report = await service.resolve_unlinked_properties(options)
+
+    # 驗證統計報告
+    assert report.scanned_properties_count == 1
+    assert report.remotely_resolved_properties_count == 1
+    assert report.persisted_communities_count == 1
+    assert report.ambiguous_targets_count == 0
+
+    # 驗證資料庫 Communities 表成功寫入
+    async with resolver_test_db.session() as session:
+        c_stmt = select(CommunityTable).where(CommunityTable.external_community_id == "104143")
+        c_res = await session.execute(c_stmt)
+        saved_comm = c_res.scalar_one()
+        assert saved_comm.name == "Forest Park 吉美富徠"
+        assert saved_comm.lat == 25.0298
+        assert saved_comm.lng == 121.5392
+
+        # 驗證房屋表記錄反向補齊 external_community_id 與外鍵 community_uuid
+        p_stmt = select(PropertyTable).where(PropertyTable.external_house_id == "S20846137")
+        p_res = await session.execute(p_stmt)
+        updated_prop = p_res.scalar_one()
+        assert updated_prop.community_uuid == saved_comm.id
+        assert updated_prop.external_community_id == "104143"  # 關鍵：模式 2 成功補齊外部 ID！
+

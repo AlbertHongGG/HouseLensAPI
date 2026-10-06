@@ -357,6 +357,69 @@ class SaleHouseDetailProbe(Base591Probe):
         )
 
 
+class SaleCommunityEntryProbe(Base591Probe):
+    """中古屋詳情頁社區入口卡片 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "sale_community_entry"
+
+    @property
+    def name(self) -> str:
+        return "中古屋社區入口卡片 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.SALE
+
+    @property
+    def description(self) -> str:
+        return "測試 591 中古屋社區卡片微服務端點連線 (支援自訂 target_id、動態 ID 與種子回退)"
+
+    @property
+    def requires_target_id(self) -> bool:
+        return True
+
+    @property
+    def default_target_id(self) -> Optional[str]:
+        return SEED_SALE_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        raw_target_id = (
+            context.target_id
+            if context and context.target_id
+            else self._context.get("sale_id", SEED_SALE_ID)
+        )
+        clean_id = str(raw_target_id).strip()
+        if clean_id.upper().startswith("S"):
+            clean_id = clean_id[1:]
+        elif clean_id.upper().startswith("H"):
+            clean_id = clean_id[1:]
+
+        target_id = clean_id
+        url = f"{CANONICAL_DOMAINS['house']}/v1/sale/detail/community/entry"
+        base_params = {
+            "id": target_id,
+            **DEFAULT_591_QUERY_PARAMS,
+        }
+        params = self._merge_params(base_params, context)
+        headers = dict(DEFAULT_591_HEADERS)
+        headers = self._merge_headers(headers, context)
+        metadata = self._create_metadata_template()
+        return await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="GET",
+            url=url,
+            params=params,
+            headers=headers,
+        )
+
+
 class NewHouseListProbe(Base591Probe):
     """新建案物件清單 API 探針"""
 
@@ -547,6 +610,7 @@ class Source591Diagnostics(IProviderDiagnostics):
             CommunityDetailProbe(ctx),
             SaleHouseListProbe(ctx),
             SaleHouseDetailProbe(ctx),
+            SaleCommunityEntryProbe(ctx),
             NewHouseListProbe(ctx),
             NewHouseDetailProbe(ctx),
         ]

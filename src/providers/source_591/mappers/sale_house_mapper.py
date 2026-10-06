@@ -27,6 +27,74 @@ from src.providers.source_591.normalizers import (
 )
 
 
+class Source591CommunityEntryDTO:
+    """591 中古屋社區入口卡片防腐資料傳輸物件 (ACL DTO)
+
+    專屬處理 /v1/sale/detail/community/entry 微服務回應：
+    - 模式 1: 有官方社區代碼且有名稱 (cid > 0, community_name != "")
+    - 模式 2: 無代碼但有真實社區名稱 (cid == 0, community_name != "") -> 痛點核心
+    - 模式 3: 客觀無社區獨立建物 (cid == 0, community_name == "")
+    - 模式 4: 空資料 (data: [])
+    """
+
+    def __init__(self, raw: Optional[Dict[str, Any]] = None):
+        if isinstance(raw, dict):
+            # 優先解析 data 區塊內之 info 核心資訊物件
+            info = raw.get("info")
+            if isinstance(info, dict):
+                self._data = info
+            else:
+                self._data = raw
+        else:
+            self._data = {}
+
+    @property
+    def cid(self) -> Optional[int]:
+        val = self._data.get("cid")
+        if val is not None:
+            try:
+                return int(val)
+            except (ValueError, TypeError):
+                return None
+        return None
+
+    @property
+    def community_name(self) -> Optional[str]:
+        val = self._data.get("community_name")
+        if val and str(val).strip():
+            return str(val).strip()
+        return None
+
+    @property
+    def street_keyword(self) -> Optional[str]:
+        condition = self._data.get("condition")
+        if isinstance(condition, dict) and condition.get("keyword"):
+            return str(condition.get("keyword")).strip()
+        val = self._data.get("street_keyword")
+        if val and str(val).strip():
+            return str(val).strip()
+        return None
+
+    @property
+    def normalized_community_id(self) -> Optional[str]:
+        """模式正規化外部社區代碼：
+        - 若 cid > 0: 回傳官方代碼字串 (模式 1)
+        - 若 cid == 0 或為空: 回傳 None (模式 2/3/4，杜絕魔術數字 '0' 入庫)
+        """
+        c = self.cid
+        if c is not None and c > 0:
+            return str(c)
+        return None
+
+    @property
+    def normalized_community_name(self) -> Optional[str]:
+        """模式正規化社區名稱：
+        - 若有名稱非空字串: 回傳純淨名稱 (模式 1/2)
+        - 若為空字串或無社區: 回傳 None (模式 3/4)
+        """
+        return self.community_name
+
+
 def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListing]:
     """將 591 sale/list 原始項目轉換為標準 NormalizedSaleListing。
 
@@ -110,11 +178,13 @@ def map_sale_house_summary(item: Dict[str, Any]) -> Optional[NormalizedSaleListi
 def map_sale_house_detail(
     data: Dict[str, Any],
     summary: Optional[NormalizedSaleListing] = None,
+    community_entry: Optional[Dict[str, Any]] = None,
 ) -> NormalizedSalePropertyDetail:
     """將 591 sale/detail 回應在模組內部清洗為標準 NormalizedSalePropertyDetail。
 
     所有欄位皆以強型別數值封裝，徹底杜絕文字殘留。
-    若提供 summary 上下文，則社區代號、社區名稱、封面縮圖等清單專屬資訊將完整繼承注入。
+    透過 Source591CommunityEntryDTO 整合微服務卡片資訊，支援模式 1 至模式 4 之原子化合併。
+    若提供 summary 上下文，則封面縮圖、地理標識等清單專屬資訊將安全繼承注入。
     """
     base_info = data.get("baseInfo") or {}
     address_info = base_info.get("address") or {}
@@ -181,7 +251,7 @@ def map_sale_house_detail(
     num_str = f"{address_info.get('addr_number')}號" if address_info.get("addr_number") else ""
     full_address = f"{raw_region or ''}{raw_section or ''}{raw_street or ''}{addr_str}{num_str}"
 
-    # --- 第一層：身分與地理空間標識 (100% 統一自清單 API summary) ---
+    # --- 第一層：身分與地理空間標識 ---
     raw_id = str(data.get("id") or "").strip().upper()
     canonical_id = raw_id if raw_id.startswith("S") else f"S{raw_id}"
 
@@ -191,8 +261,32 @@ def map_sale_house_detail(
     section_name = summary.section_name if summary else raw_section
     street_name = summary.street if summary else raw_street
     address_str = summary.address if summary else clean_optional_str(full_address)
-    ext_comm_id = summary.external_community_id if summary else clean_optional_str(data.get("community_id"))
-    comm_name = summary.community_name if summary else clean_optional_str(data.get("community_name"))
+
+    # 社區入口資訊防腐整合 (微服務雙端點併發聚合)
+    entry_dto = Source591CommunityEntryDTO(community_entry)
+
+    # 外部社區代碼判定：
+    # 1. 優先取微服務正規化 ID (若 cid > 0，模式 1)
+    # 2. 次之取 summary 的 external_community_id (清單中房仲有勾選者)
+    # 3. 再次之取 data 中的 community_id (若非 0)
+    ext_comm_id = entry_dto.normalized_community_id
+    if not ext_comm_id and summary and summary.external_community_id:
+        ext_comm_id = summary.external_community_id
+    if not ext_comm_id:
+        raw_cid = clean_optional_str(data.get("community_id"))
+        if raw_cid and raw_cid not in ("0", ""):
+            ext_comm_id = raw_cid
+
+    # 社區名稱判定：
+    # 1. 優先取微服務入口卡片名稱 (模式 1 與模式 2，如「吉美富徠」)
+    # 2. 次之取 summary 的 community_name
+    # 3. 再次之取 data 中的 community_name
+    comm_name = entry_dto.normalized_community_name
+    if not comm_name and summary and summary.community_name:
+        comm_name = summary.community_name
+    if not comm_name:
+        comm_name = clean_optional_str(data.get("community_name"))
+
     cover_image = summary.cover_image_url if summary else clean_optional_str(data.get("photo_src"))
 
     # 原始刊登網址 (100% 取自 otherInfo.shareInfo.url，防禦性容錯 shareInfo.url)
