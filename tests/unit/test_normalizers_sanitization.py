@@ -2,8 +2,8 @@
 
 from src.providers.source_591.normalizers import (
     clean_optional_str,
-    clean_park_price,
     clean_parking_count,
+    parse_parking_price_range,
 )
 
 
@@ -35,41 +35,44 @@ class TestCleanOptionalStr:
         assert clean_optional_str("RC造") == "RC造"
 
 
-class TestCleanParkPrice:
-    """測試 clean_park_price 車位價格清洗與 591 統計 Bug 修復"""
+class TestParseParkingPriceRange:
+    """測試 parse_parking_price_range 車位價格純數值解析與 591 統計 Bug 修復"""
 
     def test_empty_or_none(self):
-        assert clean_park_price(None) is None
-        assert clean_park_price("") is None
-        assert clean_park_price("   ") is None
-        assert clean_park_price("-") is None
-        assert clean_park_price({"price": "", "unit": "萬"}) is None
-        assert clean_park_price({"price": None, "unit": "萬"}) is None
+        assert parse_parking_price_range(None) == (None, None)
+        assert parse_parking_price_range("") == (None, None)
+        assert parse_parking_price_range("   ") == (None, None)
+        assert parse_parking_price_range("-") == (None, None)
+        assert parse_parking_price_range({"price": "", "unit": "萬"}) == (None, None)
+        assert parse_parking_price_range({"price": None, "unit": "萬"}) == (None, None)
+        assert parse_parking_price_range({"pending": 1, "price": "價格待定"}) == (None, None)
 
     def test_zero_to_max_bug_fixed_to_highest(self):
         # 591 實價登錄將無車位 0 元納入區間的 Bug 修復 (包含半形與全形符號 ~ ～ - －)
-        assert clean_park_price("0~320萬") == "最高 320萬"
-        assert clean_park_price("0～320萬") == "最高 320萬"
-        assert clean_park_price("0－320萬") == "最高 320萬"
-        assert clean_park_price("0~320") == "最高 320萬"
-        assert clean_park_price({"price": "0~320", "unit": "萬"}) == "最高 320萬"
-        assert clean_park_price({"price": "0～320", "unit": "萬"}) == "最高 320萬"
-        assert clean_park_price("0~2,750萬") == "最高 2,750萬"
-        assert clean_park_price("0～2,750萬") == "最高 2,750萬"
-        assert clean_park_price("0-500萬") == "最高 500萬"
-        assert clean_park_price("0~1,120萬") == "最高 1,120萬"
+        assert parse_parking_price_range("0~320萬") == (None, 320.0)
+        assert parse_parking_price_range("0～320萬") == (None, 320.0)
+        assert parse_parking_price_range("0－320萬") == (None, 320.0)
+        assert parse_parking_price_range("0~320") == (None, 320.0)
+        assert parse_parking_price_range({"price": "0~320", "unit": "萬"}) == (None, 320.0)
+        assert parse_parking_price_range({"price": "0～320", "unit": "萬"}) == (None, 320.0)
+        assert parse_parking_price_range("0~2,750萬") == (None, 2750.0)
+        assert parse_parking_price_range("0～2,750萬") == (None, 2750.0)
+        assert parse_parking_price_range("0-500萬") == (None, 500.0)
+        assert parse_parking_price_range("0~1,120萬") == (None, 1120.0)
+        assert parse_parking_price_range("最高 250萬") == (None, 250.0)
 
     def test_standard_range_preserved(self):
-        assert clean_park_price("290~330萬") == "290~330萬"
-        assert clean_park_price("290～330萬") == "290~330萬"
-        assert clean_park_price({"price": "290~330", "unit": "萬"}) == "290~330萬"
-        assert clean_park_price("220-300萬") == "220~300萬"
-        assert clean_park_price("360~500萬") == "360~500萬"
+        assert parse_parking_price_range("290~330萬") == (290.0, 330.0)
+        assert parse_parking_price_range("290～330萬") == (290.0, 330.0)
+        assert parse_parking_price_range({"price": "290~330", "unit": "萬"}) == (290.0, 330.0)
+        assert parse_parking_price_range("220-300萬") == (220.0, 300.0)
+        assert parse_parking_price_range("360~500萬") == (360.0, 500.0)
+        assert parse_parking_price_range({"price": "155~320", "unit": "萬"}) == (155.0, 320.0)
 
     def test_single_price_preserved(self):
-        assert clean_park_price("350萬") == "350萬"
-        assert clean_park_price({"price": "350", "unit": "萬"}) == "350萬"
-        assert clean_park_price("260") == "260萬"
+        assert parse_parking_price_range("350萬") == (350.0, 350.0)
+        assert parse_parking_price_range({"price": "350", "unit": "萬"}) == (350.0, 350.0)
+        assert parse_parking_price_range("260") == (260.0, 260.0)
 
 
 

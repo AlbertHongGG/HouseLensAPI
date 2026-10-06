@@ -406,58 +406,82 @@ def clean_optional_str(raw: Any) -> Optional[str]:
     return s
 
 
-def clean_park_price(raw: Any) -> Optional[str]:
-    """清洗並規範化車位價格描述。
+def parse_parking_price_range(
+    raw: Any,
+) -> Tuple[Optional[float], Optional[float]]:
+    """將各類平台車位價格封包解析為純數值 (min_price_wan, max_price_wan)。
 
-    處理 591 實價登錄統計缺陷 (未排除無車位交易導致的 0~X萬):
-        - "0~320萬" / "0～320萬" / "0－320萬" -> "最高 320萬"
-        - "0~2,750萬" / "0～2,750" -> "最高 2,750萬"
-        - "290~330萬" / "290～330萬" -> "290~330萬" (保持客觀區間)
-        - "350萬" -> "350萬" (單一價格)
-        - "" / None / "-" -> None
+    支援格式：
+        - 字典結構：{'price': '155~320', 'unit': '萬'} -> (155.0, 320.0)
+        - 591 統計缺陷結構：{'price': '0~250', 'unit': '萬'} -> (None, 250.0)
+        - 單一價格字典：{'price': '350', 'unit': '萬'} -> (350.0, 350.0)
+        - 待定字典：{'pending': 1, 'price': '價格待定'} -> (None, None)
+        - 字串正常區間："290~330萬" / "290～330" -> (290.0, 330.0)
+        - 字串缺陷結構："最高 250萬" / "0~250萬" -> (None, 250.0)
+        - 單一價格字串："350萬" / "350" -> (350.0, 350.0)
+        - 待定/空值："價格待定" / "暫無" / None -> (None, None)
     """
     if raw is None:
-        return None
+        return (None, None)
 
-    unit = "萬"
     price_str = ""
 
     if isinstance(raw, dict):
-        p_val = raw.get("price")
-        unit = raw.get("unit") or "萬"
-        price_str = str(p_val or "").strip()
+        pending = int(raw.get("pending") or 0)
+        if pending == 1:
+            return (None, None)
+        price_str = str(raw.get("price") or "").strip()
     else:
         price_str = str(raw).strip()
 
     cleaned = clean_optional_str(price_str)
-    if not cleaned:
-        return None
+    if not cleaned or "待定" in cleaned:
+        return (None, None)
 
     # 去除可能已自帶的單位進行正規化分析
     base_str = cleaned.replace("萬元", "").replace("萬", "").strip()
 
-    # 1. 偵測 0~X 模式 (591 統計 Bug 修復，支援全形與半形符號: ~ ～ - －)
+    # 1. 偵測 "最高 X" 或 "0~X" 模式 (591 實價登錄未排除無車位之統計缺陷)
+    m_highest = re.match(r"^最高\s*(\d[\d,]*(?:\.\d+)?)$", base_str)
+    if m_highest:
+        try:
+            return (None, float(m_highest.group(1).replace(",", "")))
+        except (ValueError, TypeError):
+            return (None, None)
+
     m_zero_to_max = re.match(r"^0\s*[~～\-－]\s*(\d[\d,]*(?:\.\d+)?)$", base_str)
     if m_zero_to_max:
-        max_p = m_zero_to_max.group(1)
-        return f"最高 {max_p}{unit}"
+        try:
+            return (None, float(m_zero_to_max.group(1).replace(",", "")))
+        except (ValueError, TypeError):
+            return (None, None)
 
-    # 2. 偵測正常區間 X~Y (支援全形與半形符號)
+    # 2. 偵測正常區間 X~Y (支援全形與半形符號: ~ ～ - －)
     m_range = re.match(
         r"^(\d[\d,]*(?:\.\d+)?)\s*[~～\-－]\s*(\d[\d,]*(?:\.\d+)?)$", base_str
     )
     if m_range:
-        min_p = m_range.group(1)
-        max_p = m_range.group(2)
-        return f"{min_p}~{max_p}{unit}"
+        try:
+            min_val = float(m_range.group(1).replace(",", ""))
+            max_val = float(m_range.group(2).replace(",", ""))
+            if min_val == 0.0 and max_val > 0.0:
+                return (None, max_val)
+            return (min_val, max_val)
+        except (ValueError, TypeError):
+            return (None, None)
 
     # 3. 偵測單一純數字
     m_single = re.match(r"^(\d[\d,]*(?:\.\d+)?)$", base_str)
     if m_single:
-        return f"{m_single.group(1)}{unit}"
+        try:
+            val = float(m_single.group(1).replace(",", ""))
+            if val == 0.0:
+                return (None, None)
+            return (val, val)
+        except (ValueError, TypeError):
+            return (None, None)
 
-    # 其他自訂文字描述，若非空則保留
-    return cleaned
+    return (None, None)
 
 
 
@@ -596,39 +620,7 @@ def parse_coordinate(val: Any) -> Optional[float]:
         return None
 
 
-def parse_new_house_parking_price(
-    raw: Any,
-) -> Tuple[Optional[str], Optional[float], Optional[float]]:
-    """解析新建案車位開價，回傳 (描述字串, 最低價萬元, 最高價萬元)。
 
-    支援 591 封包結構:
-        {'pending': 0, 'price': '155~320', 'unit': '萬'} -> ("155~320萬", 155.0, 320.0)
-        {'pending': 0, 'price': '380', 'unit': '萬'} -> ("380萬", 380.0, 380.0)
-        {'pending': 1, 'price': '價格待定', 'unit': ''} -> ("價格待定", None, None)
-    """
-    if raw is None:
-        return (None, None, None)
-
-    pending = 0
-    price_val = ""
-    unit = "萬"
-
-    if isinstance(raw, dict):
-        pending = int(raw.get("pending") or 0)
-        price_val = str(raw.get("price") or "").strip()
-        unit = str(raw.get("unit") or "萬").strip()
-    else:
-        price_val = str(raw).strip()
-
-    if not price_val or price_val in ("暫無", "無", "暫無資料"):
-        return (None, None, None)
-
-    if pending == 1 or "待定" in price_val:
-        return ("價格待定", None, None)
-
-    min_p, max_p = parse_range_float(price_val)
-    desc = f"{price_val}{unit}" if unit and not price_val.endswith(unit) else price_val
-    return (desc, min_p, max_p)
 
 
 

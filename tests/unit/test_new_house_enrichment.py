@@ -16,8 +16,8 @@ from src.providers.source_591.mappers.new_house_mapper import map_new_house_deta
 from src.providers.source_591.normalizers import (
     parse_charging_piles,
     parse_coordinate,
-    parse_new_house_parking_price,
     parse_parking_planning,
+    parse_parking_price_range,
     parse_parking_ratio,
 )
 from src.storage.database import DatabaseManager
@@ -83,33 +83,30 @@ class TestNewHouseNormalizers:
         assert parse_charging_piles("暫無") == (None, None)
         assert parse_charging_piles(None) == (None, None)
 
-    def test_parse_new_house_parking_price_variations(self):
+    def test_parse_parking_price_range_variations(self):
         # 區間價
-        desc, min_p, max_p = parse_new_house_parking_price(
+        min_p, max_p = parse_parking_price_range(
             {"pending": 0, "price": "155~320", "unit": "萬"}
         )
-        assert desc == "155~320萬"
         assert min_p == 155.0
         assert max_p == 320.0
 
         # 單一價
-        desc, min_p, max_p = parse_new_house_parking_price(
+        min_p, max_p = parse_parking_price_range(
             {"pending": 0, "price": "380", "unit": "萬"}
         )
-        assert desc == "380萬"
         assert min_p == 380.0
         assert max_p == 380.0
 
         # 待定價格
-        desc, min_p, max_p = parse_new_house_parking_price(
+        min_p, max_p = parse_parking_price_range(
             {"pending": 1, "price": "價格待定", "unit": ""}
         )
-        assert desc == "價格待定"
         assert min_p is None
         assert max_p is None
 
         # 缺失值
-        assert parse_new_house_parking_price(None) == (None, None, None)
+        assert parse_parking_price_range(None) == (None, None)
 
     def test_parse_coordinate_variations(self):
         assert parse_coordinate("25.04440") == 25.0444
@@ -175,7 +172,6 @@ class TestNewHouseRepositoryAndViews:
         await test_db.init_db()
 
         p = NewHouseParkingSpec(
-            parking_price_desc="180~250萬",
             min_parking_price_wan=180.0,
             max_parking_price_wan=250.0,
             parking_ratio_desc="1:1.0",

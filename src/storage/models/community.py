@@ -44,6 +44,8 @@ class CommunityTable(Base, TimestampMixin):
     public_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 公設比 (%)
     parking_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 車位數量
     parking_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比 (%)
+    min_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價下限 (萬元)
+    max_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價上限 (萬元)
     manage_fee_per_pin: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 管理費單價 (元/坪/月)
 
     # 描述與規劃資訊
@@ -52,7 +54,6 @@ class CommunityTable(Base, TimestampMixin):
     floor_plan: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     park_type_str: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    park_price: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 車位價格描述 (如: 290~330萬, 最高 320萬)
     land_division: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # 土地使用分區
     direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     landscape_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)

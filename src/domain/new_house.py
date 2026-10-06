@@ -22,7 +22,6 @@ class NewHouseLayoutSpec(BaseModel):
 class NewHouseParkingSpec(BaseModel):
     """標準車位規劃與充電設備規格 (純數值化值物件)"""
 
-    parking_price_desc: CleanStr = Field(None, description="車位價格描述 (例如: '155~320萬')")
     min_parking_price_wan: Optional[float] = Field(None, ge=0.0, description="車位價格下限 (萬元)")
     max_parking_price_wan: Optional[float] = Field(None, ge=0.0, description="車位價格上限 (萬元)")
     parking_ratio_desc: CleanStr = Field(None, description="車位配比描述 (例如: '1:0.46')")

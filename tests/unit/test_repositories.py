@@ -85,7 +85,8 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             developer_company="中華工程股份有限公司",
             cover_image_url="https://example.com/cover.jpg",
             park_type_str="平面式",
-            park_price="360~420萬",
+            min_parking_price_wan=360.0,
+            max_parking_price_wan=420.0,
             land_division="第三之二種住宅區",
             landscape_name="境業設計",
             postulate_name="境業設計",
@@ -101,7 +102,8 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         assert updated.facilities == ["接待大廳", "空中花園"]
         assert updated.cover_image_url == "https://example.com/cover.jpg"
         assert updated.park_type_str == "平面式"
-        assert updated.park_price == "360~420萬"
+        assert updated.min_parking_price_wan == 360.0
+        assert updated.max_parking_price_wan == 420.0
         assert updated.base_area_pin == 450.0
         assert updated.land_division == "第三之二種住宅區"
         assert updated.landscape_name == "境業設計"

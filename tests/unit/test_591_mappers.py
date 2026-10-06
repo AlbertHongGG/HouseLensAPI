@@ -112,7 +112,8 @@ class Test591CommunityMappers:
         assert detail.avg_unit_price_wan == summary.avg_unit_price_wan
         assert detail.avg_unit_price_wan == 94.0
         assert detail.park_type_str == "平面式"
-        assert detail.park_price == "360~420萬"
+        assert detail.min_parking_price_wan == 360.0
+        assert detail.max_parking_price_wan == 420.0
         assert detail.base_area_pin == 1446.0
         assert detail.land_division == "第三種住宅區"
         assert detail.landscape_name == "境業設計工程有限公司"
@@ -353,7 +354,6 @@ class Test591NewHouseMappers:
         assert detail.longitude == 121.50265
 
         # 斷言車位規格值物件 (NewHouseParkingSpec)
-        assert detail.parking.parking_price_desc == "155~320萬"
         assert detail.parking.min_parking_price_wan == 155.0
         assert detail.parking.max_parking_price_wan == 320.0
         assert detail.parking.parking_ratio_desc == "1:0.46"

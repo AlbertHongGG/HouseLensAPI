@@ -76,7 +76,6 @@ def test_domain_model_clean_str_invariants():
         direction_rule="無",
         floor_plan="-",
         park_type_str="",
-        park_price="",
         land_division="不詳",
         developer_company="未知",
         builder_company="",
@@ -88,7 +87,8 @@ def test_domain_model_clean_str_invariants():
     assert detail.direction_rule is None
     assert detail.floor_plan is None
     assert detail.park_type_str is None
-    assert detail.park_price is None
+    assert detail.min_parking_price_wan is None
+    assert detail.max_parking_price_wan is None
     assert detail.land_division is None
     assert detail.developer_company is None
     assert detail.builder_company is None
@@ -123,7 +123,8 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
             cover_image_url="https://example.com/summary_cover.jpg",
             # 待清洗的舊硬體規格
             park_type_str="舊髒資料_機械式",
-            park_price="舊髒價格_100萬",
+            min_parking_price_wan=100.0,
+            max_parking_price_wan=150.0,
             land_division="舊分區_住三",
             floor_plan="舊樓層_地上10層",
             structure="舊結構_RC",
@@ -138,7 +139,7 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
         await session.flush()
 
         # 2. 準備權威 Detail 快照：
-        #    硬體規格中 park_type_str, park_price, land_division 等皆為 None (例如國宅無車位型態或無土地分區資料)
+        #    硬體規格中 park_type_str, min_parking_price_wan, land_division 等皆為 None (例如國宅無車位型態或無土地分區資料)
         #    avg_unit_price_wan 為 None (detail 未提供均價，需保留 summary 原始均價)
         clean_detail = NormalizedCommunityDetail(
             provider_id="591",
@@ -157,7 +158,8 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
             floor_plan="地上12層",  # 更新
             structure=None,  # 權威清空 (覆蓋 舊結構_RC)
             park_type_str=None,  # 權威清空 (覆蓋 舊髒資料_機械式)
-            park_price=None,  # 權威清空 (覆蓋 舊髒價格_100萬)
+            min_parking_price_wan=None,  # 權威清空 (覆蓋 100.0)
+            max_parking_price_wan=None,  # 權威清空 (覆蓋 150.0)
             land_division=None,  # 權威清空 (覆蓋 舊分區_住三)
             developer_company=None,  # 權威清空 (覆蓋 舊建商)
             builder_company="新建造商",
@@ -168,7 +170,8 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
         # 3. 驗證權威覆蓋語意
         # (A) 硬體規格被 None 徹底清空，髒資料不再殘留
         assert updated.park_type_str is None
-        assert updated.park_price is None
+        assert updated.min_parking_price_wan is None
+        assert updated.max_parking_price_wan is None
         assert updated.land_division is None
         assert updated.structure is None
         assert updated.parking_count is None

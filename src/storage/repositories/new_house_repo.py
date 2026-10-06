@@ -71,7 +71,6 @@ class NewHouseRepository(INewHouseRepository):
                 max_unit_price_wan=detail.max_unit_price_wan,
                 min_parking_price_wan=detail.parking.min_parking_price_wan if detail.parking else None,
                 max_parking_price_wan=detail.parking.max_parking_price_wan if detail.parking else None,
-                parking_price_desc=detail.parking.parking_price_desc if detail.parking else None,
                 parking_ratio_desc=detail.parking.parking_ratio_desc if detail.parking else None,
                 parking_ratio_val=detail.parking.parking_ratio_val if detail.parking else None,
                 parking_planning_desc=detail.parking.parking_planning_desc if detail.parking else None,
@@ -141,8 +140,6 @@ class NewHouseRepository(INewHouseRepository):
                     record.min_parking_price_wan = detail.parking.min_parking_price_wan
                 if detail.parking.max_parking_price_wan is not None:
                     record.max_parking_price_wan = detail.parking.max_parking_price_wan
-                if detail.parking.parking_price_desc:
-                    record.parking_price_desc = detail.parking.parking_price_desc
                 if detail.parking.parking_ratio_desc:
                     record.parking_ratio_desc = detail.parking.parking_ratio_desc
                 if detail.parking.parking_ratio_val is not None:

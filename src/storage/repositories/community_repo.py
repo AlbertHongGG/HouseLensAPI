@@ -138,11 +138,12 @@ class CommunityRepository(ICommunityRepository):
                 public_ratio_pct=detail.public_ratio_pct,
                 parking_count=detail.parking_count,
                 parking_ratio_pct=detail.parking_ratio_pct,
+                min_parking_price_wan=detail.min_parking_price_wan,
+                max_parking_price_wan=detail.max_parking_price_wan,
                 manage_fee_per_pin=detail.manage_fee_per_pin,
                 floor_plan=detail.floor_plan,
                 structure=detail.structure,
                 park_type_str=detail.park_type_str,
-                park_price=detail.park_price,
                 land_division=detail.land_division,
                 direction_rule=detail.direction_rule,
                 landscape_name=detail.landscape_name,
@@ -190,12 +191,13 @@ class CommunityRepository(ICommunityRepository):
             record.public_ratio_pct = detail.public_ratio_pct
             record.parking_count = detail.parking_count
             record.parking_ratio_pct = detail.parking_ratio_pct
+            record.min_parking_price_wan = detail.min_parking_price_wan
+            record.max_parking_price_wan = detail.max_parking_price_wan
             record.manage_fee_per_pin = detail.manage_fee_per_pin
 
             record.floor_plan = detail.floor_plan
             record.structure = detail.structure
             record.park_type_str = detail.park_type_str
-            record.park_price = detail.park_price
             record.land_division = detail.land_division
             record.direction_rule = detail.direction_rule
             record.landscape_name = detail.landscape_name

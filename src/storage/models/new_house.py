@@ -52,7 +52,6 @@ class NewHouseTable(Base, TimestampMixin):
     # 車位純數值與規格規劃
     min_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價下限 (萬元)
     max_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價上限 (萬元)
-    parking_price_desc: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 車位開價描述
     parking_ratio_desc: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)  # 車位配比描述
     parking_ratio_val: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比數值比率
     parking_planning_desc: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # 車位規劃描述

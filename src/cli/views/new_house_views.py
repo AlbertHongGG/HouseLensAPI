@@ -128,12 +128,15 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     park_table.add_column(style="bold cyan", justify="right")
     park_table.add_column(style="white")
 
-    p_price_s = nh.parking_price_desc or "-"
     if nh.min_parking_price_wan is not None and nh.max_parking_price_wan is not None:
         if nh.min_parking_price_wan == nh.max_parking_price_wan:
             p_price_s = f"{nh.min_parking_price_wan:.0f} 萬"
         else:
             p_price_s = f"{nh.min_parking_price_wan:.0f}~{nh.max_parking_price_wan:.0f} 萬"
+    elif nh.max_parking_price_wan is not None:
+        p_price_s = f"最高 {nh.max_parking_price_wan:.0f} 萬"
+    else:
+        p_price_s = "-"
 
     p_counts = []
     if nh.plane_parking_count is not None:
@@ -234,7 +237,6 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
         "parking": {
             "min_parking_price_wan": nh.min_parking_price_wan,
             "max_parking_price_wan": nh.max_parking_price_wan,
-            "parking_price_desc": nh.parking_price_desc,
             "parking_ratio_desc": nh.parking_ratio_desc,
             "parking_ratio_val": nh.parking_ratio_val,
             "parking_planning_desc": nh.parking_planning_desc,

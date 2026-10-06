@@ -19,8 +19,8 @@ from src.providers.source_591.normalizers import (
     parse_currency_amount,
     parse_households_count,
     parse_int_count,
-    parse_new_house_parking_price,
     parse_parking_planning,
+    parse_parking_price_range,
     parse_parking_ratio,
     parse_percent,
     parse_pin,
@@ -150,7 +150,7 @@ def map_new_house_detail(
 
     # 10. 車位規劃與充電設備規格解析
     park_price_raw = housing.get("park_price")
-    p_price_desc, min_p_price, max_p_price = parse_new_house_parking_price(park_price_raw)
+    min_p_price, max_p_price = parse_parking_price_range(park_price_raw)
     p_ratio_desc, p_ratio_val = parse_parking_ratio(housing.get("park_ratio"))
     plane_p_cnt, mech_p_cnt = parse_parking_planning(housing.get("park_planning"))
     p_plan_desc = clean_optional_str(housing.get("park_planning"))
@@ -161,7 +161,6 @@ def map_new_house_detail(
         park_style = None
 
     parking = NewHouseParkingSpec(
-        parking_price_desc=p_price_desc,
         min_parking_price_wan=min_p_price,
         max_parking_price_wan=max_p_price,
         parking_ratio_desc=p_ratio_desc,

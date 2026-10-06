@@ -13,10 +13,10 @@ from src.domain.community import (
 from src.providers.source_591.mappers.age_mapper import Source591AgeMapper
 from src.providers.source_591.normalizers import (
     clean_optional_str,
-    clean_park_price,
     clean_parking_count,
     parse_currency_amount,
     parse_int_count,
+    parse_parking_price_range,
     parse_percent,
     parse_pin,
     parse_unit_price,
@@ -103,8 +103,8 @@ def map_community_detail(
         rate_raw=park_rate_raw,
     )
 
-    # 車位價格正規化清洗 (修正 591 實價登錄 0~X萬 統計缺陷為 最高 X萬)
-    park_price = clean_park_price(build_info.get("park_price"))
+    # 車位價格純數值解析 (min_parking_price_wan, max_parking_price_wan)
+    min_park_price, max_park_price = parse_parking_price_range(build_info.get("park_price"))
 
     # 車位型態空值純化
     park_type_str = clean_optional_str(build_info.get("park_type_str"))
@@ -181,7 +181,8 @@ def map_community_detail(
         housing_status=housing_status,
         total_households=total_households,
         parking_count=parking_count,
-        park_price=park_price,
+        min_parking_price_wan=min_park_price,
+        max_parking_price_wan=max_park_price,
         park_type_str=park_type_str,
         parking_ratio_pct=park_ratio,
         public_ratio_pct=public_ratio,
