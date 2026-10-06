@@ -125,7 +125,8 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     specs_table.add_row("所在樓層:", floor_str, "屋齡/座向:", f"{age_str} / {p.orientation or '-'}")
     specs_table.add_row("行政區地址:", f"{p.region_name or ''}{p.section_name or ''} {p.address or ''}", "地理座標:", coords_str)
     specs_table.add_row("管理費:", mgmt_fee_str, "公設比/現況:", f"{pub_ratio_str} / {p.current_state or '-'}")
-    specs_table.add_row("帶租約現況:", lease_str, "車位規格說明:", p.parking_desc or "-")
+    photo_count_str = f"{len(p.image_urls)} 張" if p.image_urls else "無"
+    specs_table.add_row("相簿照片數量:", photo_count_str, "封面照片連結:", p.cover_image_url or "-")
     specs_table.add_row("原始物件網址:", p.url or "-", "", "")
 
     # 產權面積明細
@@ -222,6 +223,8 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
         "address": p.address,
         "lat": p.lat,
         "lng": p.lng,
+        "cover_image_url": p.cover_image_url,
+        "image_urls": p.image_urls or [],
         "url": p.url,
         "listings_count": len(p.listings),
         "listings": [
@@ -232,6 +235,7 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
                 "listing_title": it.listing_title,
                 "listing_price_wan": it.listing_price_wan,
                 "cover_image_url": it.cover_image_url,
+                "image_urls": it.image_urls or [],
                 "url": it.url,
                 "updated_at": it.updated_at.isoformat() if it.updated_at else None,
             }

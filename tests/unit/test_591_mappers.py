@@ -26,6 +26,7 @@ from src.providers.source_591.mappers.new_house_mapper import (
 )
 from src.providers.source_591.mappers.sale_house_mapper import (
     Source591CommunityEntryDTO,
+    Source591PhotosDTO,
     map_sale_house_detail,
     map_sale_house_summary,
 )
@@ -339,6 +340,85 @@ class Test591SaleHouseMappers:
         detail3 = map_sale_house_detail(mock_detail_raw, community_entry=entry_mode3)
         assert detail3.external_community_id is None
         assert detail3.community_name is None
+
+    def test_sale_photos_dto_extraction_and_sorting(self):
+        mock_raw_photos = {
+            "list": [
+                {
+                    "key": "video",
+                    "title": "影片介紹",
+                    "list": [
+                        {"photo": "https://img.591.com.tw/video_thumb.jpg", "isCover": 0}
+                    ],
+                },
+                {
+                    "key": "picture",
+                    "title": "房屋相片",
+                    "list": [
+                        {"photo": "https://img.591.com.tw/room_1.jpg", "isCover": 0},
+                        {"photo": "https://img.591.com.tw/living_room_cover.jpg", "isCover": 1},
+                        {"photo": "https://img.591.com.tw/kitchen.jpg", "isCover": 0},
+                        {"photo": "https://img.591.com.tw/room_1.jpg", "isCover": 0},  # 重複網址
+                    ],
+                },
+                {
+                    "key": "picture",
+                    "title": "格局圖",
+                    "list": [
+                        {"photo": "https://img.591.com.tw/layout.jpg", "isCover": 0}
+                    ],
+                },
+            ]
+        }
+        dto = Source591PhotosDTO(mock_raw_photos)
+        # 1. 排除 video
+        assert "https://img.591.com.tw/video_thumb.jpg" not in dto.image_urls
+        # 2. 封面置頂於索引 0
+        assert dto.image_urls[0] == "https://img.591.com.tw/living_room_cover.jpg"
+        assert dto.cover_url == "https://img.591.com.tw/living_room_cover.jpg"
+        # 3. 去重且保持後續順序
+        assert dto.image_urls == [
+            "https://img.591.com.tw/living_room_cover.jpg",
+            "https://img.591.com.tw/room_1.jpg",
+            "https://img.591.com.tw/kitchen.jpg",
+            "https://img.591.com.tw/layout.jpg",
+        ]
+
+        # 4. 容錯處理：None 與非 dict 輸入
+        empty_dto = Source591PhotosDTO(None)
+        assert empty_dto.image_urls == []
+        assert empty_dto.cover_url is None
+
+    def test_sale_house_detail_atomic_merging_with_photos(self):
+        mock_detail_raw = {
+            "id": "20846137",
+            "baseInfo": {
+                "title": "瑞安靜巷吉美富徠低公設純住",
+                "price": "7,880萬",
+                "area": "88.27",
+            },
+        }
+        mock_photos_raw = {
+            "list": [
+                {
+                    "key": "picture",
+                    "list": [
+                        {"photo": "https://img.591.com.tw/pic1.jpg", "isCover": 1},
+                        {"photo": "https://img.591.com.tw/pic2.jpg", "isCover": 0},
+                    ],
+                }
+            ]
+        }
+
+        # 傳入相簿微服務資料
+        detail = map_sale_house_detail(mock_detail_raw, photos_data=mock_photos_raw)
+        assert detail.image_urls == [
+            "https://img.591.com.tw/pic1.jpg",
+            "https://img.591.com.tw/pic2.jpg",
+        ]
+        # 當 detail 本身無封面時，自動回填相簿封面
+        assert detail.cover_image_url == "https://img.591.com.tw/pic1.jpg"
+
 
 
 class Test591AgeMapper:

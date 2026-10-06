@@ -145,6 +145,7 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
             address="台北市松山區三民路80巷25號",
             coordinates=GeoPoint(lat=25.0561, lng=121.5645),
             community_name="鳴森大苑-碧硯閣",
+            image_urls=["https://img.example.com/p1.jpg", "https://img.example.com/p2.jpg"],
         )
         sh_summary_591 = NormalizedSaleListing(
             provider_id="591",
@@ -175,8 +176,12 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
         assert prop1.price_wan == 5258
         assert prop1.floor_current == 2
         assert prop1.rooms == 3
+        assert prop1.cover_image_url == "https://img.example.com/cover1.jpg"
+        assert prop1.image_urls == ["https://img.example.com/p1.jpg", "https://img.example.com/p2.jpg"]
         assert len(prop1.listings) == 1
         assert prop1.listings[0].provider_id == "591"
+        assert prop1.listings[0].cover_image_url == "https://img.example.com/cover1.jpg"
+        assert prop1.listings[0].image_urls == ["https://img.example.com/p1.jpg", "https://img.example.com/p2.jpg"]
 
         # 2. 另一來源 (如信義房屋 sinyi) 刊登同一物理物件 (同社區、同樓層、坪數微幅誤差 46.30 vs 46.29)
         sh_summary_sinyi = NormalizedSaleListing(

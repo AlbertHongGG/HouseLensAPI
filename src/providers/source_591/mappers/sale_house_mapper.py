@@ -4,7 +4,7 @@
 NormalizedSaleListing 與 NormalizedSalePropertyDetail。
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from src.domain.common import GeoPoint
 from src.domain.sale_house import (
@@ -25,6 +25,73 @@ from src.providers.source_591.normalizers import (
     parse_price_wan,
     parse_unit_price,
 )
+
+
+class Source591PhotosDTO:
+    """591 中古屋相簿防腐資料傳輸物件 (ACL DTO)
+
+    專屬處理 /v1/ware/photos 微服務回應：
+    - 解析 data.list 中的圖片群組 (key == 'picture' 或含有 items 之相簿群組)
+    - 排序保證：標記為 isCover == 1 的封面照片強制置頂至第一順位 (index 0)
+    - 清洗萃取乾淨的高畫質 photo URL 清單
+    """
+
+    def __init__(self, raw: Optional[Dict[str, Any]] = None):
+        if isinstance(raw, dict):
+            if "data" in raw and isinstance(raw["data"], dict):
+                self._raw = raw["data"]
+            else:
+                self._raw = raw
+        else:
+            self._raw = {}
+
+    @property
+    def cover_url(self) -> Optional[str]:
+        """傳回封面照片 URL (若無標記封面則傳回第一張相片)"""
+        urls = self.image_urls
+        return urls[0] if urls else None
+
+    @property
+    def image_urls(self) -> List[str]:
+        """傳回標準按序排列的高畫質照片 URL 列表 (首圖保證置頂)"""
+        list_blocks = self._raw.get("list")
+        if not isinstance(list_blocks, list):
+            return []
+
+        cover_urls: List[str] = []
+        regular_urls: List[str] = []
+        seen: set = set()
+
+        for block in list_blocks:
+            if not isinstance(block, dict):
+                continue
+            # 若為影片群組，忽略其影片封面，專注於實際房屋實景相簿
+            if block.get("key") == "video":
+                continue
+
+            items = block.get("list") or block.get("items") or []
+            if not isinstance(items, list):
+                continue
+
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                raw_url = item.get("photo") or item.get("origPhoto")
+                if not raw_url or not str(raw_url).strip():
+                    continue
+
+                url = str(raw_url).strip()
+                if url in seen:
+                    continue
+                seen.add(url)
+
+                is_cover = str(item.get("isCover")) in ("1", "true", "True")
+                if is_cover:
+                    cover_urls.append(url)
+                else:
+                    regular_urls.append(url)
+
+        return cover_urls + regular_urls
 
 
 class Source591CommunityEntryDTO:
@@ -179,11 +246,13 @@ def map_sale_house_detail(
     data: Dict[str, Any],
     summary: Optional[NormalizedSaleListing] = None,
     community_entry: Optional[Dict[str, Any]] = None,
+    photos_data: Optional[Dict[str, Any]] = None,
 ) -> NormalizedSalePropertyDetail:
     """將 591 sale/detail 回應在模組內部清洗為標準 NormalizedSalePropertyDetail。
 
     所有欄位皆以強型別數值封裝，徹底杜絕文字殘留。
-    透過 Source591CommunityEntryDTO 整合微服務卡片資訊，支援模式 1 至模式 4 之原子化合併。
+    透過 Source591CommunityEntryDTO 整合微服務社區卡片資訊，支援模式 1 至模式 4 之原子化合併。
+    透過 Source591PhotosDTO 整合微服務相簿資訊，保證封面首圖置頂並過濾影片群組。
     若提供 summary 上下文，則封面縮圖、地理標識等清單專屬資訊將安全繼承注入。
     """
     base_info = data.get("baseInfo") or {}
@@ -287,7 +356,13 @@ def map_sale_house_detail(
     if not comm_name:
         comm_name = clean_optional_str(data.get("community_name"))
 
+    # 相簿圖片清單防腐整合 (微服務三端點並行聚合)
+    photos_dto = Source591PhotosDTO(photos_data)
+    image_urls = photos_dto.image_urls
+
     cover_image = summary.cover_image_url if summary else clean_optional_str(data.get("photo_src"))
+    if not cover_image and image_urls:
+        cover_image = image_urls[0]
 
     # 原始刊登網址 (100% 取自 otherInfo.shareInfo.url，防禦性容錯 shareInfo.url)
     other_info = data.get("otherInfo") or {}
@@ -306,6 +381,7 @@ def map_sale_house_detail(
         external_community_id=ext_comm_id,
         community_name=comm_name,
         cover_image_url=cover_image,
+        image_urls=image_urls,
         url=sale_house_url,
         # --- 第二層：深層建築、硬體規格與時程層 (100% 詳情 API 唯一來源) ---
         price_wan=price_wan,

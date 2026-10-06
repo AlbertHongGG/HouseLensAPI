@@ -128,6 +128,15 @@ class Source591Client:
         params = {"id": clean_id}
         return await self.get("house", "/v1/sale/detail/community/entry", params=params)
 
+    async def fetch_sale_house_photos(self, sale_id: str) -> Dict[str, Any]:
+        """取得中古屋房屋相簿圖片列表 (微服務端點)
+
+        端點: GET https://bff-house.591.com.tw/v1/ware/photos?id={sale_id}&type=2
+        """
+        clean_id = sale_id.lstrip("S") if sale_id.startswith("S") else sale_id
+        params = {"id": clean_id, "type": "2"}
+        return await self.get("house", "/v1/ware/photos", params=params)
+
     async def close(self):
         """關閉連線池"""
         if self._client and not self._client.is_closed:

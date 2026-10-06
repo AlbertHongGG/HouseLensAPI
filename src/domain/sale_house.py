@@ -4,7 +4,7 @@
 Provider 模組必須自行將外部各平台之字串與特化格式清洗正規化為此規格。
 """
 
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from src.domain.common import BaseSearchQuery, CleanStr, GeoPoint
@@ -89,6 +89,7 @@ class NormalizedSalePropertyDetail(BaseModel):
     external_community_id: CleanStr = Field(None, description="外部平台所屬社區代號 (如 591 社區 ID: '5855864')")
     community_name: CleanStr = Field(None, description="社區名稱")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
+    image_urls: List[str] = Field(default_factory=list, description="物件完整相簿圖片網址清單 (首圖保證置頂)")
     url: CleanStr = Field(None, description="原始刊登網址")
 
 

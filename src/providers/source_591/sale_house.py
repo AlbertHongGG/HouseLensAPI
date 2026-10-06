@@ -99,7 +99,7 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
         }
         detail_headers = {"cm91dgu": "L3NhbGVob3VzZS9kZXRhaWw="}
 
-        # 雙端點併發聚合：同時發送主詳情與社區入口微服務
+        # 三端點並行聚合：同時發送主詳情、社區入口微服務與相簿微服務
         detail_task = self._client.get(
             "house",
             "/v1/app/gateway/sale/detail",
@@ -107,9 +107,15 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
             headers=detail_headers,
         )
         comm_entry_task = self._client.fetch_sale_community_entry(clean_id)
+        photos_task = self._client.fetch_sale_house_photos(clean_id)
 
-        results = await asyncio.gather(detail_task, comm_entry_task, return_exceptions=True)
-        detail_res, comm_entry_res = results[0], results[1]
+        results = await asyncio.gather(
+            detail_task,
+            comm_entry_task,
+            photos_task,
+            return_exceptions=True,
+        )
+        detail_res, comm_entry_res, photos_res = results[0], results[1], results[2]
 
         if isinstance(detail_res, Exception):
             raise detail_res
@@ -122,8 +128,15 @@ class Source591SaleHouseProvider(ISaleHouseProvider):
         else:
             logger.warning("取得中古屋社區入口微服務失敗 (ID: %s): %s", clean_id, comm_entry_res)
 
+        photos_data = None
+        if not isinstance(photos_res, Exception):
+            photos_data = photos_res.get("data")
+        else:
+            logger.warning("取得中古屋相簿微服務失敗 (ID: %s): %s", clean_id, photos_res)
+
         return map_sale_house_detail(
             detail_data,
             summary=summary,
             community_entry=comm_entry_data if isinstance(comm_entry_data, dict) else None,
+            photos_data=photos_data if isinstance(photos_data, dict) else None,
         )

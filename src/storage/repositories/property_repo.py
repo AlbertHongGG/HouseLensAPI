@@ -246,6 +246,8 @@ class PropertyRepository(IPropertyRepository):
                 address=detail.address,
                 lat=lat,
                 lng=lng,
+                cover_image_url=detail.cover_image_url or (summary.cover_image_url if summary else None),
+                image_urls=detail.image_urls,
                 url=detail.url,
             )
             self.session.add(property_entity)
@@ -295,11 +297,15 @@ class PropertyRepository(IPropertyRepository):
             if lat is not None and lng is not None:
                 property_entity.lat = lat
                 property_entity.lng = lng
+            if detail.cover_image_url or (summary and summary.cover_image_url):
+                property_entity.cover_image_url = detail.cover_image_url or (summary.cover_image_url if summary else None)
+            if detail.image_urls:
+                property_entity.image_urls = detail.image_urls
             if detail.url:
                 property_entity.url = detail.url
 
         # 5. 同步更新或新增來源刊登紀錄
-        cover_url = (summary.cover_image_url if summary else None) or detail.cover_image_url
+        cover_url = detail.cover_image_url or (summary.cover_image_url if summary else None)
         listing_price = summary.price_wan if summary else detail.price_wan
         listing_url = (summary.url if summary and summary.url else None) or detail.url
 
@@ -312,6 +318,7 @@ class PropertyRepository(IPropertyRepository):
                 listing_title=detail.title,
                 listing_price_wan=listing_price,
                 cover_image_url=cover_url,
+                image_urls=detail.image_urls,
                 url=listing_url,
             )
             listing.property = property_entity
@@ -321,6 +328,8 @@ class PropertyRepository(IPropertyRepository):
             listing.listing_price_wan = listing_price
             if cover_url:
                 listing.cover_image_url = cover_url
+            if detail.image_urls:
+                listing.image_urls = detail.image_urls
             if listing_url:
                 listing.url = listing_url
 
@@ -393,6 +402,7 @@ class PropertyRepository(IPropertyRepository):
                 section_name=summary.section_name,
                 street=summary.street,
                 address=summary.address,
+                cover_image_url=summary.cover_image_url,
                 url=summary.url,
             )
             self.session.add(property_entity)
@@ -426,6 +436,8 @@ class PropertyRepository(IPropertyRepository):
                 property_entity.region_name = summary.region_name
             if summary.section_name:
                 property_entity.section_name = summary.section_name
+            if summary.cover_image_url and not property_entity.cover_image_url:
+                property_entity.cover_image_url = summary.cover_image_url
             if summary.url:
                 property_entity.url = summary.url
 

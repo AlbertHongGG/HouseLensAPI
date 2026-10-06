@@ -13,7 +13,7 @@ uv sync
 ```
 
 ### 2. 執行自動化測試
-全套 114 項自動化測試（涵蓋領域模型規格、591 封包正規化轉換、倉儲層、消歧去重服務、領域不變量、單端點參數化探針與串流同步管線）：
+全套 120 項自動化測試（涵蓋領域模型規格、591 封包正規化轉換、倉儲層、消歧去重服務、領域不變量、單端點參數化探針與串流同步管線）：
 ```bash
 uv run pytest
 ```
@@ -166,7 +166,7 @@ uv run houselens list sale --format json | jq '.[0]'
 | 指令 | 識別碼參數 (IDENTIFIER) | 選項 | 說明 |
 | :--- | :--- | :--- | :--- |
 | `houselens get community <id>` | 社區內部 UUID、UUID 前綴、或來源平台社區代號（如 `5868278`） | `-f, --format <text\|json>` | 檢視建築規劃、車位比、座向規則、公設清單、管理費與原始網址 |
-| `houselens get sale <id>` | 房屋實體 UUID、UUID 前綴、或主表外部房源代號/各平台刊登編號（如 `S20604856`） | `-f, --format <text\|json>` | 檢視客觀物理規格，並列出跨平台來源刊登比價明細與原始網址 |
+| `houselens get sale <id>` | 房屋實體 UUID、UUID 前綴、或主表外部房源代號/各平台刊登編號（如 `S20604856`） | `-f, --format <text\|json>` | 檢視客觀物理規格、相簿照片數量、封面圖，並列出跨平台來源刊登比價明細與原始網址 |
 | `houselens get newhouse <id>` | 建案內部 UUID、UUID 前綴、或外部建案專案代號（如 `128292` 或 `138045`） | `-f, --format <text\|json>` | 檢視建案建材、團隊、房型坪數規劃矩陣與原始網址 |
 
 #### 常用範例
@@ -205,7 +205,7 @@ houselens test
 | 參數 / 選項 | 簡寫 | 類型 | 預設值 | 說明 |
 | :--- | :--- | :--- | :--- | :--- |
 | `provider_id` | - | Argument | 必要 | 目標來源外掛代碼（例如 `591`） |
-| `endpoint_id` | - | Argument | 必要 | 目標端點代碼（例如 `sale_detail`, `community_detail`, `new_house_detail`） |
+| `endpoint_id` | - | Argument | 必要 | 目標端點代碼（例如 `sale_detail`, `sale_photos`, `sale_community_entry`, `community_detail`, `new_house_detail`） |
 | `--target-id` | `-i` | Option | None | 目標物件/實體 ID（例如中古屋 `S20846137`、社區 `5855864`、建案 `138045`）。未提供時回退至預設種子 ID |
 | `--params` | `-p` | Option | None | 自訂追加或覆蓋之 Query 參數（JSON 字串，例如 `'{"regionid": 1}'`） |
 | `--output-file` | `-o` | Option | None | 自訂完整封包 JSON 落盤檔案路徑 |
@@ -245,18 +245,27 @@ houselens test
         │   ├── community_detail.json             # 社區詳情 API 快照
         │   ├── sale_list.json                    # 中古屋清單 API 快照
         │   ├── sale_detail.json                  # 中古屋詳情 API 快照
+        │   ├── sale_community_entry.json         # 中古屋社區入口卡片微服務快照
+        │   ├── sale_photos.json                  # 中古屋相簿圖片微服務快照
         │   ├── new_house_list.json               # 新建案清單 API 快照
         │   └── new_house_detail.json             # 新建案詳情 API 快照
         └── single_probes/                       # 單端點 test endpoint 執行目錄
             ├── sale_detail_2026-10-07T03-13-13.json
+            ├── sale_photos_2026-10-07T05-08-17.json
             └── community_detail_2026-10-07T03-15-20.json
 ```
 
 #### 常用範例
 
 ```bash
+# 測試 591 中古屋相簿圖片 API，指定測試特定物件代碼 S20846137 並錄製完整相簿封包
+uv run houselens test endpoint 591 sale_photos -i S20846137
+
 # 測試 591 中古屋詳情 API，指定測試特定物件代碼 S20846137 並錄製完整封包
 uv run houselens test endpoint 591 sale_detail -i S20846137
+
+# 測試 591 中古屋社區卡片入口微服務 API
+uv run houselens test endpoint 591 sale_community_entry -i S20846137
 
 # 測試 591 社區詳情 API，指定社區代碼 5855864 並另存至指定檔案
 uv run houselens test endpoint 591 community_detail -i 5855864 -o ./debug_community.json
@@ -339,6 +348,19 @@ uv run houselens link-communities -l 50 --format json
   * 各平台外掛模組（如 591）負責完全清洗其特化字串（如 `"5,258萬元"`, `"2F/24F"`, `"3房2廳2衛"`, `"1年"`, `"30%"`）。
   * CleanStr 自動防護：空字串 `""`、空白 `\s+`、破折號 `"-"`、中文佔位符 `"未提供"` 等於領域模型實例化瞬間昇華為 `None`。
   * 權威快照覆蓋語意（Authoritative Snapshot Override）：當以 Detail 詳情覆蓋更新既有實體時，Detail 中的 `None` 具備權威清空髒資料之能力，使舊有未清洗欄位能正確被覆蓋清空。
+* **BFF 三端點並行非同步聚合與相簿微服務整合 (BFF Tri-Endpoint Parallel Aggregation)**：
+  * 針對 591 平台中古屋資料破碎割裂現象（主詳情 API 無相簿與無社區真實名稱），採用 BFF (Backend-For-Frontend) 三端點非同步並行聚合架構：
+    1. 主詳情端點：`/v1/app/gateway/sale/detail`（負責深層建築規格、價格格局與坐標）。
+    2. 社區入口卡片端點：`/v1/sale/detail/community/entry`（負責突破房仲未綁官方庫之限制，補齊真實社區名稱）。
+    3. 相簿圖片微服務端點：`/v1/ware/photos?id={id}&type=2`（負責取得房屋分組相簿與實景高畫質大圖）。
+  * 透過 `asyncio.gather` 並行調用，總耗時與單一請求相當（0 額外耗時），且輔助微服務具備安全降級與容錯隔離，確保主資料流程堅不可摧。
+* **相簿防腐層 ACL 與封面排序置頂不變量 (Photos ACL & Cover First Invariant)**：
+  * 相簿防腐 DTO 自動排除影片群組（`key == "video"`），專注提取真實房屋實景相簿與格局圖。
+  * 封面排序保證：標記為 `isCover == 1` 的照片強制置頂至第一順位（index 0），同時作為客觀實體之 `cover_image_url`。
+  * 清洗萃取 1000px 高畫質圖並自動去除重複 URL，以標準字串陣列 `image_urls: List[str]` 持久化儲存。
+* **資料庫結構自動增補遷移機制 (SQLite Lightweight Auto-Migration)**：
+  * 本地 SQLite 引擎具備自我修復機制，在 `init_db()` 及 Session 連線建立時自動檢查現有資料表結構。
+  * 若偵測到新版欄位（如 `cover_image_url`、`image_urls`）缺失，自動執行安全的 `ALTER TABLE ... ADD COLUMN` 動態增補，徹底免疫「no such column」問題，平滑相容既有資料庫。
 * **串流微批次同步管線 (Streaming Micro-batch Pipeline)**：
   * 逐頁探索、快篩已入庫、併發取得自足規格、即時微批次持久化入庫，兼顧記憶體控制、失敗重試隔離與目標筆數跨頁累加。
 
@@ -445,6 +467,8 @@ uv run houselens link-communities -l 50 --format json
 | `land_area_pin` | Float | 土地持分 (坪) | 詳情 `baseInfo.areaIntro[土地持分坪數].value` | 【第二層：詳情】轉 float |
 | `parking_area_pin` | Float | 車位面積 (坪) | 詳情 `baseInfo.areaIntro[車位面積].value` | 【第二層：詳情】轉 float |
 | `lat` / `lng` | Float | 經緯度坐標 | 詳情 `baseInfo.address.lat`, `lng` | 【第二層：詳情】轉 float (中古屋物理精確坐標來自詳情 API) |
+| `cover_image_url` | String(512) | 封面圖 URL | 清單 `photo_src` / 相簿微服務首圖 | 【第一/二層】封面高畫質大圖/縮圖 URL |
+| `image_urls` | JSON | 相簿圖片 URL 清單 | 相簿微服務 `ware/photos` | 【第二層：微服務】標準字串陣列 `["https://..."]`，首圖置頂保證 |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |
 
 ---
@@ -463,6 +487,7 @@ uv run houselens link-communities -l 50 --format json
 | `listing_title` | String(256) | 刊登廣告標題 | 清單 `items[].title` | 【第一層：清單】房仲自訂廣告標題 |
 | `listing_price_wan` | Int | 刊登開價 (萬元) | 清單 `items[].price` | 【第一層：清單】轉 int |
 | `cover_image_url` | String(512) | 封面圖 URL | 清單 `items[].photo_src` | 【第一層：清單】清單刊登縮圖 |
+| `image_urls` | JSON | 來源刊登相簿圖片清單 | 相簿微服務 `ware/photos` | 【第二層：微服務】該刊登所屬之相簿圖片清單 |
 | `url` | String(512) | 刊登網址 | 詳情 `otherInfo.shareInfo.url` | 【第二層：詳情】來源刊登原始網址 |
 | `raw_data` | JSON | 原始封包 | - | 快照備份 (可選) |
 | `created_at` / `updated_at` | DateTime | 建立/更新時間 | - | 系統自動產生 |

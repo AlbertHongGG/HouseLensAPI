@@ -238,7 +238,7 @@ def test_591_diagnostics_probes():
     assert diag.provider_id == "591"
 
     probes = diag.get_probes()
-    assert len(probes) == 8
+    assert len(probes) == 9
 
     endpoint_ids = [p.endpoint_id for p in probes]
     assert "health_ping" in endpoint_ids
@@ -247,12 +247,13 @@ def test_591_diagnostics_probes():
     assert "sale_list" in endpoint_ids
     assert "sale_detail" in endpoint_ids
     assert "sale_community_entry" in endpoint_ids
+    assert "sale_photos" in endpoint_ids
     assert "new_house_list" in endpoint_ids
     assert "new_house_detail" in endpoint_ids
 
     # 領域篩選檢驗
     sale_probes = diag.get_probes(domain=DiagnosticDomain.SALE)
-    assert len(sale_probes) == 3
+    assert len(sale_probes) == 4
     for sp in sale_probes:
         assert sp.domain == DiagnosticDomain.SALE
 
@@ -447,4 +448,34 @@ async def test_591_sale_detail_probe_target_id_cleaning():
     assert artifact.metadata.status == DiagnosticStatus.SUCCESS
     # 檢查請求參數中的 id 是否已去除 S
     assert artifact.request.params["id"] == "20846137"
+
+
+@pytest.mark.asyncio
+async def test_591_sale_photos_probe_execution():
+    """驗證 591 SaleHousePhotosProbe 規格、前綴清理與參數組裝"""
+    from src.domain.diagnostics import ProbeExecutionContext
+    from src.providers.source_591.diagnostics import SaleHousePhotosProbe
+
+    probe = SaleHousePhotosProbe()
+    assert probe.endpoint_id == "sale_photos"
+    assert probe.domain == DiagnosticDomain.SALE
+    assert probe.requires_target_id is True
+    assert probe.default_target_id == "20604856"
+
+    mock_client = AsyncMock(spec=httpx.AsyncClient)
+    mock_resp = MagicMock(spec=httpx.Response)
+    mock_resp.status_code = 200
+    mock_resp.headers = {}
+    mock_resp.json.return_value = {"status": 1, "data": {"list": []}}
+    mock_client.headers = {}
+    mock_client.request.return_value = mock_resp
+
+    ctx = ProbeExecutionContext(target_id="S20846137")
+    artifact = await probe.execute(mock_client, context=ctx)
+
+    assert artifact.metadata.status == DiagnosticStatus.SUCCESS
+    assert artifact.request.params["id"] == "20846137"
+    assert artifact.request.params["type"] == "2"
+    assert "/v1/ware/photos" in artifact.request.url
+
 
