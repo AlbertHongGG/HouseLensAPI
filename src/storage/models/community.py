@@ -26,7 +26,7 @@ class CommunityTable(Base, TimestampMixin):
 
     name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     building_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    build_purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     housing_status: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
 
     region_name: Mapped[Optional[str]] = mapped_column(String(32), nullable=True, index=True)
@@ -43,7 +43,7 @@ class CommunityTable(Base, TimestampMixin):
     base_area_pin: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 基地面積純浮點數 (坪)
     public_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 公設比 (%)
     parking_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 車位數量
-    parking_ratio_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比 (%)
+    parking_ratio: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比率
     min_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價下限 (萬元)
     max_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價上限 (萬元)
     manage_fee_per_pin: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 管理費單價 (元/坪/月)
@@ -53,11 +53,11 @@ class CommunityTable(Base, TimestampMixin):
     transport: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     floor_plan: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    park_type_str: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    parking_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     land_division: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # 土地使用分區
-    direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    landscape_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
-    postulate_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    orientation: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    landscape_designer: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    public_facility_designer: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     facilities: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
 
     # 建商營造團隊

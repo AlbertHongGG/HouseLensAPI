@@ -51,14 +51,14 @@ def test_domain_model_clean_str_invariants():
         section_name="大安區",
         address="台北市大安區新生南路",
         building_type="",  # 空字串
-        build_purpose="   ",  # 空白字串
+        purpose="   ",  # 空白字串
         housing_status="-",  # 破折號佔位符
         shopping_district="未提供",  # 中文佔位符
         transport="暫無資料",  # 佔位符
         cover_image_url="--",  # 雙破折號
     )
     assert summary.building_type is None
-    assert summary.build_purpose is None
+    assert summary.purpose is None
     assert summary.housing_status is None
     assert summary.shopping_district is None
     assert summary.transport is None
@@ -73,28 +73,28 @@ def test_domain_model_clean_str_invariants():
         region_name="台北市",
         section_name="大安區",
         structure="",
-        direction_rule="無",
+        orientation="無",
         floor_plan="-",
-        park_type_str="",
+        parking_type="",
         land_division="不詳",
         developer_company="未知",
         builder_company="",
         architect_company="",
-        landscape_name="",
-        postulate_name="",
+        landscape_designer="",
+        public_facility_designer="",
     )
     assert detail.structure is None
-    assert detail.direction_rule is None
+    assert detail.orientation is None
     assert detail.floor_plan is None
-    assert detail.park_type_str is None
+    assert detail.parking_type is None
     assert detail.min_parking_price_wan is None
     assert detail.max_parking_price_wan is None
     assert detail.land_division is None
     assert detail.developer_company is None
     assert detail.builder_company is None
     assert detail.architect_company is None
-    assert detail.landscape_name is None
-    assert detail.postulate_name is None
+    assert detail.landscape_designer is None
+    assert detail.public_facility_designer is None
 
 
 def test_community_table_schema_convergence():
@@ -122,14 +122,14 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
             building_age_years=5.0,
             cover_image_url="https://example.com/summary_cover.jpg",
             # 待清洗的舊硬體規格
-            park_type_str="舊髒資料_機械式",
+            parking_type="舊髒資料_機械式",
             min_parking_price_wan=100.0,
             max_parking_price_wan=150.0,
             land_division="舊分區_住三",
             floor_plan="舊樓層_地上10層",
             structure="舊結構_RC",
             parking_count=50,
-            parking_ratio_pct=0.8,
+            parking_ratio=0.8,
             public_ratio_pct=35.0,
             manage_fee_per_pin=80,
             base_area_pin=300.0,
@@ -139,7 +139,7 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
         await session.flush()
 
         # 2. 準備權威 Detail 快照：
-        #    硬體規格中 park_type_str, min_parking_price_wan, land_division 等皆為 None (例如國宅無車位型態或無土地分區資料)
+        #    硬體規格中 parking_type, min_parking_price_wan, land_division 等皆為 None (例如國宅無車位型態或無土地分區資料)
         #    avg_unit_price_wan 為 None (detail 未提供均價，需保留 summary 原始均價)
         clean_detail = NormalizedCommunityDetail(
             provider_id="591",
@@ -153,11 +153,11 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
             base_area_pin=400.0,  # 權威更新
             public_ratio_pct=33.0,
             parking_count=None,  # 權威清空 (覆蓋 50)
-            parking_ratio_pct=None,  # 權威清空 (覆蓋 0.8)
+            parking_ratio=None,  # 權威清空 (覆蓋 0.8)
             manage_fee_per_pin=100,
             floor_plan="地上12層",  # 更新
             structure=None,  # 權威清空 (覆蓋 舊結構_RC)
-            park_type_str=None,  # 權威清空 (覆蓋 舊髒資料_機械式)
+            parking_type=None,  # 權威清空 (覆蓋 舊髒資料_機械式)
             min_parking_price_wan=None,  # 權威清空 (覆蓋 100.0)
             max_parking_price_wan=None,  # 權威清空 (覆蓋 150.0)
             land_division=None,  # 權威清空 (覆蓋 舊分區_住三)
@@ -169,13 +169,13 @@ async def test_authoritative_snapshot_override_cleans_dirty_data(mem_db: Databas
 
         # 3. 驗證權威覆蓋語意
         # (A) 硬體規格被 None 徹底清空，髒資料不再殘留
-        assert updated.park_type_str is None
+        assert updated.parking_type is None
         assert updated.min_parking_price_wan is None
         assert updated.max_parking_price_wan is None
         assert updated.land_division is None
         assert updated.structure is None
         assert updated.parking_count is None
-        assert updated.parking_ratio_pct is None
+        assert updated.parking_ratio is None
         assert updated.developer_company is None
 
         # (B) 權威新規格成功寫入
@@ -255,7 +255,7 @@ async def test_sale_house_property_authoritative_snapshot_and_fk_linking(mem_db:
             management_fee_monthly=4200,
             has_lease=False,
             building_type="住宅",
-            building_structure="電梯大樓",
+            structure="電梯大樓",
             orientation="坐南朝北",
             purpose="住家用",
             current_state="住宅",
@@ -428,8 +428,8 @@ def test_cross_domain_ssot_two_tier_invariants():
     nh_summary = NormalizedNewHouseSummary(
         provider_id="591",
         external_project_id="888001",
-        project_name="清單權威建案名",
-        project_status="預售屋",
+        name="清單權威建案名",
+        housing_status="預售屋",
         region_name="新北市",
         section_name="三重區",
         address="新北市三重區重新路",
@@ -452,8 +452,8 @@ def test_cross_domain_ssot_two_tier_invariants():
     mapped_nh = map_new_house_detail(data=nh_detail_raw, summary=nh_summary)
     # 第一層：100% 統一由 summary 注入
     assert mapped_nh.external_project_id == "888001"
-    assert mapped_nh.project_name == "清單權威建案名"
-    assert mapped_nh.build_type == "預售屋"
+    assert mapped_nh.name == "清單權威建案名"
+    assert mapped_nh.housing_status == "預售屋"
     assert mapped_nh.region_name == "新北市"
     assert mapped_nh.section_name == "三重區"
     assert mapped_nh.address == "新北市三重區重新路"
@@ -465,7 +465,7 @@ def test_cross_domain_ssot_two_tier_invariants():
     assert mapped_nh.max_area_pin == 45.0
     assert mapped_nh.base_area_pin == 600.0
     assert mapped_nh.total_households == 150
-    assert mapped_nh.latitude == 25.0600
+    assert mapped_nh.lat == 25.0600
 
     # 3. 社區 (Community) SSOT 驗證
     comm_summary = NormalizedCommunitySummary(
@@ -500,7 +500,7 @@ def test_cross_domain_ssot_two_tier_invariants():
     assert mapped_comm.cover_image_url == "https://img.example.com/comm_summary.jpg"
     # 第二層：100% 來自詳情 API
     assert mapped_comm.building_type == "住宅大樓"
-    assert mapped_comm.build_purpose == "住家用"
+    assert mapped_comm.purpose == "住家用"
     assert mapped_comm.housing_status == "預售屋"
     assert mapped_comm.total_households == 200
     assert mapped_comm.base_area_pin == 800.0

@@ -205,8 +205,8 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
             NormalizedNewHouseSummary(
                 provider_id="mock_591",
                 external_project_id=str(1000 + (query.page - 1) * 10 + i),
-                project_name=f"測試建案_{(query.page - 1) * 10 + i}",
-                project_status="預售屋",
+                name=f"測試建案_{(query.page - 1) * 10 + i}",
+                housing_status="預售屋",
                 region_name="台北市",
                 section_name="南港區",
                 address="台北市南港區重陽路",
@@ -219,8 +219,8 @@ async def test_sync_new_houses_multi_page_accumulation(sync_test_db: DatabaseMan
         return NormalizedNewHouseDetail(
             provider_id="mock_591",
             external_project_id=new_house_id,
-            project_name=f"詳情_{new_house_id}",
-            build_type="預售屋",
+            name=f"詳情_{new_house_id}",
+            housing_status="預售屋",
             region_name="台北市",
             section_name="南港區",
             address="台北市南港區重陽路",
@@ -338,8 +338,8 @@ async def test_sync_all_with_unified_options(sync_test_db):
             NormalizedNewHouseSummary(
                 provider_id="mock_591",
                 external_project_id=str(9000 + i),
-                project_name=f"建案_{i}",
-                project_status="新成屋",
+                name=f"建案_{i}",
+                housing_status="新成屋",
                 region_name="台北市",
                 section_name="中山區",
                 address="台北市中山區民生東路",
@@ -352,8 +352,8 @@ async def test_sync_all_with_unified_options(sync_test_db):
         return NormalizedNewHouseDetail(
             provider_id="mock_591",
             external_project_id=hid,
-            project_name=f"建案_{hid}",
-            build_type="新成屋",
+            name=f"建案_{hid}",
+            housing_status="新成屋",
             region_name="台北市",
             section_name="中山區",
             address="台北市中山區民生東路",

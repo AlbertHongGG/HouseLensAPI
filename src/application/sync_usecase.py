@@ -273,7 +273,7 @@ class SyncUseCase:
                         record = await repo.upsert_from_detail(detail, provider_id=provider_id)
                         saved.append(record)
                     else:
-                        logger.warning(f"新建案項目 {item.external_project_id} ({item.project_name}) 詳情獲取失敗或已失效，略過入庫。")
+                        logger.warning(f"新建案項目 {item.external_project_id} ({item.name}) 詳情獲取失敗或已失效，略過入庫。")
             return saved
 
         pipeline = StreamingSyncPipeline[NormalizedNewHouseSummary, NormalizedNewHouseDetail, NewHouseTable](

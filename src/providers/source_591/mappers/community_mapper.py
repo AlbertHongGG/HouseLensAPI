@@ -64,7 +64,7 @@ def map_community_summary(item: Dict[str, Any]) -> NormalizedCommunitySummary:
         coordinates=coords,
         avg_unit_price_wan=avg_price,
         building_type=None,
-        build_purpose=clean_optional_str(item.get("build_purpose_simple")),
+        purpose=clean_optional_str(item.get("build_purpose_simple")),
         housing_status=clean_optional_str(item.get("housing_text")),
         shopping_district=clean_optional_str(item.get("shop_name")),
         transport=clean_optional_str(item.get("station_name")),
@@ -107,7 +107,7 @@ def map_community_detail(
     min_park_price, max_park_price = parse_parking_price_range(build_info.get("park_price"))
 
     # 車位型態空值純化
-    park_type_str = clean_optional_str(build_info.get("park_type_str"))
+    parking_type = clean_optional_str(build_info.get("park_type_str"))
 
     # 車位配比與公設比解析
     park_ratio = None
@@ -138,7 +138,7 @@ def map_community_detail(
     building_type = clean_optional_str(build_info.get("purpose_str"))
 
     # 2. 法定使用用途 (100% 來自詳情 build_info.purpose_other2)
-    build_purpose = clean_optional_str(build_info.get("purpose_other2"))
+    purpose = clean_optional_str(build_info.get("purpose_other2"))
 
     # 3. 成屋/建案狀態 (100% 來自詳情 build_info.build_type / build_type_str)
     raw_status_code = build_info.get("build_type")
@@ -177,27 +177,27 @@ def map_community_detail(
         transport=summary.transport,
         # --- 建築規格與規劃：100% 取自詳情 build_info 單一區塊 (三維解耦) ---
         building_type=building_type,
-        build_purpose=build_purpose,
+        purpose=purpose,
         housing_status=housing_status,
         total_households=total_households,
         parking_count=parking_count,
         min_parking_price_wan=min_park_price,
         max_parking_price_wan=max_park_price,
-        park_type_str=park_type_str,
-        parking_ratio_pct=park_ratio,
+        parking_type=parking_type,
+        parking_ratio=park_ratio,
         public_ratio_pct=public_ratio,
         manage_fee_per_pin=manage_fee,
         base_area_pin=base_area_pin,
         land_division=land_division,
         building_age_years=building_age,
         structure=clean_optional_str(build_info.get("structural_engine")),
-        direction_rule=clean_optional_str(build_info.get("direction_rule")),
+        orientation=clean_optional_str(build_info.get("direction_rule")),
         floor_plan=clean_optional_str(build_info.get("floor")),
         facilities=facility_list,
         developer_company=clean_optional_str(build_info.get("company")),
         builder_company=clean_optional_str(build_info.get("build_company")),
         architect_company=clean_optional_str(build_info.get("construction_company")),
-        landscape_name=clean_optional_str(build_info.get("landscape_name")),
-        postulate_name=clean_optional_str(build_info.get("postulate_name")),
+        landscape_designer=clean_optional_str(build_info.get("landscape_name")),
+        public_facility_designer=clean_optional_str(build_info.get("postulate_name")),
     )
 

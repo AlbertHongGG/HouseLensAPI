@@ -74,8 +74,8 @@ class MockNewHouseProvider(INewHouseProvider):
         return NormalizedNewHouseDetail(
             provider_id="mock_src",
             external_project_id=external_project_id,
-            project_name="測試建案",
-            build_type="預售屋",
+            name="測試建案",
+            housing_status="預售屋",
             region_name="台北市",
             section_name="中正區",
             address="測試路",

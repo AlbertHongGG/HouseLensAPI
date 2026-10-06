@@ -72,7 +72,7 @@ class NormalizedSalePropertyDetail(BaseModel):
 
     # 構造與現況描述
     building_type: CleanStr = Field(None, description="建物類型 (如: 住宅)")
-    building_structure: CleanStr = Field(None, description="建築構造 (如: 電梯大樓、公寓)")
+    structure: CleanStr = Field(None, description="建築結構工法 (如: RC造、SRC造)")
     is_whole_building: bool = Field(default=False, description="是否為整棟銷售 (如透天、整棟別墅)")
     orientation: CleanStr = Field(None, description="主要朝向 (如: 坐南朝北)")
     purpose: CleanStr = Field(None, description="法定主要用途 (如: 住家用)")

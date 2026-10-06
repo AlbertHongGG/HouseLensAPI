@@ -82,7 +82,7 @@ class TestCommunityModels:
             avg_unit_price_wan=141.0,
             building_age_years=1.0,
             building_type="住宅大樓",
-            build_purpose="住宅",
+            purpose="住宅",
             housing_status="新成屋",
             shopping_district="民生社區",
             transport="南京三民站",
@@ -107,10 +107,10 @@ class TestCommunityModels:
             region_name="台北市",
             section_name="松山區",
             building_type="住宅大樓",
-            build_purpose="住家用",
+            purpose="住家用",
             housing_status="新成屋",
-            parking_ratio_pct=1.07,
-            direction_rule="朝北、朝南",
+            parking_ratio=1.07,
+            orientation="朝北、朝南",
             facilities=["接待大廳", "空中花園"],
             manage_fee_per_pin=150,
             total_households=290,
@@ -121,10 +121,10 @@ class TestCommunityModels:
         assert detail.external_community_id == "5934204"
         assert detail.base_area_pin == 450.0
         assert len(detail.facilities) == 2
-        assert detail.direction_rule == "朝北、朝南"
+        assert detail.orientation == "朝北、朝南"
         assert detail.manage_fee_per_pin == 150
         assert detail.building_type == "住宅大樓"
-        assert detail.build_purpose == "住家用"
+        assert detail.purpose == "住家用"
         assert detail.housing_status == "新成屋"
 
 
@@ -175,7 +175,7 @@ class TestSaleHouseModels:
             balconies=1,
             total_area_pin=46.29,
             building_type="住宅",
-            building_structure="電梯大樓",
+            structure="電梯大樓",
             floor_current=2,
             floor_total=24,
             building_age_years=1.0,
@@ -219,8 +219,8 @@ class TestNewHouseModels:
         summary = NormalizedNewHouseSummary(
             provider_id="591",
             external_project_id="138045",
-            project_name="長虹MVP",
-            project_status="預售屋",
+            name="長虹MVP",
+            housing_status="預售屋",
             region_name="台北市",
             section_name="萬華區",
             address="台北市萬華區康定路",
@@ -241,14 +241,14 @@ class TestNewHouseModels:
         detail = NormalizedNewHouseDetail(
             provider_id="591",
             external_project_id="138045",
-            project_name="長虹MVP",
-            build_type="預售屋",
+            name="長虹MVP",
+            housing_status="預售屋",
             region_name="台北市",
             section_name="萬華區",
             address="台北市萬華區康定路、峨眉街口",
             manage_fee_per_pin=150,
-            structural_engine="SRC鋼骨鋼筋混凝土結構",
-            direction_rule="朝西北",
+            structure="SRC鋼骨鋼筋混凝土結構",
+            orientation="朝西北",
             layouts=[
                 NewHouseLayoutSpec(room_name="二房", rooms_count=2, min_area_pin=28.0, max_area_pin=31.0),
                 NewHouseLayoutSpec(room_name="三房", rooms_count=3, min_area_pin=35.0, max_area_pin=41.0),
@@ -265,4 +265,4 @@ class TestNewHouseModels:
         assert detail.layouts[0].room_name == "二房"
         assert detail.layouts[0].rooms_count == 2
         assert detail.total_households == 331
-        assert detail.structural_engine == "SRC鋼骨鋼筋混凝土結構"
+        assert detail.structure == "SRC鋼骨鋼筋混凝土結構"

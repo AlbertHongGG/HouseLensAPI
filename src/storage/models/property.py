@@ -69,7 +69,7 @@ class PropertyTable(Base, TimestampMixin):
 
     # 建築類型與描述
     building_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    building_structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    structure: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     orientation: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     current_state: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)

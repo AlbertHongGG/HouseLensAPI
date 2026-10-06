@@ -71,7 +71,7 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     base_str = f"{c.base_area_pin:.2f} 坪" if c.base_area_pin is not None else "-"
     pub_str = f"{c.public_ratio_pct:.1f}%" if c.public_ratio_pct is not None else "-"
     park_cnt_str = f"{c.parking_count} 個" if c.parking_count is not None else "-"
-    park_pct_str = f"{c.parking_ratio_pct:.1f}%" if c.parking_ratio_pct is not None else "-"
+    park_pct_str = f"{c.parking_ratio:.2f}" if c.parking_ratio is not None else "-"
     mgmt_fee_str = f"{c.manage_fee_per_pin} 元/坪/月" if c.manage_fee_per_pin is not None else "-"
 
     if c.min_parking_price_wan is not None and c.max_parking_price_wan is not None:
@@ -88,14 +88,14 @@ def render_community_detail_panel(c: CommunityTable) -> Panel:
     details_table.add_row("社區名稱:", f"[bold yellow]{c.name}[/bold yellow]", "成交均價:", price_str)
     details_table.add_row("地址描述:", c.address or "-", "地理座標:", coords_str)
     details_table.add_row("行政區域:", f"{c.region_name or ''} {c.section_name or ''}", "生活圈/捷運:", f"{c.shopping_district or '-'} / {c.transport or '-'}")
-    details_table.add_row("狀態/型態:", f"{c.housing_status or '-'} / {c.building_type or '-'}", "法定用途:", c.build_purpose or "-")
+    details_table.add_row("狀態/型態:", f"{c.housing_status or '-'} / {c.building_type or '-'}", "法定用途:", c.purpose or "-")
     details_table.add_row("屋齡規格:", age_str, "規劃總戶數:", hh_str)
     details_table.add_row("樓層規劃:", c.floor_plan or "-", "建築結構:", c.structure or "-")
     details_table.add_row("基地總坪:", base_str, "土地分區:", c.land_division or "-")
     details_table.add_row("公設比率:", pub_str, "管理費單價:", mgmt_fee_str)
     details_table.add_row("車位總數:", park_cnt_str, "車位配比:", park_pct_str)
-    details_table.add_row("車位型態:", c.park_type_str or "-", "車位價格:", park_price_str)
-    details_table.add_row("座向規則:", c.direction_rule or "-", "景觀/公設設計:", f"{c.landscape_name or '-'} / {c.postulate_name or '-'}")
+    details_table.add_row("車位型態:", c.parking_type or "-", "車位價格:", park_price_str)
+    details_table.add_row("座向規則:", c.orientation or "-", "景觀/公設設計:", f"{c.landscape_designer or '-'} / {c.public_facility_designer or '-'}")
     details_table.add_row("投資建設:", c.developer_company or "-", "營造廠:", c.builder_company or "-")
     details_table.add_row("建築設計:", c.architect_company or "-", "", "")
 
@@ -120,7 +120,7 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
         "name": c.name,
         "housing_status": c.housing_status,
         "building_type": c.building_type,
-        "build_purpose": c.build_purpose,
+        "purpose": c.purpose,
         "region_name": c.region_name,
         "section_name": c.section_name,
         "address": c.address,
@@ -139,9 +139,11 @@ def community_to_dict(c: CommunityTable) -> Dict[str, Any]:
         "max_parking_price_wan": c.max_parking_price_wan,
         "public_ratio_pct": c.public_ratio_pct,
         "parking_count": c.parking_count,
-        "parking_ratio_pct": c.parking_ratio_pct,
-        "park_type_str": c.park_type_str,
-        "direction_rule": c.direction_rule,
+        "parking_ratio": c.parking_ratio,
+        "parking_type": c.parking_type,
+        "orientation": c.orientation,
+        "landscape_designer": c.landscape_designer,
+        "public_facility_designer": c.public_facility_designer,
         "manage_fee_per_pin": c.manage_fee_per_pin,
         "facilities": c.facilities,
         "developer_company": c.developer_company,

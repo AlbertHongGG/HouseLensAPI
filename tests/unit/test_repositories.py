@@ -43,7 +43,7 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             provider_id="591",
             external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
-            build_purpose="住宅",
+            purpose="住宅",
             building_type="住宅大樓",
             housing_status="新成屋",
             region_name="台北市",
@@ -62,7 +62,7 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         assert saved.avg_unit_price_wan == 129.0
         assert saved.building_age_years == 1.0
         assert saved.building_type == "住宅大樓"
-        assert saved.build_purpose == "住宅"
+        assert saved.purpose == "住宅"
         assert saved.housing_status == "新成屋"
 
         # 2. 從 Detail 豐富欄位規格
@@ -71,7 +71,7 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             external_community_id="5855864",
             community_name="鳴森大苑-碧硯閣",
             building_type="住宅大樓",
-            build_purpose="住家用",
+            purpose="住家用",
             housing_status="新成屋",
             address="台北市松山區延壽街76之1號",
             region_name="台北市",
@@ -84,30 +84,30 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
             facilities=["接待大廳", "空中花園"],
             developer_company="中華工程股份有限公司",
             cover_image_url="https://example.com/cover.jpg",
-            park_type_str="平面式",
+            parking_type="平面式",
             min_parking_price_wan=360.0,
             max_parking_price_wan=420.0,
             land_division="第三之二種住宅區",
-            landscape_name="境業設計",
-            postulate_name="境業設計",
+            landscape_designer="境業設計",
+            public_facility_designer="境業設計",
         )
         updated = await repo.upsert_from_detail(detail, provider_id="591")
         assert updated.id == saved.id
         assert updated.building_type == "住宅大樓"
-        assert updated.build_purpose == "住家用"
+        assert updated.purpose == "住家用"
         assert updated.housing_status == "新成屋"
         assert updated.structure == "SRC造"
         assert updated.total_households == 290
         assert updated.manage_fee_per_pin == 150
         assert updated.facilities == ["接待大廳", "空中花園"]
         assert updated.cover_image_url == "https://example.com/cover.jpg"
-        assert updated.park_type_str == "平面式"
+        assert updated.parking_type == "平面式"
         assert updated.min_parking_price_wan == 360.0
         assert updated.max_parking_price_wan == 420.0
         assert updated.base_area_pin == 450.0
         assert updated.land_division == "第三之二種住宅區"
-        assert updated.landscape_name == "境業設計"
-        assert updated.postulate_name == "境業設計"
+        assert updated.landscape_designer == "境業設計"
+        assert updated.public_facility_designer == "境業設計"
 
         # 3. 搜尋驗證 (含屋齡篩選)
         results = await repo.search(region="台北市", keyword="鳴森", min_age_years=0, max_age_years=5)
@@ -136,7 +136,7 @@ async def test_property_repository_deduplication_and_listings(test_db: DatabaseM
             bathrooms=2,
             total_area_pin=46.29,
             building_type="住宅",
-            building_structure="電梯大樓",
+            structure="電梯大樓",
             floor_current=2,
             floor_total=24,
             building_age_years=1.0,
@@ -309,8 +309,8 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
         nh_detail_init = NormalizedNewHouseDetail(
             provider_id="591",
             external_project_id="138045",
-            project_name="長虹MVP",
-            build_type="預售屋",
+            name="長虹MVP",
+            housing_status="預售屋",
             region_name="台北市",
             section_name="萬華區",
             address="台北市萬華區康定路、峨眉街口",
@@ -331,14 +331,14 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
         nh_detail = NormalizedNewHouseDetail(
             provider_id="591",
             external_project_id="138045",
-            project_name="長虹MVP",
-            build_type="預售屋",
+            name="長虹MVP",
+            housing_status="預售屋",
             region_name="台北市",
             section_name="萬華區",
             address="台北市萬華區康定路、峨眉街口",
             manage_fee_per_pin=150,
-            structural_engine="SRC鋼骨鋼筋混凝土結構",
-            direction_rule="朝西北",
+            structure="SRC鋼骨鋼筋混凝土結構",
+            orientation="朝西北",
             layouts=[
                 NewHouseLayoutSpec(room_name="二房", rooms_count=2, min_area_pin=28.0, max_area_pin=30.0),
                 NewHouseLayoutSpec(room_name="三房", rooms_count=3, min_area_pin=35.0, max_area_pin=41.0),
@@ -352,7 +352,7 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
         updated = await repo.upsert_from_detail(nh_detail, provider_id="591")
         assert updated.id == saved.id
         assert updated.manage_fee_per_pin == 150
-        assert updated.structural_engine == "SRC鋼骨鋼筋混凝土結構"
+        assert updated.structure == "SRC鋼骨鋼筋混凝土結構"
         assert isinstance(updated.layouts, list)
         assert len(updated.layouts) == 2
         assert updated.layouts[0]["room_name"] == "二房"
@@ -362,7 +362,7 @@ async def test_new_house_repository_upsert_and_layout_v2(test_db: DatabaseManage
         # 3. 根據外部專案 ID 查詢
         found = await repo.get_by_external_id("591", "138045")
         assert found is not None
-        assert found.project_name == "長虹MVP"
+        assert found.name == "長虹MVP"
 
 
 @pytest.mark.asyncio
@@ -409,8 +409,8 @@ async def test_repository_filter_existing_external_ids(test_db: DatabaseManager)
             NormalizedNewHouseDetail(
                 provider_id="591",
                 external_project_id="900",
-                project_name="測試建案A",
-                build_type="預售屋",
+                name="測試建案A",
+                housing_status="預售屋",
                 region_name="台北市",
                 section_name="南港區",
                 address="台北市南港區重陽路",

@@ -192,7 +192,7 @@ async def test_aggregator_service_sync_and_search_flow(service_test_db: Database
     assert len(synced_nhs) == 2
     for nh in synced_nhs:
         assert nh.id is not None
-        assert nh.project_name != ""
+        assert nh.name != ""
 
     # 在庫查詢新建案
     found_nhs = await service.search_new_houses(region="台北市")

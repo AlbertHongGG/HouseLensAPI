@@ -24,10 +24,10 @@ class NewHouseTable(Base, TimestampMixin):
     provider_id: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     external_project_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
 
-    project_name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
-    build_type: Mapped[str] = mapped_column(String(64), nullable=False)  # 建案期程狀態 (預售屋/新成屋)
+    name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    housing_status: Mapped[str] = mapped_column(String(64), nullable=False)  # 建案期程狀態 (預售屋/新成屋)
     building_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 建物型態 (住宅大樓/透天等)
-    legal_purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 法定用途 (住商用/住家用等)
+    purpose: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 法定用途 (住商用/住家用等)
     land_division: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # 土地使用分區
     region_name: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     section_name: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
@@ -53,20 +53,20 @@ class NewHouseTable(Base, TimestampMixin):
     min_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價下限 (萬元)
     max_parking_price_wan: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位開價上限 (萬元)
     parking_ratio_desc: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)  # 車位配比描述
-    parking_ratio_val: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比數值比率
+    parking_ratio: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 車位配比數值比率
     parking_planning_desc: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)  # 車位規劃描述
     plane_parking_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 平面車位數
     mechanical_parking_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 機械車位數
     charging_piles_desc: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 充電設備描述
     has_charging_piles: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)  # 是否具備充電設備或預留
-    parking_style: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 車位停放型式風格
+    parking_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # 車位停放型式風格
 
     # 結構化房型坪數矩陣
     layouts: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True)
 
     # 建築描述與工法
-    structural_engine: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
-    direction_rule: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    structure: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    orientation: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
 
     # 建商營造團隊與企劃銷售
     developer_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
@@ -77,16 +77,17 @@ class NewHouseTable(Base, TimestampMixin):
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     # 社區跨領域關聯
+    community_uuid: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
     external_community_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     community_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     community_age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     # 基地地理座標
-    latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     __table_args__ = (
         UniqueConstraint("provider_id", "external_project_id", name="uq_new_house_source"),
         Index("ix_new_house_region_section", "region_name", "section_name"),
-        Index("ix_new_house_lat_lng", "latitude", "longitude"),
+        Index("ix_new_house_lat_lng", "lat", "lng"),
     )

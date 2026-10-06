@@ -149,17 +149,17 @@ class TestNewHouseMapperEnrichment:
         }
         detail = map_new_house_detail(mock_packet)
         assert detail.building_type == "透天"
-        assert detail.legal_purpose == "住家用"
+        assert detail.purpose == "住家用"
         assert detail.land_division == "第一種住宅區"
         assert detail.handover_time == "隨時交屋"
         assert detail.open_sell_date == "2024-05-01"
-        assert detail.parking.parking_style == "前院停車，1樓停車"
+        assert detail.parking.parking_type == "前院停車，1樓停車"
         assert detail.parking.plane_parking_count == 2
         assert detail.parking.has_charging_piles is False
         assert detail.sales_agency_company == "自售"
         assert detail.external_community_id == "778899"
-        assert detail.latitude == 23.1345
-        assert detail.longitude == 120.2987
+        assert detail.lat == 23.1345
+        assert detail.lng == 120.2987
 
 
 @pytest.mark.asyncio
@@ -175,22 +175,22 @@ class TestNewHouseRepositoryAndViews:
             min_parking_price_wan=180.0,
             max_parking_price_wan=250.0,
             parking_ratio_desc="1:1.0",
-            parking_ratio_val=1.0,
+            parking_ratio=1.0,
             parking_planning_desc="平面式100個",
             plane_parking_count=100,
             mechanical_parking_count=0,
             charging_piles_desc="有充電設備（含預留）",
             has_charging_piles=True,
-            parking_style=None,
+            parking_type=None,
         )
 
         detail = NormalizedNewHouseDetail(
             provider_id="591",
             external_project_id="888801",
-            project_name="卓越天廈",
-            build_type="預售屋",
+            name="卓越天廈",
+            housing_status="預售屋",
             building_type="住宅大樓",
-            legal_purpose="住商用",
+            purpose="住商用",
             land_division="第二種商業區",
             region_name="新北市",
             section_name="板橋區",
@@ -205,17 +205,17 @@ class TestNewHouseRepositoryAndViews:
             external_community_id="556677",
             community_name="卓越天廈",
             community_age=0,
-            latitude=25.0135,
-            longitude=121.4658,
+            lat=25.0135,
+            lng=121.4658,
         )
 
         async with test_db.session() as session:
             repo = NewHouseRepository(session)
             # 1. 寫入新紀錄
             record = await repo.upsert_from_detail(detail, "591")
-            assert record.project_name == "卓越天廈"
+            assert record.name == "卓越天廈"
             assert record.building_type == "住宅大樓"
-            assert record.legal_purpose == "住商用"
+            assert record.purpose == "住商用"
             assert record.land_division == "第二種商業區"
             assert record.min_parking_price_wan == 180.0
             assert record.max_parking_price_wan == 250.0
@@ -223,7 +223,7 @@ class TestNewHouseRepositoryAndViews:
             assert record.has_charging_piles is True
             assert record.sales_agency_company == "甲山林廣告"
             assert record.external_community_id == "556677"
-            assert record.latitude == 25.0135
+            assert record.lat == 25.0135
 
             # 2. 透過社區外部 ID 反查
             results = await repo.get_by_external_community_id("591", "556677")

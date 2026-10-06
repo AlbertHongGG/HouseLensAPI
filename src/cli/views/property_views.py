@@ -121,7 +121,7 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     specs_table.add_row("客觀實體 ID:", id_disp, "所屬社區:", p.community_name or "-")
     specs_table.add_row("刊登參考標題:", p.title, "參考總價:", f"[bold green]{p.price_wan} 萬元[/bold green]")
     specs_table.add_row("權狀登記總坪:", total_area_str, "參考單價:", unit_price_str)
-    specs_table.add_row("格局規劃:", layout_str, "建物型態/結構:", f"{p.building_type or '-'} / {p.building_structure or '-'}")
+    specs_table.add_row("格局規劃:", layout_str, "建物型態/結構:", f"{p.building_type or '-'} / {p.structure or '-'}")
     specs_table.add_row("所在樓層:", floor_str, "屋齡/座向:", f"{age_str} / {p.orientation or '-'}")
     specs_table.add_row("行政區地址:", f"{p.region_name or ''}{p.section_name or ''} {p.address or ''}", "地理座標:", coords_str)
     specs_table.add_row("管理費:", mgmt_fee_str, "公設比/現況:", f"{pub_ratio_str} / {p.current_state or '-'}")
@@ -201,7 +201,7 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
         "public_ratio_pct": p.public_ratio_pct,
         "has_lease": p.has_lease,
         "building_type": p.building_type,
-        "building_structure": p.building_structure,
+        "structure": p.structure,
         "orientation": p.orientation,
         "purpose": p.purpose,
         "current_state": p.current_state,

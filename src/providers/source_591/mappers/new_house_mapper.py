@@ -37,8 +37,8 @@ def map_new_house_summary(item: Dict[str, Any]) -> NormalizedNewHouseSummary:
     return NormalizedNewHouseSummary(
         provider_id="591",
         external_project_id=str(item.get("hid")),
-        project_name=str(item.get("build_name") or "").strip(),
-        project_status=str(item.get("build_type_name") or "").strip(),
+        name=str(item.get("build_name") or "").strip(),
+        housing_status=str(item.get("build_type_name") or "").strip(),
         region_name=str(item.get("region") or "").strip(),
         section_name=str(item.get("section") or "").strip(),
         address=clean_optional_str(item.get("address")) or "",
@@ -65,8 +65,8 @@ def map_new_house_detail(
 
     # 第一層：身分與地理空間標識 (統一由 summary 提供)
     ext_id = summary.external_project_id if summary else str(housing.get("hid"))
-    p_name = summary.project_name if summary else str(housing.get("build_name") or "").strip()
-    build_type_val = summary.project_status if summary else clean_optional_str(housing.get("build_type_name"))
+    p_name = summary.name if summary else str(housing.get("build_name") or "").strip()
+    housing_status_val = summary.housing_status if summary else clean_optional_str(housing.get("build_type_name"))
     r_name = summary.region_name if summary else str(housing.get("region") or "").strip()
     s_name = summary.section_name if summary else str(housing.get("section") or "").strip()
     addr = summary.address if summary else (clean_optional_str(housing.get("address")) or "")
@@ -122,7 +122,7 @@ def map_new_house_detail(
 
     # 8. 建物型態、法定用途、土地使用分區
     building_type = clean_optional_str(housing.get("purpose_name"))
-    legal_purpose = clean_optional_str(housing.get("purpose_other_name"))
+    purpose_val = clean_optional_str(housing.get("purpose_other_name"))
     land_division = clean_optional_str(housing.get("land_division"))
 
     # 9. 時程規劃: 完工交屋期程與公開銷售日期
@@ -164,13 +164,13 @@ def map_new_house_detail(
         min_parking_price_wan=min_p_price,
         max_parking_price_wan=max_p_price,
         parking_ratio_desc=p_ratio_desc,
-        parking_ratio_val=p_ratio_val,
+        parking_ratio=p_ratio_val,
         parking_planning_desc=p_plan_desc,
         plane_parking_count=plane_p_cnt,
         mechanical_parking_count=mech_p_cnt,
         charging_piles_desc=charging_desc,
         has_charging_piles=has_charging,
-        parking_style=park_style,
+        parking_type=park_style,
     )
 
     # 11. 社區跨領域外部關聯
@@ -196,15 +196,15 @@ def map_new_house_detail(
         # --- 第一層：身分與地理空間標識 (100% 清單 API summary 唯一來源) ---
         provider_id=summary.provider_id if summary else "591",
         external_project_id=ext_id,
-        project_name=p_name,
+        name=p_name,
         region_name=r_name,
         section_name=s_name,
         address=addr,
         cover_image_url=cover_url,
         # --- 第二層：深層建築規格、規劃、時程與坐標 (100% 詳情 API 唯一來源) ---
-        build_type=build_type_val,
+        housing_status=housing_status_val,
         building_type=building_type,
-        legal_purpose=legal_purpose,
+        purpose=purpose_val,
         land_division=land_division,
         handover_time=handover_time,
         open_sell_date=open_sell_date,
@@ -218,8 +218,8 @@ def map_new_house_detail(
         max_area_pin=max_area_val,
         parking=parking,
         layouts=layouts,
-        structural_engine=clean_optional_str(housing.get("structural_engine")),
-        direction_rule=clean_optional_str(housing.get("direction_rule")),
+        structure=clean_optional_str(housing.get("structural_engine")),
+        orientation=clean_optional_str(housing.get("direction_rule")),
         developer_company=clean_optional_str(housing.get("company")),
         builder_company=clean_optional_str(housing.get("build_company")),
         architect_company=clean_optional_str(housing.get("construction_company")),
@@ -228,7 +228,7 @@ def map_new_house_detail(
         external_community_id=external_community_id,
         community_name=community_name,
         community_age=community_age,
-        latitude=lat_val,
-        longitude=lng_val,
+        lat=lat_val,
+        lng=lng_val,
     )
 

@@ -56,7 +56,7 @@ class CommunityRepository(ICommunityRepository):
                 external_community_id=summary.external_community_id,
                 name=summary.community_name,
                 building_type=summary.building_type,
-                build_purpose=summary.build_purpose,
+                purpose=summary.purpose,
                 housing_status=summary.housing_status,
                 region_name=summary.region_name,
                 section_name=summary.section_name,
@@ -74,8 +74,8 @@ class CommunityRepository(ICommunityRepository):
             record.name = summary.community_name
             if summary.building_type:
                 record.building_type = summary.building_type
-            if summary.build_purpose:
-                record.build_purpose = summary.build_purpose
+            if summary.purpose:
+                record.purpose = summary.purpose
             if summary.housing_status:
                 record.housing_status = summary.housing_status
             if summary.region_name:
@@ -122,7 +122,7 @@ class CommunityRepository(ICommunityRepository):
                 external_community_id=detail.external_community_id,
                 name=detail.community_name,
                 building_type=detail.building_type,
-                build_purpose=detail.build_purpose,
+                purpose=detail.purpose,
                 housing_status=detail.housing_status,
                 transport=detail.transport,
                 address=detail.address,
@@ -137,17 +137,17 @@ class CommunityRepository(ICommunityRepository):
                 base_area_pin=detail.base_area_pin,
                 public_ratio_pct=detail.public_ratio_pct,
                 parking_count=detail.parking_count,
-                parking_ratio_pct=detail.parking_ratio_pct,
+                parking_ratio=detail.parking_ratio,
                 min_parking_price_wan=detail.min_parking_price_wan,
                 max_parking_price_wan=detail.max_parking_price_wan,
                 manage_fee_per_pin=detail.manage_fee_per_pin,
                 floor_plan=detail.floor_plan,
                 structure=detail.structure,
-                park_type_str=detail.park_type_str,
+                parking_type=detail.parking_type,
                 land_division=detail.land_division,
-                direction_rule=detail.direction_rule,
-                landscape_name=detail.landscape_name,
-                postulate_name=detail.postulate_name,
+                orientation=detail.orientation,
+                landscape_designer=detail.landscape_designer,
+                public_facility_designer=detail.public_facility_designer,
                 facilities=detail.facilities,
                 developer_company=detail.developer_company,
                 builder_company=detail.builder_company,
@@ -159,8 +159,8 @@ class CommunityRepository(ICommunityRepository):
             record.name = detail.community_name or record.name
             if detail.building_type:
                 record.building_type = detail.building_type
-            if detail.build_purpose:
-                record.build_purpose = detail.build_purpose
+            if detail.purpose:
+                record.purpose = detail.purpose
             if detail.housing_status:
                 record.housing_status = detail.housing_status
             if detail.transport:
@@ -190,18 +190,18 @@ class CommunityRepository(ICommunityRepository):
             record.base_area_pin = detail.base_area_pin
             record.public_ratio_pct = detail.public_ratio_pct
             record.parking_count = detail.parking_count
-            record.parking_ratio_pct = detail.parking_ratio_pct
+            record.parking_ratio = detail.parking_ratio
             record.min_parking_price_wan = detail.min_parking_price_wan
             record.max_parking_price_wan = detail.max_parking_price_wan
             record.manage_fee_per_pin = detail.manage_fee_per_pin
 
             record.floor_plan = detail.floor_plan
             record.structure = detail.structure
-            record.park_type_str = detail.park_type_str
+            record.parking_type = detail.parking_type
             record.land_division = detail.land_division
-            record.direction_rule = detail.direction_rule
-            record.landscape_name = detail.landscape_name
-            record.postulate_name = detail.postulate_name
+            record.orientation = detail.orientation
+            record.landscape_designer = detail.landscape_designer
+            record.public_facility_designer = detail.public_facility_designer
             record.facilities = detail.facilities
             record.developer_company = detail.developer_company
             record.builder_company = detail.builder_company

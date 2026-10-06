@@ -230,7 +230,7 @@ class PropertyRepository(IPropertyRepository):
                 public_ratio_pct=detail.public_ratio_pct,
                 has_lease=detail.has_lease,
                 building_type=detail.building_type,
-                building_structure=detail.building_structure,
+                structure=detail.structure,
                 orientation=detail.orientation,
                 purpose=detail.purpose,
                 current_state=detail.current_state,
@@ -273,7 +273,7 @@ class PropertyRepository(IPropertyRepository):
             property_entity.public_ratio_pct = detail.public_ratio_pct
             property_entity.has_lease = detail.has_lease
             property_entity.building_type = detail.building_type
-            property_entity.building_structure = detail.building_structure
+            property_entity.structure = detail.structure
             property_entity.orientation = detail.orientation
             property_entity.purpose = detail.purpose
             property_entity.current_state = detail.current_state

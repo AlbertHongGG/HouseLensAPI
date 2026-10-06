@@ -34,7 +34,7 @@ def render_new_house_table(new_houses: List[NewHouseTable]) -> Table:
     for nh in new_houses:
         specs_team = f"{nh.developer_company or '-'} / {nh.builder_company or '-'}"
         addr_str = nh.address or nh.reception_address or "-"
-        b_type_str = f"{nh.build_type or '-'}"
+        b_type_str = f"{nh.housing_status or '-'}"
         if nh.building_type:
             b_type_str += f" ({nh.building_type})"
 
@@ -58,7 +58,7 @@ def render_new_house_table(new_houses: List[NewHouseTable]) -> Table:
 
         table.add_row(
             f"[{nh.provider_id}] {nh.external_project_id}",
-            nh.project_name,
+            nh.name,
             b_type_str,
             f"{nh.region_name}{nh.section_name}",
             price_str,
@@ -104,19 +104,19 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     mgmt_fee_str = f"{nh.manage_fee_per_pin} 元/坪/月" if nh.manage_fee_per_pin is not None else "-"
 
     specs_table.add_row("外部 ID:", nh.external_project_id, "來源平台:", f"[{nh.provider_id.upper()}]")
-    specs_table.add_row("建案名稱:", f"[bold yellow]{nh.project_name}[/bold yellow]", "期程狀態:", nh.build_type)
-    specs_table.add_row("建物型態:", nh.building_type or "-", "法定用途:", nh.legal_purpose or "-")
+    specs_table.add_row("建案名稱:", f"[bold yellow]{nh.name}[/bold yellow]", "期程狀態:", nh.housing_status)
+    specs_table.add_row("建物型態:", nh.building_type or "-", "法定用途:", nh.purpose or "-")
     specs_table.add_row("土地分區:", nh.land_division or "-", "行政區域:", f"{nh.region_name}{nh.section_name}")
     specs_table.add_row("基地地址:", nh.address, "接待會館:", nh.reception_address or "-")
     specs_table.add_row("完工期程:", nh.handover_time or "-", "公開銷售:", nh.open_sell_date or "-")
     specs_table.add_row("開價區間:", f"[bold green]{price_str}[/bold green]", "坪數範圍:", area_str)
     specs_table.add_row("基地總坪:", base_str, "公設比率:", pub_str)
     specs_table.add_row("規劃總戶數:", hh_str, "管理費單價:", mgmt_fee_str)
-    specs_table.add_row("結構工法:", nh.structural_engine or "-", "座向規則:", nh.direction_rule or "-")
+    specs_table.add_row("結構工法:", nh.structure or "-", "座向規則:", nh.orientation or "-")
 
     base_panel = Panel(
         specs_table,
-        title=f"新建案基本規格 - {nh.project_name}",
+        title=f"新建案基本規格 - {nh.name}",
         border_style="blue",
         box=box.ROUNDED,
     )
@@ -148,7 +148,7 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     charging_s = nh.charging_piles_desc or ("有" if nh.has_charging_piles else "-")
 
     park_table.add_row("車位價格:", p_price_s, "車位配比:", nh.parking_ratio_desc or "-")
-    park_table.add_row("車位規劃:", p_cnt_str, "車位風格:", nh.parking_style or "標準地下室/暫無")
+    park_table.add_row("車位規劃:", p_cnt_str, "車位型態:", nh.parking_type or "標準地下室/暫無")
     park_table.add_row("充電設備:", charging_s, "預留充電樁:", "是" if nh.has_charging_piles else "否")
 
     park_panel = Panel(
@@ -165,7 +165,7 @@ def render_new_house_detail_view(nh: NewHouseTable) -> Group:
     team_table.add_column(style="bold cyan", justify="right")
     team_table.add_column(style="white")
 
-    coord_s = f"{nh.latitude:.5f}, {nh.longitude:.5f}" if nh.latitude and nh.longitude else "-"
+    coord_s = f"{nh.lat:.5f}, {nh.lng:.5f}" if nh.lat and nh.lng else "-"
     comm_s = f"{nh.community_name or '-'} (ID: {nh.external_community_id or '-'})"
 
     team_table.add_row("投資建設:", nh.developer_company or "-", "營造公司:", nh.builder_company or "-")
@@ -216,10 +216,10 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
         "id": nh.id,
         "provider_id": nh.provider_id,
         "external_project_id": nh.external_project_id,
-        "project_name": nh.project_name,
-        "build_type": nh.build_type,
+        "name": nh.name,
+        "housing_status": nh.housing_status,
         "building_type": nh.building_type,
-        "legal_purpose": nh.legal_purpose,
+        "purpose": nh.purpose,
         "land_division": nh.land_division,
         "region_name": nh.region_name,
         "section_name": nh.section_name,
@@ -238,27 +238,28 @@ def new_house_to_dict(nh: NewHouseTable) -> Dict[str, Any]:
             "min_parking_price_wan": nh.min_parking_price_wan,
             "max_parking_price_wan": nh.max_parking_price_wan,
             "parking_ratio_desc": nh.parking_ratio_desc,
-            "parking_ratio_val": nh.parking_ratio_val,
+            "parking_ratio": nh.parking_ratio,
             "parking_planning_desc": nh.parking_planning_desc,
             "plane_parking_count": nh.plane_parking_count,
             "mechanical_parking_count": nh.mechanical_parking_count,
             "charging_piles_desc": nh.charging_piles_desc,
             "has_charging_piles": nh.has_charging_piles,
-            "parking_style": nh.parking_style,
+            "parking_type": nh.parking_type,
         },
         "layouts": nh.layouts,
-        "structural_engine": nh.structural_engine,
-        "direction_rule": nh.direction_rule,
+        "structure": nh.structure,
+        "orientation": nh.orientation,
         "developer_company": nh.developer_company,
         "builder_company": nh.builder_company,
         "architect_company": nh.architect_company,
         "sales_agency_company": nh.sales_agency_company,
         "reception_address": nh.reception_address,
+        "community_uuid": nh.community_uuid,
         "external_community_id": nh.external_community_id,
         "community_name": nh.community_name,
         "community_age": nh.community_age,
-        "latitude": nh.latitude,
-        "longitude": nh.longitude,
+        "lat": nh.lat,
+        "lng": nh.lng,
         "cover_image_url": nh.cover_image_url,
         "updated_at": nh.updated_at.isoformat() if nh.updated_at else None,
     }

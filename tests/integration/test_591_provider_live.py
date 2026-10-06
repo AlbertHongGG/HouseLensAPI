@@ -97,11 +97,11 @@ async def test_591_new_house_live_flow():
     first_nh = res.items[0]
     assert isinstance(first_nh, NormalizedNewHouseSummary)
     assert first_nh.external_project_id != ""
-    assert first_nh.project_name != ""
+    assert first_nh.name != ""
 
     # 2. 獲取建案詳情
     detail = await provider.new_house.get_new_house_detail(first_nh.external_project_id)
     assert isinstance(detail, NormalizedNewHouseDetail)
     assert detail.external_project_id == first_nh.external_project_id
-    assert detail.project_name != ""
+    assert detail.name != ""
     assert detail.region_name != ""

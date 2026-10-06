@@ -228,7 +228,7 @@ def map_sale_house_detail(
         management_fee_monthly=manage_fee,
         has_lease=has_lease,
         building_type=clean_optional_str(data.get("kindStr")),
-        building_structure=clean_optional_str(info_dict.get("型態")),
+        structure=clean_optional_str(info_dict.get("型態")),
         orientation=clean_optional_str(info_dict.get("朝向")),
         purpose=clean_optional_str(info_dict.get("用途")),
         current_state=clean_optional_str(info_dict.get("現況")),
