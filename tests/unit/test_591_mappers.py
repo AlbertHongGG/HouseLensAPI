@@ -100,6 +100,7 @@ class Test591CommunityMappers:
         assert detail.shopping_district == summary.shopping_district
         assert detail.transport == summary.transport
         assert detail.cover_image_url == summary.cover_image_url
+        assert detail.url == "https://market.591.com.tw/5855864"
 
         # 詳細建築與硬體規格 100% 直取自 detail 的 build_info
         assert detail.orientation == "朝北、朝南"
@@ -182,6 +183,7 @@ class Test591SaleHouseMappers:
         assert detail.coordinates is not None
         assert detail.coordinates.lat == 25.056119
         assert detail.coordinates.lng == 121.5645131
+        assert detail.url == "https://www.591.com.tw/2S?salt=SaI9a&s=a"
 
         # Summary context injection test
         raw_list = load_captured_json("房屋物件清單 Respond.json")
@@ -352,6 +354,7 @@ class Test591NewHouseMappers:
         assert detail.community_age == 0
         assert detail.lat == 25.0444
         assert detail.lng == 121.50265
+        assert detail.url == "https://www.591.com.tw/8H?salt=6Zv&s=a"
 
         # 斷言車位規格值物件 (NewHouseParkingSpec)
         assert detail.parking.min_parking_price_wan == 155.0

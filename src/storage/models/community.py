@@ -66,6 +66,7 @@ class CommunityTable(Base, TimestampMixin):
     architect_company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
 
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     __table_args__ = (
         UniqueConstraint("provider_id", "external_community_id", name="uq_community_source"),

@@ -246,6 +246,7 @@ class PropertyRepository(IPropertyRepository):
                 address=detail.address,
                 lat=lat,
                 lng=lng,
+                url=detail.url,
             )
             self.session.add(property_entity)
         else:
@@ -294,10 +295,13 @@ class PropertyRepository(IPropertyRepository):
             if lat is not None and lng is not None:
                 property_entity.lat = lat
                 property_entity.lng = lng
+            if detail.url:
+                property_entity.url = detail.url
 
         # 5. 同步更新或新增來源刊登紀錄
         cover_url = (summary.cover_image_url if summary else None) or detail.cover_image_url
         listing_price = summary.price_wan if summary else detail.price_wan
+        listing_url = (summary.url if summary and summary.url else None) or detail.url
 
         if listing is None:
             listing = PropertyListingTable(
@@ -308,6 +312,7 @@ class PropertyRepository(IPropertyRepository):
                 listing_title=detail.title,
                 listing_price_wan=listing_price,
                 cover_image_url=cover_url,
+                url=listing_url,
             )
             listing.property = property_entity
             self.session.add(listing)
@@ -316,6 +321,8 @@ class PropertyRepository(IPropertyRepository):
             listing.listing_price_wan = listing_price
             if cover_url:
                 listing.cover_image_url = cover_url
+            if listing_url:
+                listing.url = listing_url
 
         await self.session.flush()
         self.session.expire(property_entity, ["listings"])
@@ -386,6 +393,7 @@ class PropertyRepository(IPropertyRepository):
                 section_name=summary.section_name,
                 street=summary.street,
                 address=summary.address,
+                url=summary.url,
             )
             self.session.add(property_entity)
         else:
@@ -418,6 +426,8 @@ class PropertyRepository(IPropertyRepository):
                 property_entity.region_name = summary.region_name
             if summary.section_name:
                 property_entity.section_name = summary.section_name
+            if summary.url:
+                property_entity.url = summary.url
 
         if listing is None:
             listing = PropertyListingTable(
@@ -428,6 +438,7 @@ class PropertyRepository(IPropertyRepository):
                 listing_title=summary.title,
                 listing_price_wan=summary.price_wan,
                 cover_image_url=summary.cover_image_url,
+                url=summary.url,
             )
             listing.property = property_entity
             self.session.add(listing)
@@ -436,6 +447,8 @@ class PropertyRepository(IPropertyRepository):
             listing.listing_price_wan = summary.price_wan
             if summary.cover_image_url:
                 listing.cover_image_url = summary.cover_image_url
+            if summary.url:
+                listing.url = summary.url
 
         await self.session.flush()
         self.session.expire(property_entity, ["listings"])

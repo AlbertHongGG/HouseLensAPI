@@ -50,6 +50,7 @@ class NormalizedNewHouseSummary(BaseModel):
     max_area_pin: Optional[float] = Field(None, ge=0.0, description="規劃坪數上限 (坪)")
     developer: CleanStr = Field(None, description="投資興建公司")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
+    url: CleanStr = Field(None, description="原始建案網址")
 
 
 class NormalizedNewHouseDetail(BaseModel):
@@ -95,6 +96,7 @@ class NormalizedNewHouseDetail(BaseModel):
     sales_agency_company: CleanStr = Field(None, description="企劃銷售 / 代銷公司")
     reception_address: CleanStr = Field(None, description="接待會館地址")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
+    url: CleanStr = Field(None, description="原始建案網址")
 
     # 社區跨領域關聯
     community_uuid: Optional[str] = Field(None, description="本地關聯社區 UUID")

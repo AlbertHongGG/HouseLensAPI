@@ -29,6 +29,7 @@ class NormalizedCommunitySummary(BaseModel):
     shopping_district: CleanStr = Field(None, description="生活圈商圈名稱")
     transport: CleanStr = Field(None, description="鄰近捷運站點")
     cover_image_url: CleanStr = Field(None, description="封面圖片網址")
+    url: CleanStr = Field(None, description="原始社區網址")
 
 
 class NormalizedCommunityDetail(BaseModel):
@@ -68,6 +69,7 @@ class NormalizedCommunityDetail(BaseModel):
     landscape_designer: CleanStr = Field(None, description="景觀設計公司/設計師")
     public_facility_designer: CleanStr = Field(None, description="公設設計公司/設計師")
     cover_image_url: CleanStr = Field(None, description="封面圖片網址")
+    url: CleanStr = Field(None, description="原始社區網址")
     facilities: List[str] = Field(default_factory=list, description="公共設施清單")
     developer_company: CleanStr = Field(None, description="投資興建公司")
     builder_company: CleanStr = Field(None, description="營造公司")

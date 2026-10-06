@@ -419,3 +419,98 @@ async def test_repository_filter_existing_external_ids(test_db: DatabaseManager)
         )
         existing_nh = await nh_repo.filter_existing_external_ids("591", ["900", "901", "902"])
         assert existing_nh == {"900"}
+
+
+@pytest.mark.asyncio
+async def test_repositories_url_persistence_and_listing_tracking(test_db: DatabaseManager):
+    """測試各倉儲之 url 欄位持久化、覆蓋更新與中古屋多刊登獨立 url 追蹤"""
+    async with test_db.session() as session:
+        comm_repo = CommunityRepository(session)
+        nh_repo = NewHouseRepository(session)
+        prop_repo = PropertyRepository(session)
+
+        # 1. 社區 url 測試
+        comm_detail = NormalizedCommunityDetail(
+            provider_id="591",
+            external_community_id="5855864",
+            community_name="鳴森大苑",
+            region_name="台北市",
+            section_name="松山區",
+            address="台北市松山區延壽街",
+            url="https://market.591.com.tw/5855864",
+        )
+        saved_comm = await comm_repo.upsert_from_detail(comm_detail, provider_id="591")
+        assert saved_comm.url == "https://market.591.com.tw/5855864"
+
+        # 2. 新建案 url 測試
+        nh_detail = NormalizedNewHouseDetail(
+            provider_id="591",
+            external_project_id="138045",
+            name="長虹MVP",
+            housing_status="預售屋",
+            region_name="台北市",
+            section_name="萬華區",
+            address="台北市萬華區康定路",
+            url="https://www.591.com.tw/8H?salt=6Zv&s=a",
+        )
+        saved_nh = await nh_repo.upsert_from_detail(nh_detail, provider_id="591")
+        assert saved_nh.url == "https://www.591.com.tw/8H?salt=6Zv&s=a"
+
+        # 3. 中古屋多刊登聚合 url 測試
+        prop_detail_1 = NormalizedSalePropertyDetail(
+            provider_id="591",
+            external_house_id="S10001",
+            title="敦化南路林蔭景觀三房",
+            price_wan=4500,
+            total_area_pin=40.0,
+            rooms=3,
+            living_rooms=2,
+            bathrooms=2,
+            floor_current=5,
+            floor_total=14,
+            region_name="台北市",
+            section_name="大安區",
+            street="敦化南路一段",
+            community_name="敦化大廈",
+            url="https://www.591.com.tw/2S?salt=first&s=a",
+        )
+        prop_saved_1 = await prop_repo.upsert_property_with_listing(
+            detail=prop_detail_1,
+            provider_id="591",
+        )
+        assert prop_saved_1.url == "https://www.591.com.tw/2S?salt=first&s=a"
+        assert len(prop_saved_1.listings) == 1
+        assert prop_saved_1.listings[0].url == "https://www.591.com.tw/2S?salt=first&s=a"
+
+        # 模擬第二筆來自不同刊登 (房仲不同) 但指向同一客觀房屋 (去重合併至 prop_saved_1)
+        prop_detail_2 = NormalizedSalePropertyDetail(
+            provider_id="591",
+            external_house_id="S10002",
+            title="敦南林蔭三房專任委託",
+            price_wan=4480,
+            total_area_pin=40.0,
+            rooms=3,
+            living_rooms=2,
+            bathrooms=2,
+            floor_current=5,
+            floor_total=14,
+            region_name="台北市",
+            section_name="大安區",
+            street="敦化南路一段",
+            community_name="敦化大廈",
+            url="https://www.591.com.tw/2S?salt=second&s=a",
+        )
+        prop_saved_2 = await prop_repo.upsert_property_with_listing(
+            detail=prop_detail_2,
+            provider_id="591",
+            candidate_property_id=prop_saved_1.id,
+        )
+        # 驗證合併至同一物理實體
+        assert prop_saved_2.id == prop_saved_1.id
+        assert len(prop_saved_2.listings) == 2
+
+        # 驗證各自刊登的 url 各自精準保留且不互相覆蓋
+        listing_urls = {item.external_house_id: item.url for item in prop_saved_2.listings}
+        assert listing_urls["S10001"] == "https://www.591.com.tw/2S?salt=first&s=a"
+        assert listing_urls["S10002"] == "https://www.591.com.tw/2S?salt=second&s=a"
+

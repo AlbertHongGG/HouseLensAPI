@@ -61,6 +61,7 @@ class NewHouseRepository(INewHouseRepository):
                 min_area_pin=detail.min_area_pin,
                 max_area_pin=detail.max_area_pin,
                 cover_image_url=detail.cover_image_url,
+                url=detail.url,
                 handover_time=detail.handover_time,
                 open_sell_date=detail.open_sell_date,
                 base_area_pin=detail.base_area_pin,
@@ -134,6 +135,8 @@ class NewHouseRepository(INewHouseRepository):
                 record.max_area_pin = detail.max_area_pin
             if detail.cover_image_url:
                 record.cover_image_url = detail.cover_image_url
+            if detail.url:
+                record.url = detail.url
 
             # 車位規格更新
             if detail.parking:

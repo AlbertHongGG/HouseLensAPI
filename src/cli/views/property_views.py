@@ -126,6 +126,7 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     specs_table.add_row("行政區地址:", f"{p.region_name or ''}{p.section_name or ''} {p.address or ''}", "地理座標:", coords_str)
     specs_table.add_row("管理費:", mgmt_fee_str, "公設比/現況:", f"{pub_ratio_str} / {p.current_state or '-'}")
     specs_table.add_row("帶租約現況:", lease_str, "車位規格說明:", p.parking_desc or "-")
+    specs_table.add_row("原始物件網址:", p.url or "-", "", "")
 
     # 產權面積明細
     main_b = f"{p.main_area_pin:.2f}坪" if p.main_area_pin is not None else "-"
@@ -158,9 +159,10 @@ def render_property_detail_view(p: PropertyTable) -> Group:
     )
     listings_table.add_column("來源平台", style="bold cyan", justify="center")
     listings_table.add_column("外部房源編號", style="white")
-    listings_table.add_column("該刊登開出標題", style="white", max_width=40, overflow="ellipsis")
+    listings_table.add_column("該刊登開出標題", style="white", max_width=35, overflow="ellipsis")
     listings_table.add_column("刊登開價", justify="right", style="bold green")
-    listings_table.add_column("封面照片連結", style="dim", max_width=30, overflow="ellipsis")
+    listings_table.add_column("原始刊登網址", style="dim", max_width=35, overflow="ellipsis")
+    listings_table.add_column("封面照片連結", style="dim", max_width=25, overflow="ellipsis")
     listings_table.add_column("更新時間", style="dim")
 
     for listing in p.listings:
@@ -170,6 +172,7 @@ def render_property_detail_view(p: PropertyTable) -> Group:
             listing.external_house_id,
             listing.listing_title or "-",
             price_disp,
+            listing.url or "-",
             listing.cover_image_url or "-",
             listing.updated_at.strftime("%Y-%m-%d %H:%M") if listing.updated_at else "-",
         )
@@ -219,6 +222,7 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
         "address": p.address,
         "lat": p.lat,
         "lng": p.lng,
+        "url": p.url,
         "listings_count": len(p.listings),
         "listings": [
             {
@@ -228,6 +232,7 @@ def property_to_dict(p: PropertyTable) -> Dict[str, Any]:
                 "listing_title": it.listing_title,
                 "listing_price_wan": it.listing_price_wan,
                 "cover_image_url": it.cover_image_url,
+                "url": it.url,
                 "updated_at": it.updated_at.isoformat() if it.updated_at else None,
             }
             for it in p.listings

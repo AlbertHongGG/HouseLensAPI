@@ -192,6 +192,13 @@ def map_new_house_detail(
         lat_val = parse_coordinate(housing.get("lat"))
         lng_val = parse_coordinate(housing.get("lng"))
 
+    # 13. 原始建案網址 (100% 取自 meta.og_url，防禦性容錯 share_info.url)
+    meta_obj = data.get("meta") or {}
+    new_house_url = clean_optional_str(meta_obj.get("og_url"))
+    if not new_house_url:
+        share_info = data.get("share_info") or {}
+        new_house_url = clean_optional_str(share_info.get("url"))
+
     return NormalizedNewHouseDetail(
         # --- 第一層：身分與地理空間標識 (100% 清單 API summary 唯一來源) ---
         provider_id=summary.provider_id if summary else "591",
@@ -201,6 +208,7 @@ def map_new_house_detail(
         section_name=s_name,
         address=addr,
         cover_image_url=cover_url,
+        url=new_house_url,
         # --- 第二層：深層建築規格、規劃、時程與坐標 (100% 詳情 API 唯一來源) ---
         housing_status=housing_status_val,
         building_type=building_type,

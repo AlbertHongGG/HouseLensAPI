@@ -162,6 +162,10 @@ def map_community_detail(
     elif isinstance(facility_raw, list):
         facility_list = [str(f).strip() for f in facility_raw if clean_optional_str(f)]
 
+    # 社區原始網址 (100% 取自 share_info.url)
+    share_info = data.get("share_info") or {}
+    community_url = clean_optional_str(share_info.get("url"))
+
     return NormalizedCommunityDetail(
         # --- 基礎識別、地理資訊與市場行情：100% 取自清單 (summary，成交均價單一事實來源) ---
         provider_id=summary.provider_id,
@@ -173,6 +177,7 @@ def map_community_detail(
         coordinates=summary.coordinates,
         avg_unit_price_wan=summary.avg_unit_price_wan,
         cover_image_url=summary.cover_image_url,
+        url=community_url,
         shopping_district=summary.shopping_district,
         transport=summary.transport,
         # --- 建築規格與規劃：100% 取自詳情 build_info 單一區塊 (三維解耦) ---

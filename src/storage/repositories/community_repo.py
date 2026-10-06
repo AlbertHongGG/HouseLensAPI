@@ -68,6 +68,7 @@ class CommunityRepository(ICommunityRepository):
                 shopping_district=summary.shopping_district,
                 transport=summary.transport,
                 cover_image_url=summary.cover_image_url,
+                url=summary.url,
             )
             self.session.add(record)
         else:
@@ -97,6 +98,8 @@ class CommunityRepository(ICommunityRepository):
                 record.transport = summary.transport
             if summary.cover_image_url:
                 record.cover_image_url = summary.cover_image_url
+            if summary.url:
+                record.url = summary.url
 
         await self.session.flush()
         return record
@@ -153,6 +156,7 @@ class CommunityRepository(ICommunityRepository):
                 builder_company=detail.builder_company,
                 architect_company=detail.architect_company,
                 cover_image_url=detail.cover_image_url,
+                url=detail.url,
             )
             self.session.add(record)
         else:
@@ -177,13 +181,15 @@ class CommunityRepository(ICommunityRepository):
                 record.lat = lat
                 record.lng = lng
 
-            # 均價、屋齡與封面圖更新 (若 detail 有值則更新，若無則保留 summary)
+            # 均價、屋齡、封面圖與網址更新 (若 detail 有值則更新，若無則保留 summary)
             if detail.avg_unit_price_wan is not None:
                 record.avg_unit_price_wan = detail.avg_unit_price_wan
             if detail.building_age_years is not None:
                 record.building_age_years = detail.building_age_years
             if detail.cover_image_url:
                 record.cover_image_url = detail.cover_image_url
+            if detail.url:
+                record.url = detail.url
 
             # 建築硬體規格與規劃 (detail 為權威快照，無條件覆蓋賦值，使 None 正確覆蓋舊髒值)
             record.total_households = detail.total_households

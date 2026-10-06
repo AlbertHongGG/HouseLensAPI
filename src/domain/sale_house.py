@@ -39,6 +39,7 @@ class NormalizedSaleListing(BaseModel):
     community_name: CleanStr = Field(None, description="所屬社區名稱")
     has_parking: bool = Field(default=False, description="是否含車位")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
+    url: CleanStr = Field(None, description="原始刊登網址")
 
 
 class NormalizedSalePropertyDetail(BaseModel):
@@ -88,6 +89,7 @@ class NormalizedSalePropertyDetail(BaseModel):
     external_community_id: CleanStr = Field(None, description="外部平台所屬社區代號 (如 591 社區 ID: '5855864')")
     community_name: CleanStr = Field(None, description="社區名稱")
     cover_image_url: CleanStr = Field(None, description="封面照片網址")
+    url: CleanStr = Field(None, description="原始刊登網址")
 
 
 class SaleHouseSearchQuery(BaseSearchQuery):

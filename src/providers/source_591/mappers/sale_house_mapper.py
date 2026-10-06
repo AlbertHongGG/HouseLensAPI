@@ -195,6 +195,11 @@ def map_sale_house_detail(
     comm_name = summary.community_name if summary else clean_optional_str(data.get("community_name"))
     cover_image = summary.cover_image_url if summary else clean_optional_str(data.get("photo_src"))
 
+    # 原始刊登網址 (100% 取自 otherInfo.shareInfo.url，防禦性容錯 shareInfo.url)
+    other_info = data.get("otherInfo") or {}
+    share_info = other_info.get("shareInfo") or data.get("shareInfo") or {}
+    sale_house_url = clean_optional_str(share_info.get("url"))
+
     return NormalizedSalePropertyDetail(
         # --- 第一層：身分與地理空間標識 ---
         provider_id=summary.provider_id if summary else "591",
@@ -207,6 +212,7 @@ def map_sale_house_detail(
         external_community_id=ext_comm_id,
         community_name=comm_name,
         cover_image_url=cover_image,
+        url=sale_house_url,
         # --- 第二層：深層建築、硬體規格與時程層 (100% 詳情 API 唯一來源) ---
         price_wan=price_wan,
         unit_price_wan=unit_price,

@@ -79,11 +79,12 @@ class Source591CommunityProvider(ICommunityProvider):
         if summary is None:
             build_info = data_block.get("build_info") or {}
             summary = NormalizedCommunitySummary(
-                community_id=community_id,
+                provider_id="591",
+                external_community_id=external_community_id,
                 community_name=str(build_info.get("community_name") or ""),
                 region_name="",
                 section_name="",
-                full_address="",
+                address="",
             )
 
         return map_community_detail(summary=summary, data=data_block)

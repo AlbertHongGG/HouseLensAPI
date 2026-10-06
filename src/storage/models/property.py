@@ -89,6 +89,7 @@ class PropertyTable(Base, TimestampMixin):
     address: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     # 刊登關聯 (一對多)
     listings: Mapped[List["PropertyListingTable"]] = relationship(
@@ -131,6 +132,7 @@ class PropertyListingTable(Base, TimestampMixin):
     listing_title: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     listing_price_wan: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 刊登總價 (萬元)
     cover_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     raw_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
 
     property: Mapped["PropertyTable"] = relationship(
