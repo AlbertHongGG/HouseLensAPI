@@ -1,6 +1,6 @@
 """HouseLensAPI - 永慶房屋頂層資料來源提供者 (Yungching Source Provider)
 
-整合永慶房屋社區領域服務與自主探針，並於模組載入時自動註冊至 ProviderRegistry。
+整合永慶房屋社區、中古屋領域服務與自主探針，並於模組載入時自動註冊至 ProviderRegistry。
 """
 
 import logging
@@ -15,6 +15,7 @@ from src.core.registry import registry
 from src.providers.source_yungching.client import SourceYungchingClient
 from src.providers.source_yungching.community import SourceYungchingCommunityProvider
 from src.providers.source_yungching.diagnostics import SourceYungchingDiagnostics
+from src.providers.source_yungching.sale_house import SourceYungchingSaleHouseProvider
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ class SourceYungchingProvider(IHouseSourceProvider):
     def __init__(self, client: Optional[SourceYungchingClient] = None):
         self._client = client or SourceYungchingClient()
         self._community = SourceYungchingCommunityProvider(self._client)
+        self._sale_house = SourceYungchingSaleHouseProvider(self._client)
         self._diagnostics = SourceYungchingDiagnostics()
 
     @property
@@ -41,7 +43,7 @@ class SourceYungchingProvider(IHouseSourceProvider):
 
     @property
     def sale_house(self) -> ISaleHouseProvider:
-        raise NotImplementedError("永慶房屋提供者尚未實作中古屋領域服務")
+        return self._sale_house
 
     @property
     def new_house(self) -> INewHouseProvider:

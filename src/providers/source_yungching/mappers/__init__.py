@@ -6,12 +6,20 @@ from src.providers.source_yungching.mappers.community_mapper import (
 )
 from src.providers.source_yungching.mappers.photos_dto import (
     SourceYungchingPhotosDTO,
+    SourceYungchingSalePhotosDTO,
     normalize_yungching_image_url,
+)
+from src.providers.source_yungching.mappers.sale_house_mapper import (
+    map_yungching_sale_detail,
+    map_yungching_sale_listing,
 )
 
 __all__ = [
     "SourceYungchingPhotosDTO",
+    "SourceYungchingSalePhotosDTO",
     "normalize_yungching_image_url",
     "map_yungching_community_summary",
     "map_yungching_community_detail",
+    "map_yungching_sale_listing",
+    "map_yungching_sale_detail",
 ]

@@ -1,6 +1,7 @@
 """HouseLensAPI - 永慶房屋來源自主 API 診斷探針套件 (Yungching Diagnostics Probe Suite)
 
 定義永慶平台各 API 端點規格與自主探針，支援動態 ID 鏈接與種子回退。
+涵蓋社區 (COMMUNITY) 與中古屋 (SALE) 兩大領域端點。
 嚴禁任何裝飾性符號 (Emoji)。
 """
 
@@ -36,6 +37,7 @@ DEFAULT_YUNGCHING_HEADERS: Dict[str, str] = {
 }
 
 SEED_COMMUNITY_ID = "43035"  # 全坤威峰
+SEED_SALE_ID = "c7521dcc-3afc-4fcf-af68-57ef8bb8547c"  # 宸和苑三房邊間4
 
 
 class BaseYungchingProbe(IProbeEndpoint):
@@ -130,7 +132,6 @@ class YungchingCommunityListProbe(BaseYungchingProbe):
             headers=headers,
         )
 
-        # 動態提取社區 ID 供詳情探針使用
         if artifact.response and isinstance(artifact.response.body, dict):
             list_objs = artifact.response.body.get("Data", {}).get("ListObjects") or []
             for item in list_objs:
@@ -201,6 +202,127 @@ class YungchingCommunityDetailProbe(BaseYungchingProbe):
         )
 
 
+class YungchingSaleListProbe(BaseYungchingProbe):
+    """永慶中古屋物件清單 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "sale_list"
+
+    @property
+    def name(self) -> str:
+        return "中古屋物件清單 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.SALE
+
+    @property
+    def description(self) -> str:
+        return "測試永慶房屋中古屋搜尋端點連線與回傳清單結構"
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        url = f"{YUNGCHING_BASE_URL}/v2/SearchHouse"
+        params = self._merge_params(
+            {
+                "SearchMode": "1",
+                "Sequence": "1",
+                "Page": 1,
+                "Limit": 5,
+                "County": "台北市",
+                **DEFAULT_QUERY_PARAMS,
+            },
+            context,
+        )
+        headers = self._merge_headers(DEFAULT_YUNGCHING_HEADERS, context)
+        metadata = self._create_metadata_template()
+        artifact = await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="GET",
+            url=url,
+            params=params,
+            headers=headers,
+        )
+
+        # 動態提取中古屋 CaseID 供詳情探針使用
+        if artifact.response and isinstance(artifact.response.body, dict):
+            list_objs = artifact.response.body.get("Data", {}).get("ListObjects") or []
+            for item in list_objs:
+                if isinstance(item, dict) and item.get("CaseID"):
+                    self._context["sale_id"] = str(item["CaseID"])
+                    break
+
+        return artifact
+
+
+class YungchingSaleDetailProbe(BaseYungchingProbe):
+    """永慶中古屋物件詳情 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "sale_detail"
+
+    @property
+    def name(self) -> str:
+        return "中古屋物件詳情 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.SALE
+
+    @property
+    def description(self) -> str:
+        return "測試永慶房屋中古屋深層物理規格、產權五大面積與相簿大圖"
+
+    @property
+    def requires_target_id(self) -> bool:
+        return True
+
+    @property
+    def default_target_id(self) -> Optional[str]:
+        return SEED_SALE_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        target_id = None
+        if context and context.target_id:
+            target_id = context.target_id
+        elif "sale_id" in self._context:
+            target_id = self._context["sale_id"]
+        else:
+            target_id = self.default_target_id
+
+        url = f"{YUNGCHING_BASE_URL}/v2/houseDetail/Base"
+        params = self._merge_params(
+            {
+                "CaseID": target_id,
+                "RefererType": 2,
+                "RefererID": 0,
+                "IsMultipleLineCaseFeature": "true",
+                **DEFAULT_QUERY_PARAMS,
+            },
+            context,
+        )
+        headers = self._merge_headers(DEFAULT_YUNGCHING_HEADERS, context)
+        metadata = self._create_metadata_template()
+        return await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="GET",
+            url=url,
+            params=params,
+            headers=headers,
+        )
+
+
 class SourceYungchingDiagnostics(IProviderDiagnostics):
     """永慶房屋來源提供者診斷套件"""
 
@@ -209,6 +331,8 @@ class SourceYungchingDiagnostics(IProviderDiagnostics):
         self._probes: Dict[str, IProbeEndpoint] = {
             "community_list": YungchingCommunityListProbe(self._shared_context),
             "community_detail": YungchingCommunityDetailProbe(self._shared_context),
+            "sale_list": YungchingSaleListProbe(self._shared_context),
+            "sale_detail": YungchingSaleDetailProbe(self._shared_context),
         }
 
     @property

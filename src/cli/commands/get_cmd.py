@@ -61,13 +61,25 @@ def get_community_cmd(
 
 @get_app.command("sale")
 def get_sale_house_cmd(
-    identifier: str = typer.Argument(..., help="房屋實體 UUID 或外部房源編號 (如 S20604856)"),
+    identifier: str = typer.Argument(..., help="房屋實體 UUID 或外部房源編號 (如 S20604856 或 Yungching GUID)"),
+    provider: Optional[str] = typer.Option(None, "--provider", "-p", help="來源平台代碼 (如 591, yungching)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
 ):
     """檢視中古屋客觀實體物理規格與跨平台刊登比價追蹤清單"""
     uc = InspectUseCase(database=db_manager)
+
+    async def _execute():
+        await db_manager.init_db()
+        prop = await uc.get_property(identifier, provider_id=provider)
+        if not prop and provider:
+            try:
+                prop = await uc.fetch_and_save_property(provider, identifier)
+            except Exception:
+                pass
+        return prop
+
     try:
-        property_obj = asyncio.run(uc.get_property(identifier))
+        property_obj = asyncio.run(_execute())
     except Exception as e:
         print_error(f"查詢房屋失敗: {e}")
         raise typer.Exit(code=1)

@@ -13,7 +13,7 @@ uv sync
 ```
 
 ### 2. 執行自動化測試
-全套 125 項自動化測試（涵蓋領域模型規格、591 與永慶封包正規化轉換、倉儲層、消歧去重服務、領域不變量、單端點參數化探針與串流同步管線）：
+全套 134 項自動化測試（涵蓋領域模型規格、591 與永慶中古屋/社區封包正規化轉換、倉儲層、消歧去重服務、領域不變量、單端點參數化探針與串流同步管線）：
 ```bash
 uv run pytest
 ```
@@ -115,6 +115,9 @@ uv run houselens sync community -r 1 -k "鳴森大苑" --max-age 5
 # 串流同步永慶房屋社區 (yungching)
 uv run houselens sync community --provider yungching -l 10
 
+# 串流同步永慶房屋中古屋 (yungching)
+uv run houselens sync sale --provider yungching -l 10
+
 # 同步預售屋建案及其結構化房型坪數規劃
 uv run houselens sync newhouse -r 1 -s 1 -l 10
 
@@ -170,7 +173,7 @@ uv run houselens list sale --format json | jq '.[0]'
 | 指令 | 識別碼參數 (IDENTIFIER) | 選項 | 說明 |
 | :--- | :--- | :--- | :--- |
 | `houselens get community <id>` | 社區內部 UUID、UUID 前綴、或來源平台社區代號（如 `5868278` 或 `43035`） | `-p, --provider <id>`, `-f, --format <text\|json>` | 檢視建築規劃、車位比、座向規則、公設清單、管理費與原始網址；支援 `--provider` 即時連線入庫 |
-| `houselens get sale <id>` | 房屋實體 UUID、UUID 前綴、或主表外部房源代號/各平台刊登編號（如 `S20604856`） | `-f, --format <text\|json>` | 檢視客觀物理規格、相簿照片數量、封面圖，並列出跨平台來源刊登比價明細與原始網址 |
+| `houselens get sale <id>` | 房屋實體 UUID、UUID 前綴、或主表外部房源代號/各平台刊登編號（如 `S20604856` 或永慶 GUID） | `-p, --provider <id>`, `-f, --format <text\|json>` | 檢視客觀物理規格、相簿照片數量、封面圖，並列出跨平台來源刊登比價明細與原始網址；支援 `--provider` 即時連線入庫 |
 | `houselens get newhouse <id>` | 建案內部 UUID、UUID 前綴、或外部建案專案代號（如 `128292` 或 `138045`） | `-f, --format <text\|json>` | 檢視建案建材、團隊、房型坪數規劃矩陣與原始網址 |
 
 #### 常用範例
@@ -184,6 +187,9 @@ uv run houselens get community 43035 --provider yungching
 
 # 依外部房屋代號反查房屋客觀實體與跨平台比價明細
 uv run houselens get sale S20604856
+
+# 依永慶外部物件 GUID 即時抓取並入庫展示 (宸和苑 c7521dcc-3afc-4fcf-af68-57ef8bb8547c)
+uv run houselens get sale c7521dcc-3afc-4fcf-af68-57ef8bb8547c --provider yungching
 
 # 依外部建案專案代碼輸出新建案詳情
 uv run houselens get newhouse 128292
@@ -212,7 +218,7 @@ houselens test
 | 參數 / 選項 | 簡寫 | 類型 | 預設值 | 說明 |
 | :--- | :--- | :--- | :--- | :--- |
 | `provider_id` | - | Argument | 必要 | 目標來源外掛代碼（例如 `591`, `yungching`） |
-| `endpoint_id` | - | Argument | 必要 | 目標端點代碼（例如 591 之 `sale_detail`, `sale_photos`, `community_detail`；永慶之 `community_list`, `community_detail`） |
+| `endpoint_id` | - | Argument | 必要 | 目標端點代碼（例如 591 之 `sale_detail`, `sale_photos`, `community_detail`；永慶之 `community_list`, `community_detail`, `sale_list`, `sale_detail`） |
 | `--target-id` | `-i` | Option | None | 目標物件/實體 ID（例如中古屋 `S20846137`、591社區 `5855864`、永慶社區 `43035`、建案 `138045`）。未提供時回退至預設種子 ID |
 | `--params` | `-p` | Option | None | 自訂追加或覆蓋之 Query 參數（JSON 字串，例如 `'{"regionid": 1}'`） |
 | `--output-file` | `-o` | Option | None | 自訂完整封包 JSON 落盤檔案路徑 |
@@ -282,6 +288,10 @@ uv run houselens test endpoint 591 sale_list -p '{"regionid": 3, "p": 2}'
 
 # 單端點測試並輸出純 JSON 封包結構（供 jq 管線處理）
 uv run houselens test endpoint 591 sale_detail -i S20846137 -f json | jq '.response.body'
+
+# 測試永慶房屋中古屋清單與詳情探針
+uv run houselens test endpoint yungching sale_list
+uv run houselens test endpoint yungching sale_detail -i c7521dcc-3afc-4fcf-af68-57ef8bb8547c
 
 # 查詢 591 支援的所有可用端點規格清單
 uv run houselens test list 591
@@ -437,7 +447,14 @@ uv run houselens link-communities -l 50 --format json
 
 ### 2. `properties` (中古屋客觀實體主檔)
 
-對應來源：591 中古屋清單 API (`/v1/app/gateway/sale/list`) & 詳情 API (`/v1/app/gateway/sale/detail`)  
+對應來源：
+- **591**：中古屋清單 API (`/v1/app/gateway/sale/list`) & 詳情 API (`/v1/app/gateway/sale/detail`)
+- **永慶 (yungching)**：房屋物件清單 API (`/v2/SearchHouse`) & 房屋物件詳情資訊 API (`/v2/houseDetail/Base`)
+
+*架構原則：劃分單一事實來源（Single Source of Truth），兩層式職責明確分工：*
+- **第一層：清單 API (最小必要刊登資訊)**：專責提取外部 ID (CaseID)、刊登開價 (`listing_price_wan`)、標題、快篩面積與縮圖。
+- **第二層：詳情 API (客觀實體屬性 100% 在此取得)**：實體總價 (`price_wan`)、每坪單價 (`unit_price_wan`)、產權五大面積拆解 (主建物/附屬/共有/土地/車位)、精確樓層格局、關聯社區原生代碼與名稱反查、相簿大圖陣列 (1200x900 去重保序、封面置頂) 與官方網址。
+- **第三類：客觀無資料 (100% 權威正規化為 SQL NULL)**：平台未客觀提供之欄位（如公設比、帶租約、現況等）一律在防腐層純化為 SQL `NULL`。
 *消歧去重規則：同社區（或無社區者同路街樓層）+ 樓層相等 + 房數相等 + 坪數誤差 $\pm 2\%$ 內自動合併。主表固化建立來源身分二元組。*
 
 | 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
@@ -489,7 +506,7 @@ uv run houselens link-communities -l 50 --format json
 ### 3. `property_listings` (刊登廣告表)
 
 記錄各平台發布之房源廣告，多筆刊登可歸戶至同一 `properties` 實體。  
-對應來源：591 中古屋清單 API (`/v1/app/gateway/sale/list`)
+對應來源：591 中古屋清單 API (`/v1/app/gateway/sale/list`) & 永慶房屋物件清單 API (`/v2/SearchHouse`)
 
 | 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
 | :--- | :--- | :--- | :--- | :--- |
