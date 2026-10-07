@@ -1,6 +1,6 @@
 # HouseLens - 台灣全網房產數據終端 (CLI Engine)
 
-HouseLens 是一個以 CLI 為核心的非同步房產數據聚合引擎，以實體與刊登解耦、模組自主數據正規化（Anti-Corruption Layer）、全領域外部身分統一命名、主表原始房源固化與純數值消歧去重為架構基礎，整合各大房產平台（首發 591）提供標準化強型別資料管理與終端檢索。
+HouseLens 是一個以 CLI 為核心的非同步房產數據聚合引擎，以實體與刊登解耦、模組自主數據正規化（Anti-Corruption Layer）、全領域外部身分統一命名、主表原始房源固化與純數值消歧去重為架構基礎，整合各大房產平台（數字科技 591、永慶房產集團 yungching）提供標準化強型別資料管理與終端檢索。
 
 ---
 
@@ -13,7 +13,7 @@ uv sync
 ```
 
 ### 2. 執行自動化測試
-全套 120 項自動化測試（涵蓋領域模型規格、591 封包正規化轉換、倉儲層、消歧去重服務、領域不變量、單端點參數化探針與串流同步管線）：
+全套 125 項自動化測試（涵蓋領域模型規格、591 與永慶封包正規化轉換、倉儲層、消歧去重服務、領域不變量、單端點參數化探針與串流同步管線）：
 ```bash
 uv run pytest
 ```
@@ -37,7 +37,7 @@ uv run pytest
 
 ### 1. 來源外掛模組 (provider)
 
-管理與檢測各房產平台來源外掛。
+管理與檢測各房產平台來源外掛（支援 `591`、`yungching`）。
 
 #### 參數選項
 
@@ -49,11 +49,12 @@ uv run pytest
 #### 常用範例
 
 ```bash
-# 檢視已安裝來源外掛
+# 檢視已安裝來源外掛 (591, yungching)
 uv run houselens provider list
 
 # 量測指定來源連線延遲
 uv run houselens provider check 591
+uv run houselens provider check yungching
 ```
 
 ---
@@ -108,8 +109,11 @@ uv run houselens db vacuum
 # 依總價與屋齡（10年以下）同步台北市中古屋（自動去重合併，並自動拆解產權五大面積與原始物件網址）
 uv run houselens sync sale -r 1 --max-age 10 --min-price 2000 --max-price 5000 -l 20
 
-# 依屋齡區間與關鍵字搜尋社區並同步完整公設清單與建商團隊
+# 依屋齡區間與關鍵字搜尋社區並同步完整公設清單與建商團隊 (591)
 uv run houselens sync community -r 1 -k "鳴森大苑" --max-age 5
+
+# 串流同步永慶房屋社區 (yungching)
+uv run houselens sync community --provider yungching -l 10
 
 # 同步預售屋建案及其結構化房型坪數規劃
 uv run houselens sync newhouse -r 1 -s 1 -l 10
@@ -165,7 +169,7 @@ uv run houselens list sale --format json | jq '.[0]'
 
 | 指令 | 識別碼參數 (IDENTIFIER) | 選項 | 說明 |
 | :--- | :--- | :--- | :--- |
-| `houselens get community <id>` | 社區內部 UUID、UUID 前綴、或來源平台社區代號（如 `5868278`） | `-f, --format <text\|json>` | 檢視建築規劃、車位比、座向規則、公設清單、管理費與原始網址 |
+| `houselens get community <id>` | 社區內部 UUID、UUID 前綴、或來源平台社區代號（如 `5868278` 或 `43035`） | `-p, --provider <id>`, `-f, --format <text\|json>` | 檢視建築規劃、車位比、座向規則、公設清單、管理費與原始網址；支援 `--provider` 即時連線入庫 |
 | `houselens get sale <id>` | 房屋實體 UUID、UUID 前綴、或主表外部房源代號/各平台刊登編號（如 `S20604856`） | `-f, --format <text\|json>` | 檢視客觀物理規格、相簿照片數量、封面圖，並列出跨平台來源刊登比價明細與原始網址 |
 | `houselens get newhouse <id>` | 建案內部 UUID、UUID 前綴、或外部建案專案代號（如 `128292` 或 `138045`） | `-f, --format <text\|json>` | 檢視建案建材、團隊、房型坪數規劃矩陣與原始網址 |
 
@@ -174,6 +178,9 @@ uv run houselens list sale --format json | jq '.[0]'
 ```bash
 # 依 591 外部社區編號檢視社區規格面板
 uv run houselens get community 5868278
+
+# 依永慶外部社區代號即時抓取並入庫展示 (全坤威峰 43035)
+uv run houselens get community 43035 --provider yungching
 
 # 依外部房屋代號反查房屋客觀實體與跨平台比價明細
 uv run houselens get sale S20604856
@@ -204,9 +211,9 @@ houselens test
 
 | 參數 / 選項 | 簡寫 | 類型 | 預設值 | 說明 |
 | :--- | :--- | :--- | :--- | :--- |
-| `provider_id` | - | Argument | 必要 | 目標來源外掛代碼（例如 `591`） |
-| `endpoint_id` | - | Argument | 必要 | 目標端點代碼（例如 `sale_detail`, `sale_photos`, `sale_community_entry`, `community_detail`, `new_house_detail`） |
-| `--target-id` | `-i` | Option | None | 目標物件/實體 ID（例如中古屋 `S20846137`、社區 `5855864`、建案 `138045`）。未提供時回退至預設種子 ID |
+| `provider_id` | - | Argument | 必要 | 目標來源外掛代碼（例如 `591`, `yungching`） |
+| `endpoint_id` | - | Argument | 必要 | 目標端點代碼（例如 591 之 `sale_detail`, `sale_photos`, `community_detail`；永慶之 `community_list`, `community_detail`） |
+| `--target-id` | `-i` | Option | None | 目標物件/實體 ID（例如中古屋 `S20846137`、591社區 `5855864`、永慶社區 `43035`、建案 `138045`）。未提供時回退至預設種子 ID |
 | `--params` | `-p` | Option | None | 自訂追加或覆蓋之 Query 參數（JSON 字串，例如 `'{"regionid": 1}'`） |
 | `--output-file` | `-o` | Option | None | 自訂完整封包 JSON 落盤檔案路徑 |
 | `--format` | `-f` | Option | `text` | 輸出格式：彩色終端表格 (`text`) 或 JSON 總結 (`json`) |
@@ -376,8 +383,14 @@ uv run houselens link-communities -l 50 --format json
 
 ### 1. `communities` (社區)
 
-對應來源：591 社區清單 API (`/v1/search/list`) & 社區詳情 API (`/v1/app/gateway/community/info`)  
-*架構原則：劃分單一事實來源（Single Source of Truth），第一層身分地理、坐標與成交均價 100% 來自「清單」API；第二層建築硬體規格 100% 來自「詳情」API 的 `build_info` 單一區塊。全文字欄位空字串與佔位雜質一律在防腐層正規化為 SQL `NULL`。*
+對應來源：
+- **591**：社區清單 API (`/v1/search/list`) & 社區詳情 API (`/v1/app/gateway/community/info`)
+- **永慶 (yungching)**：社區清單 API (`/v1/SearchCommunityList`) & 社區詳情 API (`/v1/SearchCommunityDetail`)
+
+*架構原則：劃分單一事實來源（Single Source of Truth），兩層式職責明確分工：*
+- **第一層：清單 API (最小必要資訊)**：外部 ID、社區名稱、地址、經緯度坐標、成交均價、封面縮圖（1200x900）。
+- **第二層：詳情 API (剩下的主檔屬性 100% 在此取得)**：行政區域（County/District 詳情直取，杜絕猜測）、屋齡、總戶數、樓層規劃、結構工法、投資建設、公設清單（正則萃取）、相簿大圖陣列（1200x900 去重保序、封面置頂）與官方網址。
+- **第三類：客觀無資料 (100% 權威正規化為 SQL NULL)**：平台未客觀提供之 17 項欄位（如土地分區、車位價格、管理費單價等）一律在防腐層純化為 SQL `NULL`。
 
 | 欄位 | 型別 | 說明 | 591 API Body 路徑 | 架構層級 / 轉換規則 |
 | :--- | :--- | :--- | :--- | :--- |

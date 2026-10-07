@@ -1,6 +1,7 @@
 """HouseLensAPI CLI - 物件深度規格與比價檢視命令 (Get Commands)"""
 
 import asyncio
+from typing import Optional
 import typer
 
 from src.application.inspect_usecase import InspectUseCase
@@ -24,13 +25,25 @@ get_app = typer.Typer(help="檢視單一房產物件深度規格與跨平台比�
 
 @get_app.command("community")
 def get_community_cmd(
-    identifier: str = typer.Argument(..., help="社區內部 UUID 或 591 社區 ID (如 5855864)"),
+    identifier: str = typer.Argument(..., help="社區內部 UUID 或外部平台社區代碼 (如 5855864 或 43035)"),
+    provider: Optional[str] = typer.Option(None, "--provider", "-p", help="來源平台代碼 (如 591, yungching)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
 ):
     """檢視社區完整建築規劃、公設清單、管理費與周邊交通"""
     uc = InspectUseCase(database=db_manager)
+
+    async def _execute():
+        await db_manager.init_db()
+        comm = await uc.get_community(identifier, provider_id=provider)
+        if not comm and provider:
+            try:
+                comm = await uc.fetch_and_save_community(provider, identifier)
+            except Exception:
+                pass
+        return comm
+
     try:
-        community = asyncio.run(uc.get_community(identifier))
+        community = asyncio.run(_execute())
     except Exception as e:
         print_error(f"查詢社區失敗: {e}")
         raise typer.Exit(code=1)

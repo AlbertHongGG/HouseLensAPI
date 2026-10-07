@@ -19,7 +19,9 @@ class InspectUseCase:
     def __init__(self, database: DatabaseManager = db_manager):
         self.db = database
 
-    async def get_community(self, identifier: str) -> Optional[CommunityTable]:
+    async def get_community(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[CommunityTable]:
         """根據內部 UUID、前綴或外部來源代號查詢社區詳情"""
         async with self.db.session() as session:
             repo = CommunityRepository(session)
@@ -32,8 +34,26 @@ class InspectUseCase:
                 res = q_res.scalars().first()
             if res is None:
                 # 3. 嘗試以外部平台專案代碼查詢
-                res = await repo.get_by_external_id("591", identifier)
+                if provider_id:
+                    res = await repo.get_by_external_id(provider_id, identifier)
+                else:
+                    stmt = select(CommunityTable).where(CommunityTable.external_community_id == identifier)
+                    q_res = await session.execute(stmt)
+                    res = q_res.scalars().first()
             return res
+
+    async def fetch_and_save_community(
+        self, provider_id: str, external_community_id: str
+    ) -> Optional[CommunityTable]:
+        """從指定外部來源即時獲取社區詳情並立即持久化至本地資料庫"""
+        from src.core.registry import registry
+        provider = registry.get_provider(provider_id)
+        detail = await provider.community.get_community_detail(external_community_id)
+        async with self.db.session() as session:
+            repo = CommunityRepository(session)
+            record = await repo.upsert_from_detail(detail, provider_id=provider_id)
+            await session.commit()
+            return await repo.get_by_id(record.id)
 
     async def get_property(self, identifier: str) -> Optional[PropertyTable]:
         """根據內部 UUID、前綴或任何平台外部刊登 ID (如 S20604856) 查詢實體與所有比價刊登"""
