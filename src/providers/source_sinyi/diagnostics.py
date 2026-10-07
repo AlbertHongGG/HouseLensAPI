@@ -1,0 +1,263 @@
+"""HouseLensAPI - 信義房屋來源自主 API 診斷探針套件 (Sinyi Diagnostics Probe Suite)
+
+定義信義房屋平台各 API 端點規格與自主探針，支援動態 ID 鏈接與種子回退。
+涵蓋系統連線健康檢查 (SYSTEM) 與預留業務端點。
+嚴禁任何裝飾性符號 (Emoji)。
+"""
+
+import logging
+from typing import Any, Dict, List, Optional
+import httpx
+
+from src.core.diagnostics.recorder import DiagnosticTransportRecorder
+from src.core.interfaces.diagnostics import IProbeEndpoint, IProviderDiagnostics
+from src.domain.diagnostics import (
+    DiagnosticArtifact,
+    DiagnosticDomain,
+    DiagnosticMetadata,
+    DiagnosticStatus,
+    ProbeExecutionContext,
+)
+from src.providers.source_sinyi.client import FALLBACK_SEED_SID
+from src.providers.source_sinyi.config import (
+    DEFAULT_DEVICE_PAYLOAD,
+    SINYI_API_BASE_URL,
+    SINYI_HEADER_CODE,
+    SINYI_USER_AGENT,
+)
+from src.providers.source_sinyi.crypto import SinyiCryptoService
+
+logger = logging.getLogger(__name__)
+
+SEED_SALE_ID = "7342DG"  # 敦品苑全新舒適三房車位 (封包紀錄種子)
+
+
+class BaseSinyiProbe(IProbeEndpoint):
+    """信義房屋探針基礎類別"""
+
+    def __init__(self, context: Optional[Dict[str, str]] = None):
+        self._context = context if context is not None else {}
+        self._crypto = SinyiCryptoService()
+
+    def _create_metadata_template(self) -> DiagnosticMetadata:
+        """建立初始元數據物件"""
+        return DiagnosticMetadata(
+            provider_id="sinyi",
+            provider_name="信義房屋 Sinyi Housing",
+            endpoint_id=self.endpoint_id,
+            domain=self.domain.value,
+            name=self.name,
+            description=self.description,
+            status=DiagnosticStatus.SUCCESS,
+            status_code=None,
+            latency_ms=0.0,
+            timestamp="",
+            error_message=None,
+        )
+
+    def _build_encrypted_body(self, payload: Dict[str, Any]) -> Dict[str, str]:
+        """建立加密請求 JSON 實體 ({"param": "<B64>"})"""
+        merged_payload = dict(DEFAULT_DEVICE_PAYLOAD)
+        merged_payload.update(payload)
+        return self._crypto.encrypt_request_payload(merged_payload, wrap_param=True)
+
+    def _build_headers(self, context: Optional[ProbeExecutionContext] = None) -> Dict[str, str]:
+        """組裝信義 App 專屬通訊標頭 (sid 序號支援回退或外部注入)"""
+        sid = FALLBACK_SEED_SID
+        if context and context.extra_headers and "sid" in context.extra_headers:
+            sid = context.extra_headers["sid"]
+        headers = {
+            "user-agent": SINYI_USER_AGENT,
+            "code": SINYI_HEADER_CODE,
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip",
+            "Connection": "Keep-Alive",
+            "sid": sid,
+        }
+        if context and context.extra_headers:
+            headers.update(context.extra_headers)
+        return headers
+
+
+class SinyiHealthPingProbe(BaseSinyiProbe):
+    """信義房屋通訊通道健康度探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "health_ping"
+
+    @property
+    def name(self) -> str:
+        return "通訊通道與加密健康度檢測"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.SYSTEM
+
+    @property
+    def description(self) -> str:
+        return "發送輕量加密請求至信義房屋網關檢測通訊鏈路與加解密機制"
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        url = f"{SINYI_API_BASE_URL}/filterObject.php"
+        ping_payload = {
+            "page": 1,
+            "pageCnt": 1,
+            "sort": "default",
+            "filter": {
+                "retRange": ["100"],
+                "retType": 2,
+            },
+        }
+        body = self._build_encrypted_body(ping_payload)
+        headers = self._build_headers(context)
+        metadata = self._create_metadata_template()
+
+        return await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="POST",
+            url=url,
+            body=body,
+            headers=headers,
+        )
+
+
+class SinyiSaleListProbe(BaseSinyiProbe):
+    """信義中古屋物件清單 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "sale_list"
+
+    @property
+    def name(self) -> str:
+        return "中古屋物件清單 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.SALE
+
+    @property
+    def description(self) -> str:
+        return "測試信義房屋手機端中古屋物件條件篩選端點連線與回傳密文結構"
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        url = f"{SINYI_API_BASE_URL}/filterObject.php"
+        search_payload: Dict[str, Any] = {
+            "page": 1,
+            "pageCnt": 5,
+            "sort": "default",
+            "filter": {
+                "floor": None,
+                "retRange": ["100"],
+                "retType": 2,
+            },
+        }
+        if context and context.extra_params:
+            search_payload.update(context.extra_params)
+
+        body = self._build_encrypted_body(search_payload)
+        headers = self._build_headers(context)
+        metadata = self._create_metadata_template()
+
+        return await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="POST",
+            url=url,
+            body=body,
+            headers=headers,
+        )
+
+
+class SinyiSaleDetailProbe(BaseSinyiProbe):
+    """信義中古屋物件詳情 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "sale_detail"
+
+    @property
+    def name(self) -> str:
+        return "中古屋物件詳情資訊 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.SALE
+
+    @property
+    def description(self) -> str:
+        return "測試信義房屋手機端物件完整規格詳情端點連線與回傳密文結構"
+
+    @property
+    def default_target_id(self) -> str:
+        return SEED_SALE_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        if context and context.target_id:
+            target_id = context.target_id
+        elif "last_sale_id" in self._context:
+            target_id = self._context["last_sale_id"]
+        else:
+            target_id = self.default_target_id
+
+        url = f"{SINYI_API_BASE_URL}/getObjectContent.php"
+        detail_payload = {
+            "houseNo": target_id,
+            "showOff": 0,
+        }
+        body = self._build_encrypted_body(detail_payload)
+        headers = self._build_headers(context)
+        metadata = self._create_metadata_template()
+
+        return await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="POST",
+            url=url,
+            body=body,
+            headers=headers,
+        )
+
+
+class SourceSinyiDiagnostics(IProviderDiagnostics):
+    """信義房屋來源提供者診斷套件"""
+
+    def __init__(self):
+        self._shared_context: Dict[str, str] = {}
+        self._probes: Dict[str, IProbeEndpoint] = {
+            "health_ping": SinyiHealthPingProbe(self._shared_context),
+            "sale_list": SinyiSaleListProbe(self._shared_context),
+            "sale_detail": SinyiSaleDetailProbe(self._shared_context),
+        }
+
+    @property
+    def provider_id(self) -> str:
+        return "sinyi"
+
+    @property
+    def provider_name(self) -> str:
+        return "信義房屋 Sinyi Housing"
+
+    def get_probes(self, domain: Optional[DiagnosticDomain] = None) -> List[IProbeEndpoint]:
+        probes = list(self._probes.values())
+        if domain is not None:
+            return [p for p in probes if p.domain == domain]
+        return probes
+
+    def get_probe(self, endpoint_id: str) -> Optional[IProbeEndpoint]:
+        return self._probes.get(endpoint_id)
