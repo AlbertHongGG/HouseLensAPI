@@ -1,11 +1,13 @@
 """HouseLensAPI - 永慶房屋相簿防腐資料傳輸物件 (Yungching Photos ACL DTO)
 
-專屬處理永慶房屋圖片動態尺寸替換、封面相片置頂與去重保序。
-支援社區 (Pic.yungching.com.tw 模板路由) 與中古屋 (yccdn.yungching.com.tw CDN 參數路由)。
+採用物件導向樣板方法模式 (Template Method Pattern)：
+- BaseYungchingPhotosDTO 封裝統一之尺寸升級、去重保序與封面強制置頂 (Index 0)。
+- 領域子類別 (Community, Sale) 僅專注於解析各領域特有封包階層結構。
 """
 
+from abc import ABC, abstractmethod
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 
 def normalize_yungching_image_url(url: Optional[str], width: int = 1200, height: int = 900) -> Optional[str]:
@@ -42,43 +44,42 @@ def normalize_yungching_image_url(url: Optional[str], width: int = 1200, height:
     return cleaned
 
 
-class SourceYungchingPhotosDTO:
-    """永慶房屋社區相簿防腐資料傳輸物件"""
+class BaseYungchingPhotosDTO(ABC):
+    """永慶房屋相簿防腐抽象基底類別 (Template Method Pattern)"""
 
     def __init__(self, raw: Optional[Any] = None):
         self._cover_raw: Optional[str] = None
         self._pictures_raw: List[str] = []
+        if raw is not None:
+            self._extract_payload(raw)
 
-        if isinstance(raw, dict):
-            data_block = raw.get("Data") if isinstance(raw.get("Data"), dict) else raw
-            self._cover_raw = data_block.get("Cover")
-            pics = data_block.get("Pictures")
-            if isinstance(pics, list):
-                self._pictures_raw = [p for p in pics if isinstance(p, str)]
-        elif isinstance(raw, list):
-            self._pictures_raw = [p for p in raw if isinstance(p, str)]
+    @abstractmethod
+    def _extract_payload(self, raw: Any) -> None:
+        """由具體領域子類別解析專屬原始封包結構，填充 _cover_raw 與 _pictures_raw"""
+        pass
 
     @property
     def cover_url(self) -> Optional[str]:
         """傳回高畫質封面照片 URL (1200x900)"""
-        if self._cover_raw:
-            norm = normalize_yungching_image_url(self._cover_raw)
-            if norm:
-                return norm
         urls = self.image_urls
-        return urls[0] if urls else None
+        if urls:
+            return urls[0]
+        if self._cover_raw:
+            return normalize_yungching_image_url(self._cover_raw)
+        return None
 
     @property
     def image_urls(self) -> List[str]:
         """傳回標準按序排列的高畫質照片 URL 列表 (封面保證置頂且去重保序)"""
-        cover_norm = normalize_yungching_image_url(self._cover_raw) if self._cover_raw else None
-
         result: List[str] = []
         seen = set()
 
-        if cover_norm:
-            result.append(cover_norm)
-            seen.add(cover_norm)
+        # 若外部有明確提供封面相片，強制置頂至第一順位
+        if self._cover_raw:
+            c_norm = normalize_yungching_image_url(self._cover_raw)
+            if c_norm and c_norm not in seen:
+                result.append(c_norm)
+                seen.add(c_norm)
 
         for pic in self._pictures_raw:
             norm_pic = normalize_yungching_image_url(pic)
@@ -89,20 +90,33 @@ class SourceYungchingPhotosDTO:
         return result
 
 
-class SourceYungchingSalePhotosDTO:
+class SourceYungchingCommunityPhotosDTO(BaseYungchingPhotosDTO):
+    """永慶房屋社區相簿防腐資料傳輸物件"""
+
+    def _extract_payload(self, raw: Any) -> None:
+        if isinstance(raw, dict):
+            data_block = raw.get("Data") if isinstance(raw.get("Data"), dict) else raw
+            self._cover_raw = data_block.get("Cover")
+            pics = data_block.get("Pictures")
+            if isinstance(pics, list):
+                self._pictures_raw = [p for p in pics if isinstance(p, str)]
+        elif isinstance(raw, list):
+            self._pictures_raw = [p for p in raw if isinstance(p, str)]
+
+
+# 社區相簿別名
+SourceYungchingPhotosDTO = SourceYungchingCommunityPhotosDTO
+
+
+class SourceYungchingSalePhotosDTO(BaseYungchingPhotosDTO):
     """永慶房屋中古屋相簿防腐資料傳輸物件
 
-    專屬處理 /v2/houseDetail/Base 回應中之 Pictures 陣列：
+    專屬處理 /v2/houseDetail/Base 回應中之相片清單與格局圖：
     - 支援字典項目 (含 'Url', 'ClearUrl') 或純字串項目。
-    - 將網址動態升級為 width=1200&height=900 高畫質圖。
-    - 首張照片強制置頂至第一順位 (index 0) 作為封面。
-    - 自動去除重複 URL 並保證原有順序。
+    - 支援 Picture / Cover / PictureList / Pictures / FloorPlan / SpcUrl。
     """
 
-    def __init__(self, raw: Optional[Any] = None):
-        self._pictures_raw: List[str] = []
-        self._cover_raw: Optional[str] = None
-
+    def _extract_payload(self, raw: Any) -> None:
         if isinstance(raw, dict):
             data_block = raw.get("Data") if isinstance(raw.get("Data"), dict) else raw
             self._cover_raw = data_block.get("Picture") or data_block.get("Cover")
@@ -127,34 +141,3 @@ class SourceYungchingSalePhotosDTO:
                         self._pictures_raw.append(u)
                 elif isinstance(p, str):
                     self._pictures_raw.append(p)
-
-    @property
-    def cover_url(self) -> Optional[str]:
-        """傳回首張高畫質照片 URL (1200x900)"""
-        urls = self.image_urls
-        if urls:
-            return urls[0]
-        if self._cover_raw:
-            return normalize_yungching_image_url(self._cover_raw)
-        return None
-
-    @property
-    def image_urls(self) -> List[str]:
-        """傳回按序排列的高畫質照片 URL 列表 (去重保序，首圖保證置頂)"""
-        result: List[str] = []
-        seen = set()
-
-        # 若外部有明確提供 cover 且不在列表中，優先置頂
-        if self._cover_raw:
-            c_norm = normalize_yungching_image_url(self._cover_raw)
-            if c_norm and c_norm not in seen:
-                result.append(c_norm)
-                seen.add(c_norm)
-
-        for p in self._pictures_raw:
-            norm_pic = normalize_yungching_image_url(p)
-            if norm_pic and norm_pic not in seen:
-                result.append(norm_pic)
-                seen.add(norm_pic)
-
-        return result

@@ -1,9 +1,8 @@
 """HouseLensAPI - 單一物件深度規格組裝使用案例 (Inspect Use Case)"""
 
 from typing import Optional
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
+from src.services.deduplication import PropertyDeduplicationService
 from src.storage.database import DatabaseManager, db_manager
 from src.storage.models.community import CommunityTable
 from src.storage.models.new_house import NewHouseTable
@@ -18,6 +17,7 @@ class InspectUseCase:
 
     def __init__(self, database: DatabaseManager = db_manager):
         self.db = database
+        self.dedup = PropertyDeduplicationService()
 
     async def get_community(
         self, identifier: str, provider_id: Optional[str] = None
@@ -25,30 +25,19 @@ class InspectUseCase:
         """根據內部 UUID、前綴或外部來源代號查詢社區詳情"""
         async with self.db.session() as session:
             repo = CommunityRepository(session)
-            # 1. 優先以內部主鍵查詢
-            res = await repo.get_by_id(identifier)
-            if res is None:
-                # 2. 嘗試以前綴比對內部 UUID
-                stmt = select(CommunityTable).where(CommunityTable.id.like(f"{identifier}%"))
-                q_res = await session.execute(stmt)
-                res = q_res.scalars().first()
-            if res is None:
-                # 3. 嘗試以外部平台專案代碼查詢
-                if provider_id:
-                    res = await repo.get_by_external_id(provider_id, identifier)
-                else:
-                    stmt = select(CommunityTable).where(CommunityTable.external_community_id == identifier)
-                    q_res = await session.execute(stmt)
-                    res = q_res.scalars().first()
-            return res
+            return await repo.find_by_identifier(identifier, provider_id=provider_id)
 
     async def fetch_and_save_community(
         self, provider_id: str, external_community_id: str
     ) -> Optional[CommunityTable]:
         """從指定外部來源即時獲取社區詳情並立即持久化至本地資料庫"""
         from src.core.registry import registry
+
         provider = registry.get_provider(provider_id)
         detail = await provider.community.get_community_detail(external_community_id)
+        if detail is None:
+            return None
+
         async with self.db.session() as session:
             repo = CommunityRepository(session)
             record = await repo.upsert_from_detail(detail, provider_id=provider_id)
@@ -61,54 +50,7 @@ class InspectUseCase:
         """根據內部 UUID、前綴或任何平台外部刊登 ID (如 S20604856 或 Yungching GUID) 查詢實體與所有比價刊登"""
         async with self.db.session() as session:
             repo = PropertyRepository(session)
-            # 1. 優先以內部 UUID 查詢
-            res = await repo.get_by_id(identifier)
-            if res is None:
-                # 2. 嘗試以前綴比對內部 UUID
-                stmt = (
-                    select(PropertyTable)
-                    .options(selectinload(PropertyTable.listings))
-                    .where(PropertyTable.id.like(f"{identifier}%"))
-                )
-                q_res = await session.execute(stmt)
-                res = q_res.scalars().first()
-            if res is None:
-                # 3. 嘗試以主表外部房屋 ID 查詢
-                if provider_id:
-                    stmt = (
-                        select(PropertyTable)
-                        .options(selectinload(PropertyTable.listings))
-                        .where(
-                            PropertyTable.provider_id == provider_id,
-                            PropertyTable.external_house_id == identifier,
-                        )
-                    )
-                else:
-                    stmt = (
-                        select(PropertyTable)
-                        .options(selectinload(PropertyTable.listings))
-                        .where(PropertyTable.external_house_id == identifier)
-                    )
-                q_res = await session.execute(stmt)
-                res = q_res.scalars().first()
-            if res is None:
-                # 4. 嘗試以外部刊登編號反查實體
-                if provider_id:
-                    clean_id = identifier.lstrip("S") if identifier.startswith("S") else identifier
-                    for ext_id in (identifier, clean_id, f"S{clean_id}"):
-                        res = await repo.get_by_listing(provider_id, ext_id)
-                        if res:
-                            break
-                else:
-                    for prov in ("591", "yungching"):
-                        clean_id = identifier.lstrip("S") if identifier.startswith("S") else identifier
-                        for ext_id in (identifier, clean_id, f"S{clean_id}"):
-                            res = await repo.get_by_listing(prov, ext_id)
-                            if res:
-                                break
-                        if res:
-                            break
-            return res
+            return await repo.find_by_identifier(identifier, provider_id=provider_id)
 
     async def fetch_and_save_property(
         self, provider_id: str, external_house_id: str
@@ -118,24 +60,13 @@ class InspectUseCase:
 
         provider = registry.get_provider(provider_id)
         detail = await provider.sale_house.get_sale_house_detail(external_house_id)
+        if detail is None:
+            return None
+
         async with self.db.session() as session:
             repo = PropertyRepository(session)
-            candidate_id: Optional[str] = None
-            if detail.total_area_pin is not None:
-                candidate = await repo.find_duplicate_candidate(
-                    community_name=detail.community_name,
-                    floor_current=detail.floor_current,
-                    rooms=detail.rooms,
-                    total_area_pin=detail.total_area_pin,
-                    region_name=detail.region_name,
-                    section_name=detail.section_name,
-                    street=detail.street,
-                    floor_total=detail.floor_total,
-                    external_community_id=detail.external_community_id,
-                    is_whole_building=detail.is_whole_building,
-                )
-                if candidate:
-                    candidate_id = candidate.id
+            eval_res = await self.dedup.evaluate_candidate(detail, repo)
+            candidate_id = eval_res.matched_property_id if eval_res.is_duplicate else None
             record = await repo.upsert_property_with_listing(
                 detail=detail,
                 provider_id=provider_id,
@@ -144,18 +75,10 @@ class InspectUseCase:
             await session.commit()
             return await repo.get_by_id(record.id)
 
-    async def get_new_house(self, identifier: str) -> Optional[NewHouseTable]:
+    async def get_new_house(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[NewHouseTable]:
         """根據內部 UUID、前綴或建案外部 ID 查詢新建案詳情 (含 layout_v2)"""
         async with self.db.session() as session:
             repo = NewHouseRepository(session)
-            # 1. 優先以主鍵 UUID 查詢
-            res = await repo.get_by_id(identifier)
-            if res is None:
-                # 2. 嘗試以前綴比對 UUID
-                stmt = select(NewHouseTable).where(NewHouseTable.id.like(f"{identifier}%"))
-                q_res = await session.execute(stmt)
-                res = q_res.scalars().first()
-            if res is None:
-                # 3. 嘗試以外部建案 ID 查詢
-                res = await repo.get_by_external_id("591", identifier)
-            return res
+            return await repo.find_by_identifier(identifier, provider_id=provider_id)

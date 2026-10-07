@@ -62,6 +62,43 @@ class Region(IntEnum):
             raise ValueError(f"未知的縣市名稱: {name}")
         return name_map[name]
 
+    @property
+    def chinese_name(self) -> str:
+        """傳回標準台灣縣市中文全名 (例如: '台北市', '新北市')"""
+        chinese_names = {
+            self.TAIPEI: "台北市",
+            self.NEW_TAIPEI: "新北市",
+            self.TAOYUAN: "桃園市",
+            self.HSINCHU_CITY: "新竹市",
+            self.HSINCHU_COUNTY: "新竹縣",
+            self.TAICHUNG: "台中市",
+            self.TAINAN: "台南市",
+            self.KAOHSIUNG: "高雄市",
+            self.KEELUNG: "基隆市",
+            self.YILAN: "宜蘭縣",
+            self.MIAOLI: "苗栗縣",
+            self.CHANGHUA: "彰化縣",
+            self.NANTOU: "南投縣",
+            self.YUNLIN: "雲林縣",
+            self.CHIAYI_CITY: "嘉義市",
+            self.CHIAYI_COUNTY: "嘉義縣",
+            self.PINGTUNG: "屏東縣",
+            self.HUALIEN: "花蓮縣",
+            self.TAITUNG: "台東縣",
+            self.PENGHU: "澎湖縣",
+            self.KINMEN: "金門縣",
+            self.LIENCHIANG: "連江縣",
+        }
+        return chinese_names.get(self, "台北市")
+
+    @classmethod
+    def to_chinese_name(cls, val: int) -> str:
+        """將整數代碼安全轉換為標準中文縣市全名 (無效值回退 '台北市')"""
+        try:
+            return cls(val).chinese_name
+        except (ValueError, TypeError):
+            return "台北市"
+
 
 class BuildingType(str, Enum):
     """跨平台統一建物類型"""

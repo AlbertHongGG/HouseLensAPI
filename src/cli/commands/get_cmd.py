@@ -1,6 +1,5 @@
-"""HouseLensAPI CLI - 物件深度規格與比價檢視命令 (Get Commands)"""
-
 import asyncio
+import logging
 from typing import Optional
 import typer
 
@@ -20,6 +19,7 @@ from src.cli.views.property_views import (
 )
 from src.storage.database import db_manager
 
+logger = logging.getLogger(__name__)
 get_app = typer.Typer(help="檢視單一房產物件深度規格與跨平台比價卡片")
 
 
@@ -38,8 +38,8 @@ def get_community_cmd(
         if not comm and provider:
             try:
                 comm = await uc.fetch_and_save_community(provider, identifier)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("從外部來源 %s 即時獲取社區 %s 失敗: %s", provider, identifier, e, exc_info=True)
         return comm
 
     try:
@@ -74,8 +74,8 @@ def get_sale_house_cmd(
         if not prop and provider:
             try:
                 prop = await uc.fetch_and_save_property(provider, identifier)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("從外部來源 %s 即時獲取中古屋 %s 失敗: %s", provider, identifier, e, exc_info=True)
         return prop
 
     try:
@@ -98,12 +98,13 @@ def get_sale_house_cmd(
 @get_app.command("newhouse")
 def get_new_house_cmd(
     identifier: str = typer.Argument(..., help="建案內部 UUID 或建案 HID (如 138045)"),
+    provider: Optional[str] = typer.Option(None, "--provider", "-p", help="來源平台代碼 (如 591)"),
     format_opt: str = typer.Option("text", "--format", "-f", help="輸出格式: text 或 json"),
 ):
     """檢視新建案建材特色、建築團隊與 layout_v2 房型坪數規劃矩陣"""
     uc = InspectUseCase(database=db_manager)
     try:
-        new_house = asyncio.run(uc.get_new_house(identifier))
+        new_house = asyncio.run(uc.get_new_house(identifier, provider_id=provider))
     except Exception as e:
         print_error(f"查詢新建案失敗: {e}")
         raise typer.Exit(code=1)

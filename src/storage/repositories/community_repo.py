@@ -241,6 +241,30 @@ class CommunityRepository(ICommunityRepository):
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
+    async def find_by_identifier(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[CommunityTable]:
+        """多維度社區識別碼智慧檢索：內部 UUID、UUID 前綴或外部社區代碼"""
+        # 1. 優先以內部主鍵 UUID 查詢
+        record = await self.get_by_id(identifier)
+        if record is not None:
+            return record
+
+        # 2. 嘗試以前綴比對內部 UUID
+        stmt_prefix = select(CommunityTable).where(CommunityTable.id.like(f"{identifier}%"))
+        q_res = await self.session.execute(stmt_prefix)
+        record = q_res.scalars().first()
+        if record is not None:
+            return record
+
+        # 3. 嘗試以外部平台社區代碼查詢 (可選過濾特定 provider_id)
+        if provider_id:
+            return await self.get_by_external_id(provider_id, identifier)
+
+        stmt_ext = select(CommunityTable).where(CommunityTable.external_community_id == identifier)
+        q_res = await self.session.execute(stmt_ext)
+        return q_res.scalars().first()
+
     async def search(
         self,
         region: Optional[str] = None,

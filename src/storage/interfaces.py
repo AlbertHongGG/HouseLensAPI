@@ -60,6 +60,13 @@ class ICommunityRepository(ABC):
         pass
 
     @abstractmethod
+    async def find_by_identifier(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[CommunityTable]:
+        """多維度社區識別碼智慧檢索：內部 UUID、UUID 前綴或外部社區代碼"""
+        pass
+
+    @abstractmethod
     async def search(
         self,
         region: Optional[str] = None,
@@ -115,6 +122,13 @@ class IPropertyRepository(ABC):
         self, provider_id: str, external_house_id: str
     ) -> Optional[PropertyTable]:
         """根據來源平台刊登 ID 查詢關聯之客觀物件"""
+        pass
+
+    @abstractmethod
+    async def find_by_identifier(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[PropertyTable]:
+        """多維度房屋識別碼智慧檢索：內部 UUID、UUID 前綴、主表外部房源代號或關聯刊登代號 (支援 S 前綴標準化)"""
         pass
 
     @abstractmethod
@@ -202,6 +216,13 @@ class INewHouseRepository(ABC):
         self, provider_id: str, external_project_id: str
     ) -> Optional[NewHouseTable]:
         """根據來源建案外部 ID 查詢新建案"""
+        pass
+
+    @abstractmethod
+    async def find_by_identifier(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[NewHouseTable]:
+        """多維度建案識別碼智慧檢索：內部 UUID、UUID 前綴或外部建案專案代號 (HID)"""
         pass
 
     @abstractmethod

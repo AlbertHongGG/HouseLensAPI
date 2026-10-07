@@ -218,6 +218,30 @@ class NewHouseRepository(INewHouseRepository):
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
+    async def find_by_identifier(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[NewHouseTable]:
+        """多維度建案識別碼智慧檢索：內部 UUID、UUID 前綴或外部建案專案代號 (HID)"""
+        # 1. 優先以內部主鍵 UUID 查詢
+        record = await self.get_by_id(identifier)
+        if record is not None:
+            return record
+
+        # 2. 嘗試以前綴比對內部 UUID
+        stmt_prefix = select(NewHouseTable).where(NewHouseTable.id.like(f"{identifier}%"))
+        q_res = await self.session.execute(stmt_prefix)
+        record = q_res.scalars().first()
+        if record is not None:
+            return record
+
+        # 3. 嘗試以外部專案 ID 查詢 (HID)
+        if provider_id:
+            return await self.get_by_external_id(provider_id, identifier)
+
+        stmt_ext = select(NewHouseTable).where(NewHouseTable.external_project_id == identifier)
+        q_res = await self.session.execute(stmt_ext)
+        return q_res.scalars().first()
+
     async def get_by_external_community_id(
         self, provider_id: str, external_community_id: str
     ) -> List[NewHouseTable]:

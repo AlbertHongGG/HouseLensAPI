@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 
 from src.core.interfaces.sale_house import ISaleHouseProvider
 from src.domain.common import PageResult
+from src.domain.enums import Region
 from src.domain.sale_house import (
     NormalizedSaleListing,
     NormalizedSalePropertyDetail,
@@ -37,11 +38,18 @@ class SourceYungchingSaleHouseProvider(ISaleHouseProvider):
         if query.keywords:
             params["KeyWords"] = query.keywords
 
-        # 縣市與行政區條件
-        if hasattr(query, "region_name") and query.region_name:
-            params["County"] = query.region_name
-        if hasattr(query, "section_name") and query.section_name:
-            params["District"] = query.section_name
+        # 縣市與行政區條件 (將標準 region_id 解析為永慶所需之中文縣市名稱)
+        county = None
+        if query.region_id is not None:
+            county = Region.to_chinese_name(query.region_id)
+        elif hasattr(query, "region_name") and getattr(query, "region_name"):
+            county = str(getattr(query, "region_name"))
+
+        if county:
+            params["County"] = county
+
+        if hasattr(query, "section_name") and getattr(query, "section_name"):
+            params["District"] = getattr(query, "section_name")
 
         # 總價範圍篩選 (單位: 萬元)
         if query.min_price_wan is not None:
@@ -67,9 +75,8 @@ class SourceYungchingSaleHouseProvider(ISaleHouseProvider):
             except (ValueError, TypeError):
                 total_records = len(items_raw)
 
-        region_filter = getattr(query, "region_name", None)
         items = [
-            map_yungching_sale_listing(it, query_region=region_filter)
+            map_yungching_sale_listing(it, query_region=county)
             for it in items_raw
             if isinstance(it, dict)
         ]
@@ -96,8 +103,5 @@ class SourceYungchingSaleHouseProvider(ISaleHouseProvider):
         res = await self._client.get("/v2/houseDetail/Base", params=params)
         data_block = res.get("Data") or {}
 
-        # 若未提供 summary (例如單純依 ID 直接查詢)，從 detail 基礎同名欄位建立保底 listing
-        if summary is None:
-            summary = map_yungching_sale_listing(data_block)
-
-        return map_yungching_sale_detail(listing=summary, raw_detail=data_block)
+        # 直接傳入詳情封包組裝完整物理規格，無須假造 listing
+        return map_yungching_sale_detail(raw_detail=data_block, summary=summary)

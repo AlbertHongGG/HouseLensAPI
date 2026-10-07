@@ -10,6 +10,7 @@ from src.domain.community import (
     NormalizedCommunityDetail,
     NormalizedCommunitySummary,
 )
+from src.domain.enums import Region
 from src.providers.source_yungching.client import SourceYungchingClient
 from src.providers.source_yungching.mappers.community_mapper import (
     map_yungching_community_detail,
@@ -38,11 +39,18 @@ class SourceYungchingCommunityProvider(ICommunityProvider):
         if query.keywords:
             params["KeyWords"] = query.keywords
 
-        # 縣市與行政區條件
-        if hasattr(query, "region_name") and query.region_name:
-            params["County"] = query.region_name
-        if hasattr(query, "section_name") and query.section_name:
-            params["District"] = query.section_name
+        # 縣市與行政區條件 (將標準 region_id 解析為永慶所需之中文縣市名稱)
+        county = None
+        if query.region_id is not None:
+            county = Region.to_chinese_name(query.region_id)
+        elif hasattr(query, "region_name") and getattr(query, "region_name"):
+            county = str(getattr(query, "region_name"))
+
+        if county:
+            params["County"] = county
+
+        if hasattr(query, "section_name") and getattr(query, "section_name"):
+            params["District"] = getattr(query, "section_name")
 
         # 屋齡範圍轉換 (永慶格式: "~10" 或 "10~20")
         if query.min_age_years is not None or query.max_age_years is not None:

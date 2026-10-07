@@ -493,6 +493,58 @@ class PropertyRepository(IPropertyRepository):
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
+    async def find_by_identifier(
+        self, identifier: str, provider_id: Optional[str] = None
+    ) -> Optional[PropertyTable]:
+        """多維度房屋識別碼智慧檢索：內部 UUID、UUID 前綴、主表外部房源代號或關聯刊登代號 (支援 S 前綴標準化)"""
+        # 1. 優先以內部主鍵 UUID 查詢
+        res = await self.get_by_id(identifier)
+        if res is not None:
+            return res
+
+        # 2. 嘗試以前綴比對內部 UUID
+        stmt_prefix = (
+            select(PropertyTable)
+            .options(selectinload(PropertyTable.listings))
+            .where(PropertyTable.id.like(f"{identifier}%"))
+        )
+        q_res = await self.session.execute(stmt_prefix)
+        res = q_res.scalars().first()
+        if res is not None:
+            return res
+
+        # 3. 嘗試以主表外部房屋 ID 查詢 (若提供 provider_id 則限定之)
+        stmt_ext = (
+            select(PropertyTable)
+            .options(selectinload(PropertyTable.listings))
+            .where(PropertyTable.external_house_id == identifier)
+        )
+        if provider_id:
+            stmt_ext = stmt_ext.where(PropertyTable.provider_id == provider_id)
+        q_res = await self.session.execute(stmt_ext)
+        res = q_res.scalars().first()
+        if res is not None:
+            return res
+
+        # 4. 嘗試以關聯刊登廣告編號反查 (處理 S 前綴相容性)
+        clean_id = identifier.lstrip("S") if identifier.startswith("S") else identifier
+        candidate_ids = [identifier]
+        if clean_id not in candidate_ids:
+            candidate_ids.append(clean_id)
+        if f"S{clean_id}" not in candidate_ids:
+            candidate_ids.append(f"S{clean_id}")
+
+        stmt_listing = (
+            select(PropertyTable)
+            .options(selectinload(PropertyTable.listings))
+            .join(PropertyListingTable, PropertyTable.id == PropertyListingTable.property_id)
+            .where(PropertyListingTable.external_house_id.in_(candidate_ids))
+        )
+        if provider_id:
+            stmt_listing = stmt_listing.where(PropertyListingTable.provider_id == provider_id)
+        q_res = await self.session.execute(stmt_listing)
+        return q_res.scalars().first()
+
     async def search(
         self,
         region_name: Optional[str] = None,
