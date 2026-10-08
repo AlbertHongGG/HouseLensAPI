@@ -9,13 +9,14 @@ from src.core.exceptions import (
     ProviderResponseError,
     RateLimitExceededError,
 )
-from src.providers.source_sinyi.client import FALLBACK_SEED_SID, SourceSinyiClient
+from src.providers.source_sinyi.client import SourceSinyiClient
+from src.providers.source_sinyi.config import FALLBACK_SEED_MOBILE_SID
 from src.providers.source_sinyi.crypto import SinyiCryptoService
 
 
 @pytest.mark.asyncio
-async def test_ensure_sid_success_from_gateway():
-    """測試 ensure_sid 成功自網關取得全新 sid"""
+async def test_ensure_mobile_sid_success_from_gateway():
+    """測試 ensure_mobile_sid 成功自網關取得全新 sid"""
     crypto = SinyiCryptoService()
     client = SourceSinyiClient(crypto=crypto)
 
@@ -35,13 +36,13 @@ async def test_ensure_sid_success_from_gateway():
     mock_http_client.post.return_value = mock_resp
 
     with patch.object(client, "get_mobile_client", return_value=mock_http_client):
-        sid = await client.ensure_sid()
+        sid = await client.ensure_mobile_sid()
         assert sid == "20261008041801698"
-        assert client._cached_sid == "20261008041801698"
+        assert client._cached_mobile_sid == "20261008041801698"
 
 
 @pytest.mark.asyncio
-async def test_ensure_sid_fallback_on_network_error():
+async def test_ensure_mobile_sid_fallback_on_network_error():
     """測試 getSession 發生異常時平滑回退至備用種子 sid"""
     client = SourceSinyiClient()
     mock_http_client = AsyncMock(spec=httpx.AsyncClient)
@@ -49,9 +50,9 @@ async def test_ensure_sid_fallback_on_network_error():
     mock_http_client.post.side_effect = httpx.NetworkError("Session gateway down")
 
     with patch.object(client, "get_mobile_client", return_value=mock_http_client):
-        sid = await client.ensure_sid()
-        assert sid == FALLBACK_SEED_SID
-        assert client._cached_sid == FALLBACK_SEED_SID
+        sid = await client.ensure_mobile_sid()
+        assert sid == FALLBACK_SEED_MOBILE_SID
+        assert client._cached_mobile_sid == FALLBACK_SEED_MOBILE_SID
 
 
 @pytest.mark.asyncio
@@ -62,7 +63,7 @@ class TestSourceSinyiClient:
         """測試手機端加密請求發送與解密接收成功流程 (含 sid 緩存情境)"""
         crypto = SinyiCryptoService()
         client = SourceSinyiClient(crypto=crypto)
-        client._cached_sid = "test_valid_sid_123"
+        client._cached_mobile_sid = "test_valid_sid_123"
 
         # 模擬伺服器回傳有效業務資料
         mock_response_data = {
@@ -145,7 +146,7 @@ class TestSourceSinyiClient:
         """測試遭遇 000991 sid無效 時自動換發新 sid 並重新請求一次成功"""
         crypto = SinyiCryptoService()
         client = SourceSinyiClient(crypto=crypto)
-        client._cached_sid = "expired_sid"
+        client._cached_mobile_sid = "expired_sid"
 
         # 第一次回應 000991
         err_data = {"retCode": "000991", "retMsg": "sid無效"}
@@ -170,5 +171,5 @@ class TestSourceSinyiClient:
             result = await client.post_mobile_api("/test.php", {"k": "v"})
             assert result["retCode"] == "000000"
             assert result["content"]["ok"] is True
-            assert client._cached_sid == "fresh_new_sid_888"
+            assert client._cached_mobile_sid == "fresh_new_sid_888"
             assert mock_http_client.post.call_count == 3

@@ -38,16 +38,21 @@ DEFAULT_DEVICE_PAYLOAD: Dict[str, Any] = {
 # 信義房屋網頁端 API 主機基底位址與常數
 SINYI_WEB_API_BASE_URL: str = "https://sinyiwebapi.sinyi.com.tw"
 
-# 網頁端通訊標頭規格 (含靜態授權 token 與 session 樣板)
-SINYI_WEB_HEADERS: Dict[str, str] = {
+# 網頁端通訊基礎標頭規格 (靜態傳輸標頭，不包含動態會話憑證 sat 與 sid)
+SINYI_WEB_BASE_HEADERS: Dict[str, str] = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
     "code": "0",
-    "sat": "730282",
-    "sid": "20260713043603896",
     "Origin": "https://www.sinyi.com.tw",
     "Referer": "https://www.sinyi.com.tw/",
     "Content-Type": "application/json",
 }
+
+# 手機端靜態備用種子 SID (當遠端動態握手異常時之防禦性 Fallback)
+FALLBACK_SEED_MOBILE_SID: str = "20261007235202049"
+
+# 網頁端靜態備用種子會話憑證 (當遠端兩階段動態握手異常時之防禦性 Fallback)
+FALLBACK_SEED_WEB_SAT: str = "730282"
+FALLBACK_SEED_WEB_SID: str = "20260713043603896"
 
 # 網頁端預設設備與環境指紋樣板 (防範缺漏欄位造成參數個數校驗失敗)
 DEFAULT_WEB_DEVICE_PAYLOAD: Dict[str, Any] = {

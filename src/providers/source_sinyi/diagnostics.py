@@ -18,15 +18,17 @@ from src.domain.diagnostics import (
     DiagnosticStatus,
     ProbeExecutionContext,
 )
-from src.providers.source_sinyi.client import FALLBACK_SEED_SID
 from src.providers.source_sinyi.config import (
     DEFAULT_DEVICE_PAYLOAD,
     DEFAULT_WEB_DEVICE_PAYLOAD,
+    FALLBACK_SEED_MOBILE_SID,
+    FALLBACK_SEED_WEB_SAT,
+    FALLBACK_SEED_WEB_SID,
     SINYI_API_BASE_URL,
     SINYI_HEADER_CODE,
     SINYI_USER_AGENT,
     SINYI_WEB_API_BASE_URL,
-    SINYI_WEB_HEADERS,
+    SINYI_WEB_BASE_HEADERS,
 )
 from src.providers.source_sinyi.crypto import SinyiCryptoService
 
@@ -67,7 +69,7 @@ class BaseSinyiProbe(IProbeEndpoint):
 
     def _build_headers(self, context: Optional[ProbeExecutionContext] = None) -> Dict[str, str]:
         """組裝信義 App 專屬通訊標頭 (sid 序號支援回退或外部注入)"""
-        sid = FALLBACK_SEED_SID
+        sid = FALLBACK_SEED_MOBILE_SID
         if context and context.extra_headers and "sid" in context.extra_headers:
             sid = context.extra_headers["sid"]
         headers = {
@@ -90,8 +92,10 @@ class BaseSinyiProbe(IProbeEndpoint):
         return merged_payload
 
     def _build_web_headers(self, context: Optional[ProbeExecutionContext] = None) -> Dict[str, str]:
-        """組裝網頁端專屬通訊標頭"""
-        headers = dict(SINYI_WEB_HEADERS)
+        """組裝網頁端專屬通訊標頭 (支援備用種子與外部動態注入)"""
+        headers = dict(SINYI_WEB_BASE_HEADERS)
+        headers["sat"] = FALLBACK_SEED_WEB_SAT
+        headers["sid"] = FALLBACK_SEED_WEB_SID
         if context and context.extra_headers:
             headers.update(context.extra_headers)
         return headers
