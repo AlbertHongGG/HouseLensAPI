@@ -163,4 +163,22 @@ def test_cli_test_commands_help_and_list():
     assert "sale_detail" in ep_ids
 
 
+def test_cli_test_endpoint_params_parsing():
+    """驗證 _parse_cli_params 支援標準 JSON、Python 字典字面量與 PowerShell 剝除引號格式"""
+    from src.cli.commands.test_cmd import _parse_cli_params
+
+    # 1. 標準 JSON
+    res1 = _parse_cli_params('{"KeyWords": "超站S", "Limit": 5}')
+    assert res1 == {"KeyWords": "超站S", "Limit": 5}
+
+    # 2. Python dict 格式 (PowerShell 外層雙引號內層單引號)
+    res2 = _parse_cli_params("{'KeyWords': '超站S', 'County': '新北市'}")
+    assert res2 == {"KeyWords": "超站S", "County": "新北市"}
+
+    # 3. PowerShell 剝除雙引號特徵格式
+    res3 = _parse_cli_params("{KeyWords: 超站S, County: 台北市, Limit: 10, SearchMode: 1}")
+    assert res3 == {"KeyWords": "超站S", "County": "台北市", "Limit": 10, "SearchMode": 1}
+
+
+
 

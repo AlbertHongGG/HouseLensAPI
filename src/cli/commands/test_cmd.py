@@ -60,6 +60,65 @@ def _parse_domain(domain_str: Optional[str]) -> Optional[DiagnosticDomain]:
     return domain_mapping[norm]
 
 
+def _parse_cli_params(params_str: str) -> Dict[str, Any]:
+    """解析 CLI --params 參數，具備標準 JSON、Python dict 與 PowerShell 引號剝除相容容錯能力"""
+    # 1. 優先嘗試標準 JSON
+    try:
+        val = json.loads(params_str)
+        if isinstance(val, dict):
+            return val
+        print_error(f"--params 必須為 JSON 字典物件格式，傳入為: {type(val).__name__}")
+        raise typer.Exit(code=1)
+    except json.JSONDecodeError:
+        pass
+
+    # 2. 嘗試 Python dict 語法 (例如 {'Key': 'Value'})
+    try:
+        import ast
+
+        val = ast.literal_eval(params_str)
+        if isinstance(val, dict):
+            return val
+    except Exception:
+        pass
+
+    # 3. 容錯處理 Windows PowerShell 剝除雙引號情況 (例如 {KeyWords: 超站S, County: 台北市})
+    cleaned = params_str.strip()
+    if cleaned.startswith("{") and cleaned.endswith("}"):
+        inner = cleaned[1:-1].strip()
+        result: Dict[str, Any] = {}
+        pairs = [p.strip() for p in inner.split(",") if p.strip()]
+        for p in pairs:
+            if ":" in p:
+                k, v = p.split(":", 1)
+                k = k.strip().strip("'\"")
+                v = v.strip().strip("'\"")
+                if v.lower() == "true":
+                    result[k] = True
+                elif v.lower() == "false":
+                    result[k] = False
+                elif v.lower() in ("null", "none"):
+                    result[k] = None
+                elif v.isdigit():
+                    result[k] = int(v)
+                else:
+                    try:
+                        result[k] = float(v)
+                    except ValueError:
+                        result[k] = v
+        if result:
+            return result
+
+    # 若皆無法解析，拋出標準 JSONDecodeError 並給予 PowerShell 友善提示
+    try:
+        json.loads(params_str)
+    except json.JSONDecodeError as exc:
+        print_error(f"--params 格式錯誤，非合法 JSON: {exc}")
+        print_info(r"提示: 在 Windows PowerShell 中執行時，引號常被終端機剝除。建議以反斜線跳脫雙引號，例如：-p '{\"KeyWords\": \"超站S\"}'")
+        raise typer.Exit(code=1)
+    return {}
+
+
 @test_app.command(
     "endpoint",
     help="測試單一 API 端點之實際功能回傳，支援自訂 target_id 與額外參數，並錄製原始封包",
@@ -104,16 +163,7 @@ def run_single_endpoint_cmd(
     ),
 ):
     """執行單一 API 端點之參數化功能測試與封包捕捉"""
-    parsed_params: Dict[str, Any] = {}
-    if params:
-        try:
-            parsed_params = json.loads(params)
-            if not isinstance(parsed_params, dict):
-                print_error(f"--params 必須為 JSON 字典物件格式，傳入為: {type(parsed_params).__name__}")
-                raise typer.Exit(code=1)
-        except json.JSONDecodeError as exc:
-            print_error(f"--params 格式錯誤，非合法 JSON: {exc}")
-            raise typer.Exit(code=1)
+    parsed_params: Dict[str, Any] = _parse_cli_params(params) if params else {}
 
     custom_path: Optional[Path] = Path(output_file).resolve() if output_file else None
     use_case = DiagnosticsUseCase()
