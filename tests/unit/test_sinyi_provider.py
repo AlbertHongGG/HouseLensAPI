@@ -25,14 +25,15 @@ def test_sinyi_provider_properties():
     assert provider.provider_id == "sinyi"
     assert "信義房屋" in provider.provider_name
 
-    with pytest.raises(NotImplementedError):
-        _ = provider.community
+    from src.core.interfaces.community import ICommunityProvider
+    assert isinstance(provider.community, ICommunityProvider)
 
     from src.core.interfaces.sale_house import ISaleHouseProvider
     assert isinstance(provider.sale_house, ISaleHouseProvider)
 
     with pytest.raises(NotImplementedError):
         _ = provider.new_house
+
 
     assert provider.diagnostics is not None
     assert provider.diagnostics.get_probe("health_ping") is not None

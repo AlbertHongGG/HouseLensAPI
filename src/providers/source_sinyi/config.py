@@ -34,3 +34,41 @@ DEFAULT_DEVICE_PAYLOAD: Dict[str, Any] = {
     "browser": 0,
     "IDFA": "25bc599b-d8bc-4392-8386-662ed5d0fea5",
 }
+
+# 信義房屋網頁端 API 主機基底位址與常數
+SINYI_WEB_API_BASE_URL: str = "https://sinyiwebapi.sinyi.com.tw"
+
+# 網頁端通訊標頭規格 (含靜態授權 token 與 session 樣板)
+SINYI_WEB_HEADERS: Dict[str, str] = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "code": "0",
+    "sat": "730282",
+    "sid": "20260713043603896",
+    "Origin": "https://www.sinyi.com.tw",
+    "Referer": "https://www.sinyi.com.tw/",
+    "Content-Type": "application/json",
+}
+
+# 網頁端預設設備與環境指紋樣板 (防範缺漏欄位造成參數個數校驗失敗)
+DEFAULT_WEB_DEVICE_PAYLOAD: Dict[str, Any] = {
+    "machineNo": "",
+    "ipAddress": "101.12.206.109",
+    "osType": 3,
+    "model": "web",
+    "deviceVersion": "Windows 10",
+    "appVersion": "154.0.0.0",
+    "deviceType": 3,
+    "apType": 3,
+    "browser": 1,
+    "memberId": "",
+    "domain": "www.sinyi.com.tw",
+    "utmSource": "",
+    "utmMedium": "",
+    "utmCampaign": "",
+    "utmCode": "",
+    "requestor": 1,
+    "utmContent": "",
+    "utmTerm": "",
+    "sinyiGroup": 1,
+}
+

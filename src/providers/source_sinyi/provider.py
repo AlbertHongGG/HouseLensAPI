@@ -13,6 +13,7 @@ from src.core.interfaces.provider import IHouseSourceProvider
 from src.core.interfaces.sale_house import ISaleHouseProvider
 from src.core.registry import registry
 from src.providers.source_sinyi.client import SourceSinyiClient
+from src.providers.source_sinyi.community import SourceSinyiCommunityProvider
 from src.providers.source_sinyi.diagnostics import SourceSinyiDiagnostics
 from src.providers.source_sinyi.sale_house import SourceSinyiSaleHouseProvider
 
@@ -26,6 +27,7 @@ class SourceSinyiProvider(IHouseSourceProvider):
         self._client = client or SourceSinyiClient()
         self._diagnostics = SourceSinyiDiagnostics()
         self._sale_house = SourceSinyiSaleHouseProvider(self._client)
+        self._community = SourceSinyiCommunityProvider(self._client)
 
     @property
     def provider_id(self) -> str:
@@ -37,7 +39,8 @@ class SourceSinyiProvider(IHouseSourceProvider):
 
     @property
     def community(self) -> ICommunityProvider:
-        raise NotImplementedError("信義房屋提供者尚未實作社區領域服務")
+        return self._community
+
 
     @property
     def sale_house(self) -> ISaleHouseProvider:

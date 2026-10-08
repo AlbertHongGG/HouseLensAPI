@@ -17,9 +17,12 @@ from src.core.exceptions import (
 )
 from src.providers.source_sinyi.config import (
     DEFAULT_DEVICE_PAYLOAD,
+    DEFAULT_WEB_DEVICE_PAYLOAD,
     SINYI_API_BASE_URL,
     SINYI_HEADER_CODE,
     SINYI_USER_AGENT,
+    SINYI_WEB_API_BASE_URL,
+    SINYI_WEB_HEADERS,
 )
 from src.providers.source_sinyi.crypto import SinyiCryptoService
 
@@ -30,21 +33,26 @@ FALLBACK_SEED_SID = "20261007235202049"
 
 
 class SourceSinyiClient:
-    """信義房屋手機端非同步 HTTP Client"""
+    """信義房屋雙通道 (手機端與網頁端) 非同步 HTTP Client"""
 
     def __init__(
         self,
         base_url: str = SINYI_API_BASE_URL,
+        web_base_url: str = SINYI_WEB_API_BASE_URL,
         timeout: float = 15.0,
         crypto: Optional[SinyiCryptoService] = None,
     ):
         self.base_url = base_url.rstrip("/")
+        self.web_base_url = web_base_url.rstrip("/")
         self.timeout = timeout
         self.crypto = crypto or SinyiCryptoService()
         self._client: Optional[httpx.AsyncClient] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._web_client: Optional[httpx.AsyncClient] = None
+        self._web_loop: Optional[asyncio.AbstractEventLoop] = None
         self._cached_sid: Optional[str] = None
         self._sid_lock = asyncio.Lock()
+
 
     async def get_client(self) -> httpx.AsyncClient:
         """取得或建立 AsyncClient 連線池 (跨事件循環安全防護)"""
@@ -70,6 +78,24 @@ class SourceSinyiClient:
                 follow_redirects=True,
             )
         return self._client
+
+    async def get_web_client(self) -> httpx.AsyncClient:
+        """取得或建立網頁端專屬 AsyncClient 連線池 (跨事件循環安全防護)"""
+        current_loop = asyncio.get_running_loop()
+        if (
+            self._web_client is None
+            or self._web_client.is_closed
+            or self._web_loop != current_loop
+            or (self._web_loop and self._web_loop.is_closed())
+        ):
+            self._web_loop = current_loop
+            self._web_client = httpx.AsyncClient(
+                headers=dict(SINYI_WEB_HEADERS),
+                timeout=httpx.Timeout(self.timeout),
+                follow_redirects=True,
+            )
+        return self._web_client
+
 
     async def ensure_sid(self, force_refresh: bool = False) -> str:
         """取得或向信義網關換發合法有效的 Session ID (sid)
@@ -191,8 +217,77 @@ class SourceSinyiClient:
 
         return decrypted_data
 
+    async def post_web_api(
+        self,
+        path: str,
+        payload: Dict[str, Any],
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """發送請求至信義房屋網頁端 API 網關並自動解密回應
+
+        Args:
+            path: API 端點路徑 (例如 "/searchCommunity.php", "/getCommunityContent.php")。
+            payload: 業務參數字典。
+            headers: 額外覆蓋之標頭。
+
+        Returns:
+            解密後之業務資料字典 (retCode == "200" 或 "000000")。
+        """
+        full_url = f"{self.web_base_url}{path}" if path.startswith("/") else f"{self.web_base_url}/{path}"
+        client = await self.get_web_client()
+
+        # 1. 補齊網頁端設備與環境指紋參數
+        final_payload = dict(payload)
+        for k, v in DEFAULT_WEB_DEVICE_PAYLOAD.items():
+            if k not in final_payload:
+                final_payload[k] = v
+
+        # 2. 合併請求標頭
+        req_headers = dict(headers) if headers else None
+
+        # 3. 發送 HTTP POST (純 JSON 酬載)
+        try:
+            response = await client.post(
+                full_url,
+                json=final_payload,
+                headers=req_headers,
+            )
+        except httpx.ConnectTimeout as e:
+            raise ProviderConnectionError("sinyi", f"連線至信義房屋網頁端逾時: {full_url}") from e
+        except httpx.NetworkError as e:
+            raise ProviderConnectionError("sinyi", f"信義房屋網頁端網路連線異常: {e}") from e
+
+        # 4. HTTP 狀態碼檢驗
+        if response.status_code == 429:
+            raise RateLimitExceededError("sinyi", "觸發信義房屋網頁端請求頻率限制 (HTTP 429)")
+
+        if response.status_code == 403:
+            raise RateLimitExceededError("sinyi", "信義房屋網頁端存取被拒絕 (HTTP 403)，請確認標頭配置")
+
+        if response.status_code != 200:
+            raise ProviderResponseError("sinyi", f"信義房屋網頁端 HTTP 狀態碼異常: {response.status_code}")
+
+        # 5. 解密 Response 酬載
+        decrypted_data = self.crypto.decrypt_response_payload(response.text)
+
+        # 6. 業務狀態碼檢驗 (網頁端成功碼為 "200" 或 "000000")
+        ret_code = decrypted_data.get("retCode")
+        if ret_code is not None:
+            ret_code_str = str(ret_code)
+            if ret_code_str not in ("200", "000000"):
+                ret_msg = decrypted_data.get("retMsg", "未知業務錯誤")
+                raise ProviderResponseError(
+                    "sinyi", f"信義房屋網頁端 API 回應業務錯誤 [{ret_code_str}]: {ret_msg}"
+                )
+
+        return decrypted_data
+
     async def close(self):
         """關閉連線池釋放資源"""
         if self._client and not self._client.is_closed:
             await self._client.aclose()
             self._client = None
+        if self._web_client and not self._web_client.is_closed:
+            await self._web_client.aclose()
+            self._web_client = None
+

@@ -80,6 +80,9 @@ class NormalizedCommunityDetail(BaseModel):
 class CommunitySearchQuery(BaseSearchQuery):
     """跨平台統一社區檢索條件規範"""
 
+    region_name: Optional[str] = Field(None, description="縣市中文名稱 (如: 台北市、新北市)")
+    section_name: Optional[str] = Field(None, description="行政區中文名稱 (如: 板橋區、大安區)")
     min_age_years: Optional[float] = Field(None, ge=0.0, description="最小屋齡 (年)")
     max_age_years: Optional[float] = Field(None, ge=0.0, description="最大屋齡 (年)")
+
 
