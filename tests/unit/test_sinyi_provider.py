@@ -28,8 +28,8 @@ def test_sinyi_provider_properties():
     with pytest.raises(NotImplementedError):
         _ = provider.community
 
-    with pytest.raises(NotImplementedError):
-        _ = provider.sale_house
+    from src.core.interfaces.sale_house import ISaleHouseProvider
+    assert isinstance(provider.sale_house, ISaleHouseProvider)
 
     with pytest.raises(NotImplementedError):
         _ = provider.new_house

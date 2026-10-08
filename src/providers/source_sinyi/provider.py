@@ -14,6 +14,7 @@ from src.core.interfaces.sale_house import ISaleHouseProvider
 from src.core.registry import registry
 from src.providers.source_sinyi.client import SourceSinyiClient
 from src.providers.source_sinyi.diagnostics import SourceSinyiDiagnostics
+from src.providers.source_sinyi.sale_house import SourceSinyiSaleHouseProvider
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class SourceSinyiProvider(IHouseSourceProvider):
     def __init__(self, client: Optional[SourceSinyiClient] = None):
         self._client = client or SourceSinyiClient()
         self._diagnostics = SourceSinyiDiagnostics()
+        self._sale_house = SourceSinyiSaleHouseProvider(self._client)
 
     @property
     def provider_id(self) -> str:
@@ -39,7 +41,7 @@ class SourceSinyiProvider(IHouseSourceProvider):
 
     @property
     def sale_house(self) -> ISaleHouseProvider:
-        raise NotImplementedError("信義房屋提供者尚未實作中古屋領域服務")
+        return self._sale_house
 
     @property
     def new_house(self) -> INewHouseProvider:
