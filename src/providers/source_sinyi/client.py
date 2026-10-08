@@ -1,7 +1,10 @@
 """HouseLensAPI - 信義房屋專屬非同步 HTTP 客戶端 (Source Sinyi Client)
 
-封裝信義房屋手機端 Base URL、getSession 伺服器 Session 自動取得與換發、
+封裝信義房屋雙通道 (手機端與網頁端) 網關、getSession 伺服器 Session 自動取得與換發、
 雙向 AES-256-ECB 加解密與核心異常轉換。
+提供專責公開方法：
+- post_mobile_api: 手機端雙向加密網關 (https://sinyiapi.sinyi.com.tw)
+- post_web_api: 網頁端專屬網關 (https://sinyiwebapi.sinyi.com.tw)
 """
 
 import asyncio
@@ -46,22 +49,21 @@ class SourceSinyiClient:
         self.web_base_url = web_base_url.rstrip("/")
         self.timeout = timeout
         self.crypto = crypto or SinyiCryptoService()
-        self._client: Optional[httpx.AsyncClient] = None
-        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._mobile_client: Optional[httpx.AsyncClient] = None
+        self._mobile_loop: Optional[asyncio.AbstractEventLoop] = None
         self._web_client: Optional[httpx.AsyncClient] = None
         self._web_loop: Optional[asyncio.AbstractEventLoop] = None
         self._cached_sid: Optional[str] = None
         self._sid_lock = asyncio.Lock()
 
-
-    async def get_client(self) -> httpx.AsyncClient:
-        """取得或建立 AsyncClient 連線池 (跨事件循環安全防護)"""
+    async def get_mobile_client(self) -> httpx.AsyncClient:
+        """取得或建立手機端專屬 AsyncClient 連線池 (跨事件循環安全防護)"""
         current_loop = asyncio.get_running_loop()
         if (
-            self._client is None
-            or self._client.is_closed
-            or self._loop != current_loop
-            or (self._loop and self._loop.is_closed())
+            self._mobile_client is None
+            or self._mobile_client.is_closed
+            or self._mobile_loop != current_loop
+            or (self._mobile_loop and self._mobile_loop.is_closed())
         ):
             default_headers = {
                 "user-agent": SINYI_USER_AGENT,
@@ -71,13 +73,13 @@ class SourceSinyiClient:
                 "Accept-Encoding": "gzip",
                 "Connection": "Keep-Alive",
             }
-            self._loop = current_loop
-            self._client = httpx.AsyncClient(
+            self._mobile_loop = current_loop
+            self._mobile_client = httpx.AsyncClient(
                 headers=default_headers,
                 timeout=httpx.Timeout(self.timeout),
                 follow_redirects=True,
             )
-        return self._client
+        return self._mobile_client
 
     async def get_web_client(self) -> httpx.AsyncClient:
         """取得或建立網頁端專屬 AsyncClient 連線池 (跨事件循環安全防護)"""
@@ -96,7 +98,6 @@ class SourceSinyiClient:
             )
         return self._web_client
 
-
     async def ensure_sid(self, force_refresh: bool = False) -> str:
         """取得或向信義網關換發合法有效的 Session ID (sid)
 
@@ -107,7 +108,7 @@ class SourceSinyiClient:
                 return self._cached_sid
 
             try:
-                client = await self.get_client()
+                client = await self.get_mobile_client()
                 url = f"{self.base_url}/getSession.php"
                 resp = await client.post(url)
                 if resp.status_code == 200 and resp.text:
@@ -124,7 +125,7 @@ class SourceSinyiClient:
             self._cached_sid = FALLBACK_SEED_SID
             return self._cached_sid
 
-    async def post_encrypted(
+    async def post_mobile_api(
         self,
         path: str,
         payload: Dict[str, Any],
@@ -133,10 +134,10 @@ class SourceSinyiClient:
         headers: Optional[Dict[str, str]] = None,
         retry_on_invalid_sid: bool = True,
     ) -> Dict[str, Any]:
-        """發送加密 POST 請求並自動解密信義房屋回應
+        """發送加密 POST 請求至信義房屋手機端網關並自動解密回應
 
         Args:
-            path: API 端點路徑 (例如 "/filterObject.php")。
+            path: API 端點路徑 (例如 "/filterObject.php", "/getObjectContent.php")。
             payload: 待發送之業務參數字典。
             wrap_param: 是否包裹為 {"param": "<B64>"}，預設 True。
             merge_device_info: 是否自動補足缺少的設備參數，預設 True。
@@ -147,7 +148,7 @@ class SourceSinyiClient:
             解密後的業務資料字典 (retCode == "000000")。
         """
         full_url = f"{self.base_url}{path}" if path.startswith("/") else f"{self.base_url}/{path}"
-        client = await self.get_client()
+        client = await self.get_mobile_client()
 
         # 1. 補齊設備與環境參數
         final_payload = dict(payload)
@@ -202,7 +203,7 @@ class SourceSinyiClient:
             if ret_code_str == "000991" and retry_on_invalid_sid:
                 logger.info("信義房屋連線序號過期 (000991)，自動換發全新 sid 重試...")
                 await self.ensure_sid(force_refresh=True)
-                return await self.post_encrypted(
+                return await self.post_mobile_api(
                     path=path,
                     payload=payload,
                     wrap_param=wrap_param,
@@ -284,10 +285,9 @@ class SourceSinyiClient:
 
     async def close(self):
         """關閉連線池釋放資源"""
-        if self._client and not self._client.is_closed:
-            await self._client.aclose()
-            self._client = None
+        if self._mobile_client and not self._mobile_client.is_closed:
+            await self._mobile_client.aclose()
+            self._mobile_client = None
         if self._web_client and not self._web_client.is_closed:
             await self._web_client.aclose()
             self._web_client = None
-

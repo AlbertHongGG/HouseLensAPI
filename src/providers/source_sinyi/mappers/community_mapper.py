@@ -1,4 +1,4 @@
-"""HouseLensAPI - 信義房屋社區資料模型正規化轉換器 (Sinyi Community Transformers)
+"""HouseLensAPI - 信義房屋社區領域模型映射裝配器 (Sinyi Community Mapper)
 
 嚴格落實 Two-Tier SSOT 權威單一事實來源：
 - 清單 API：專責提取 7 大最小必要資訊 (commId, commName, address, lat, lng, uniprice, image)。
@@ -7,71 +7,26 @@
 """
 
 import logging
-import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from src.domain.common import GeoPoint
 from src.domain.community import (
     NormalizedCommunityDetail,
     NormalizedCommunitySummary,
 )
-from src.providers.source_sinyi.transformers import (
+from src.providers.source_sinyi.normalizers import (
+    clean_str,
     parse_coordinates,
+    parse_facilities,
     parse_float,
+    parse_image_urls,
     parse_int,
+    parse_public_ratio,
 )
 
 logger = logging.getLogger(__name__)
 
 
-def clean_str(val: Any) -> Optional[str]:
-    """清洗字串 (去除首尾空白，空字串回傳 None)"""
-    if val is None:
-        return None
-    s = str(val).strip()
-    return s if s else None
-
-
-
-def parse_public_ratio(val: Any) -> Optional[float]:
-    """解析公設比百分比字串 (例如 '32.00%~36.00%' -> 32.0, '35%' -> 35.0)"""
-    if val is None:
-        return None
-    s = str(val).strip()
-    if not s:
-        return None
-    m = re.search(r"(\d+(?:\.\d+)?)", s)
-    if m:
-        try:
-            return float(m.group(1))
-        except (ValueError, TypeError):
-            return None
-    return None
-
-
-def parse_facilities(val: Any) -> List[str]:
-    """將公設描述字串以逗號切分為清單 (例如 'SPA,花園,室內泳池,健身房')"""
-    if not val:
-        return []
-    s = str(val).strip()
-    if not s:
-        return []
-    parts = re.split(r"[,，、\s]+", s)
-    return [p.strip() for p in parts if p.strip()]
-
-
-def parse_image_urls(images_val: Any) -> List[str]:
-    """清洗並過濾大圖相簿清單"""
-    if not images_val or not isinstance(images_val, list):
-        return []
-    result: List[str] = []
-    for item in images_val:
-        if isinstance(item, str) and item.strip().startswith("http"):
-            result.append(item.strip())
-    return result
-
-
-def map_sinyi_community_summary(raw_item: Dict[str, Any]) -> NormalizedCommunitySummary:
+def map_sinyi_community_list_item(raw_item: Dict[str, Any]) -> NormalizedCommunitySummary:
     """將信義房屋網頁端清單項目轉換為標準 NormalizedCommunitySummary (最小必要資訊)
 
     權威歸屬：
@@ -159,7 +114,6 @@ def map_sinyi_community_detail(
     # 詳情 API 權威取得之行政區域名稱 (NormalizedCommunityDetail 規範為必填 str，None 則保底為 "")
     region_name = clean_str(content.get("cityName")) or ""
     section_name = clean_str(content.get("zipName")) or ""
-
 
     # 詳情 API 權威取得之建築規格
     building_age = parse_float(content.get("age"))

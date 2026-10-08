@@ -6,7 +6,10 @@ import pytest
 
 from src.core.registry import registry
 from src.domain.diagnostics import DiagnosticDomain, DiagnosticStatus
+from src.providers.source_sinyi.community import SourceSinyiCommunityProvider
 from src.providers.source_sinyi.diagnostics import (
+    SinyiCommunityDetailProbe,
+    SinyiCommunityListProbe,
     SinyiHealthPingProbe,
     SinyiSaleDetailProbe,
     SinyiSaleListProbe,
@@ -23,15 +26,22 @@ def test_sinyi_provider_registration_and_properties():
     assert provider.provider_id == "sinyi"
     assert provider.provider_name == "信義房屋 Sinyi Housing"
 
-    # 驗證中古屋領域介面已成功掛載
+    # 驗證中古屋與社區領域介面已成功掛載
     assert isinstance(provider.sale_house, SourceSinyiSaleHouseProvider)
+    assert isinstance(provider.community, SourceSinyiCommunityProvider)
 
     # 驗證診斷套件
     assert isinstance(provider.diagnostics, SourceSinyiDiagnostics)
     probes = provider.diagnostics.get_probes()
-    assert len(probes) == 3
+    assert len(probes) == 5
     probe_ids = {p.endpoint_id for p in probes}
-    assert probe_ids == {"health_ping", "sale_list", "sale_detail"}
+    assert probe_ids == {
+        "health_ping",
+        "sale_list",
+        "sale_detail",
+        "community_list",
+        "community_detail",
+    }
 
 
 @pytest.mark.asyncio
@@ -66,3 +76,17 @@ async def test_sinyi_diagnostics_probes_execution():
     art_detail = await detail_probe.execute(client=mock_client)
     assert art_detail.metadata.status == DiagnosticStatus.SUCCESS
     assert art_detail.metadata.status_code == 200
+
+    # 4. 測試 CommunityListProbe
+    comm_list_probe = SinyiCommunityListProbe()
+    assert comm_list_probe.domain == DiagnosticDomain.COMMUNITY
+    art_comm_list = await comm_list_probe.execute(client=mock_client)
+    assert art_comm_list.metadata.status == DiagnosticStatus.SUCCESS
+    assert art_comm_list.metadata.status_code == 200
+
+    # 5. 測試 CommunityDetailProbe
+    comm_detail_probe = SinyiCommunityDetailProbe()
+    assert comm_detail_probe.domain == DiagnosticDomain.COMMUNITY
+    art_comm_detail = await comm_detail_probe.execute(client=mock_client)
+    assert art_comm_detail.metadata.status == DiagnosticStatus.SUCCESS
+    assert art_comm_detail.metadata.status_code == 200

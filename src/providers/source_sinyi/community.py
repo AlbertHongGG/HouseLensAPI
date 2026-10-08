@@ -17,11 +17,11 @@ from src.domain.community import (
     NormalizedCommunitySummary,
 )
 from src.providers.source_sinyi.client import SourceSinyiClient
-from src.providers.source_sinyi.community_query_builder import SinyiCommunityQueryBuilder
-from src.providers.source_sinyi.community_transformers import (
+from src.providers.source_sinyi.mappers import (
     map_sinyi_community_detail,
-    map_sinyi_community_summary,
+    map_sinyi_community_list_item,
 )
+from src.providers.source_sinyi.query_builders import SinyiCommunityQueryBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class SourceSinyiCommunityProvider(ICommunityProvider):
             except (ValueError, TypeError):
                 total_records = len(items_raw)
 
-        items = [map_sinyi_community_summary(it) for it in items_raw if isinstance(it, dict)]
+        items = [map_sinyi_community_list_item(it) for it in items_raw if isinstance(it, dict)]
 
         # 外部代碼直接檢索防護 (Direct ID Fallback):
         # 若清單搜尋無結果，且 query.keywords 符合信義社區英數代碼規格 (如 G0000316, 0032408)，嘗試直查詳情端點

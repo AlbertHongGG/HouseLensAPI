@@ -23,7 +23,7 @@ def sale_house_provider(mock_sinyi_client):
 @pytest.mark.asyncio
 async def test_search_sale_houses_success(sale_house_provider, mock_sinyi_client):
     # 模擬 /filterObject.php 正常回應
-    mock_sinyi_client.post_encrypted.return_value = {
+    mock_sinyi_client.post_mobile_api.return_value = {
         "retCode": "000000",
         "content": {
             "page": 1,
@@ -75,8 +75,8 @@ async def test_search_sale_houses_success(sale_house_provider, mock_sinyi_client
 
     result = await sale_house_provider.search_sale_houses(query)
 
-    mock_sinyi_client.post_encrypted.assert_called_once()
-    args, kwargs = mock_sinyi_client.post_encrypted.call_args
+    mock_sinyi_client.post_mobile_api.assert_called_once()
+    args, kwargs = mock_sinyi_client.post_mobile_api.call_args
     assert args[0] == "/filterObject.php"
     assert args[1]["filter"]["retType"] == 2
     assert args[1]["filter"]["price"] == {"priceType": 2, "priceRange": ["3000-4000"]}
@@ -110,7 +110,7 @@ async def test_search_sale_houses_success(sale_house_provider, mock_sinyi_client
 
 @pytest.mark.asyncio
 async def test_search_sale_houses_empty_result(sale_house_provider, mock_sinyi_client):
-    mock_sinyi_client.post_encrypted.return_value = {
+    mock_sinyi_client.post_mobile_api.return_value = {
         "retCode": "000000",
         "content": {
             "page": 1,
@@ -130,7 +130,7 @@ async def test_search_sale_houses_empty_result(sale_house_provider, mock_sinyi_c
 @pytest.mark.asyncio
 async def test_get_sale_house_detail_success(sale_house_provider, mock_sinyi_client):
     # 模擬 /getObjectContent.php 正常回應
-    mock_sinyi_client.post_encrypted.return_value = {
+    mock_sinyi_client.post_mobile_api.return_value = {
         "retCode": "000000",
         "content": {
             "houseNo": "7342DG",
@@ -167,7 +167,7 @@ async def test_get_sale_house_detail_success(sale_house_provider, mock_sinyi_cli
 
     detail = await sale_house_provider.get_sale_house_detail("7342DG")
 
-    mock_sinyi_client.post_encrypted.assert_called_once_with(
+    mock_sinyi_client.post_mobile_api.assert_called_once_with(
         "/getObjectContent.php", {"houseNo": "7342DG", "showOff": 0}
     )
 
@@ -211,7 +211,7 @@ async def test_get_sale_house_detail_success(sale_house_provider, mock_sinyi_cli
 @pytest.mark.asyncio
 async def test_get_sale_house_detail_not_found(sale_house_provider, mock_sinyi_client):
     # 模擬查無資料 (content 為空)
-    mock_sinyi_client.post_encrypted.return_value = {
+    mock_sinyi_client.post_mobile_api.return_value = {
         "retCode": "000000",
         "content": {},
     }

@@ -21,15 +21,19 @@ from src.domain.diagnostics import (
 from src.providers.source_sinyi.client import FALLBACK_SEED_SID
 from src.providers.source_sinyi.config import (
     DEFAULT_DEVICE_PAYLOAD,
+    DEFAULT_WEB_DEVICE_PAYLOAD,
     SINYI_API_BASE_URL,
     SINYI_HEADER_CODE,
     SINYI_USER_AGENT,
+    SINYI_WEB_API_BASE_URL,
+    SINYI_WEB_HEADERS,
 )
 from src.providers.source_sinyi.crypto import SinyiCryptoService
 
 logger = logging.getLogger(__name__)
 
 SEED_SALE_ID = "7342DG"  # 敦品苑全新舒適三房車位 (封包紀錄種子)
+SEED_COMMUNITY_ID = "G0000316"  # 帝國花園 (封包紀錄社區種子)
 
 
 class BaseSinyiProbe(IProbeEndpoint):
@@ -75,6 +79,19 @@ class BaseSinyiProbe(IProbeEndpoint):
             "Connection": "Keep-Alive",
             "sid": sid,
         }
+        if context and context.extra_headers:
+            headers.update(context.extra_headers)
+        return headers
+
+    def _build_web_body(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """建立網頁端請求 JSON 實體 (合併設備指紋)"""
+        merged_payload = dict(DEFAULT_WEB_DEVICE_PAYLOAD)
+        merged_payload.update(payload)
+        return merged_payload
+
+    def _build_web_headers(self, context: Optional[ProbeExecutionContext] = None) -> Dict[str, str]:
+        """組裝網頁端專屬通訊標頭"""
+        headers = dict(SINYI_WEB_HEADERS)
         if context and context.extra_headers:
             headers.update(context.extra_headers)
         return headers
@@ -234,6 +251,125 @@ class SinyiSaleDetailProbe(BaseSinyiProbe):
         )
 
 
+class SinyiCommunityListProbe(BaseSinyiProbe):
+    """信義社區清單與搜尋 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "community_list"
+
+    @property
+    def name(self) -> str:
+        return "社區清單與搜尋 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.COMMUNITY
+
+    @property
+    def description(self) -> str:
+        return "測試信義房屋網頁端社區檢索端點連線與回傳密文結構"
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        url = f"{SINYI_WEB_API_BASE_URL}/searchCommunity.php"
+        search_payload: Dict[str, Any] = {
+            "page": 1,
+            "pageCnt": 5,
+            "sort": "0",
+            "filter": {
+                "retType": 2,
+                "retRange": ["100"],
+            },
+            "isReturnTotal": True,
+        }
+        if context and context.extra_params:
+            search_payload.update(context.extra_params)
+
+        body = self._build_web_body(search_payload)
+        headers = self._build_web_headers(context)
+        metadata = self._create_metadata_template()
+
+        artifact = await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="POST",
+            url=url,
+            body=body,
+            headers=headers,
+        )
+
+        if (
+            artifact.metadata.status == DiagnosticStatus.SUCCESS
+            and artifact.response
+            and isinstance(artifact.response.body, dict)
+        ):
+            content = artifact.response.body.get("content") or {}
+            items = content.get("object") or []
+            if items and isinstance(items, list):
+                first_id = items[0].get("commId")
+                if first_id:
+                    self._context["last_community_id"] = str(first_id).strip()
+
+        return artifact
+
+
+class SinyiCommunityDetailProbe(BaseSinyiProbe):
+    """信義社區物件詳情 API 探針"""
+
+    @property
+    def endpoint_id(self) -> str:
+        return "community_detail"
+
+    @property
+    def name(self) -> str:
+        return "社區物件詳情資訊 API"
+
+    @property
+    def domain(self) -> DiagnosticDomain:
+        return DiagnosticDomain.COMMUNITY
+
+    @property
+    def description(self) -> str:
+        return "測試信義房屋網頁端社區完整規格詳情端點連線與回傳密文結構"
+
+    @property
+    def default_target_id(self) -> str:
+        return SEED_COMMUNITY_ID
+
+    async def execute(
+        self,
+        client: httpx.AsyncClient,
+        context: Optional[ProbeExecutionContext] = None,
+    ) -> DiagnosticArtifact:
+        if context and context.target_id:
+            target_id = context.target_id
+        elif "last_community_id" in self._context:
+            target_id = self._context["last_community_id"]
+        else:
+            target_id = self.default_target_id
+
+        url = f"{SINYI_WEB_API_BASE_URL}/getCommunityContent.php"
+        detail_payload = {
+            "commId": target_id,
+        }
+        body = self._build_web_body(detail_payload)
+        headers = self._build_web_headers(context)
+        metadata = self._create_metadata_template()
+
+        return await DiagnosticTransportRecorder.capture(
+            client=client,
+            metadata=metadata,
+            method="POST",
+            url=url,
+            body=body,
+            headers=headers,
+        )
+
+
 class SourceSinyiDiagnostics(IProviderDiagnostics):
     """信義房屋來源提供者診斷套件"""
 
@@ -243,6 +379,8 @@ class SourceSinyiDiagnostics(IProviderDiagnostics):
             "health_ping": SinyiHealthPingProbe(self._shared_context),
             "sale_list": SinyiSaleListProbe(self._shared_context),
             "sale_detail": SinyiSaleDetailProbe(self._shared_context),
+            "community_list": SinyiCommunityListProbe(self._shared_context),
+            "community_detail": SinyiCommunityDetailProbe(self._shared_context),
         }
 
     @property

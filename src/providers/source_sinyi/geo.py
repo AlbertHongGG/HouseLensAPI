@@ -1,14 +1,13 @@
-"""HouseLensAPI - 信義房屋查詢條件構建與郵遞區號防腐層 (Sinyi Query Builder)
+"""HouseLensAPI - 信義房屋地理常數與郵遞區號解析防腐層 (Sinyi Geo & Zipcode Normalizer)
 
-將系統通用 SaleHouseSearchQuery 規範轉換為信義房屋 /filterObject.php 加密端點所需之篩選酬載。
-支援全台灣 22 縣市全區與 368 鄉鎮市區 3 碼郵遞區號映射、價格區間、屋齡區間與排序代碼轉換。
+定義全台灣 22 縣市與 368 鄉鎮市區 3 碼郵遞區號映射表，
+並提供標準化之郵遞區號解析純函數，杜絕跨領域模組間之倒置依賴。
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from src.domain.enums import Region
-from src.domain.sale_house import SaleHouseSearchQuery
 
 logger = logging.getLogger(__name__)
 
@@ -162,55 +161,63 @@ TAIWAN_DISTRICT_ZIPCODES: Dict[str, Dict[str, str]] = {
     },
 }
 
-# 排序代碼轉換
-SORT_ORDER_MAP: Dict[str, str] = {
-    "default": "default",
-    "price_asc": "price-asc",
-    "price-asc": "price-asc",
-    "price_desc": "price-desc",
-    "price-desc": "price-desc",
-    "area_asc": "area-asc",
-    "area-asc": "area-asc",
-    "area_desc": "area-desc",
-    "area-desc": "area-desc",
-}
+# 全台灣所有行政區郵遞區號去重排序清單
+ALL_TAIWAN_ZIPCODES: List[str] = sorted(
+    list(set(zipcode for districts in TAIWAN_DISTRICT_ZIPCODES.values() for zipcode in districts.values()))
+)
 
 
 def resolve_sinyi_zipcodes(
     region_id: Optional[int] = None,
     region_name: Optional[str] = None,
     section_name: Optional[str] = None,
+    fallback_all_taiwan: bool = False,
 ) -> List[str]:
     """解析縣市或行政區條件為信義房屋接受之 3 碼郵遞區號清單 (retRange)
 
     優先級別：
-    1. 若指定具體行政區 (section_name)，優先精準鎖定該行政區之單一郵遞區號。
-    2. 若僅指定縣市 (region_id 或 region_name)，返回該縣市下轄之所有行政區郵遞區號清單。
-    3. 若皆未指定，預設返回台北市全區 12 區代碼。
+    1. 若指定具體行政區 (section_name)，優先精準鎖定該行政區之單一郵遞區號（支援部分/模糊匹配）。
+    2. 若僅指定縣市 (region_id 或 region_name)，返回該縣市下轄之所有行政區郵遞區號清單（去重保序）。
+    3. 若皆未指定：
+       - 若 fallback_all_taiwan 為 True，返回全台灣所有行政區郵遞區號清單 (適用社區全域檢索)。
+       - 若 fallback_all_taiwan 為 False，預設返回台北市全區 12 區代碼 (適用中古屋預設)。
     """
-    target_city = "台北市"
+    target_city: Optional[str] = None
     if region_id is not None:
-        target_city = Region.to_chinese_name(region_id)
+        try:
+            target_city = Region.to_chinese_name(region_id)
+        except Exception:
+            target_city = None
     elif region_name:
-        # 兼容台/臺
-        target_city = region_name.replace("臺", "台")
+        target_city = region_name.strip()
 
-    # 取得該縣市字典
+    if target_city:
+        target_city = target_city.replace("臺", "台")
+
+    if not target_city:
+        if fallback_all_taiwan:
+            return list(ALL_TAIWAN_ZIPCODES)
+        target_city = "台北市"
+
     city_districts = TAIWAN_DISTRICT_ZIPCODES.get(target_city)
     if not city_districts:
-        # 再次嘗試台/臺互換
-        alt_city = target_city.replace("台", "臺")
-        city_districts = TAIWAN_DISTRICT_ZIPCODES.get(alt_city, TAIWAN_DISTRICT_ZIPCODES["台北市"])
+        alt_city = target_city.replace("台", "臺") if "台" in target_city else target_city.replace("臺", "台")
+        city_districts = TAIWAN_DISTRICT_ZIPCODES.get(alt_city)
+
+    if not city_districts:
+        if fallback_all_taiwan:
+            return list(ALL_TAIWAN_ZIPCODES)
+        city_districts = TAIWAN_DISTRICT_ZIPCODES["台北市"]
 
     # 1. 若有具體行政區名稱
-    if section_name:
+    if section_name and section_name.strip():
         clean_section = section_name.strip()
         # 精準匹配
         if clean_section in city_districts:
             return [city_districts[clean_section]]
-        # 模糊前綴匹配 (例如 "大安" 匹配 "大安區")
+        # 模糊/部分匹配 (例如 "大安" 匹配 "大安區")
         for dist, code in city_districts.items():
-            if clean_section in dist or dist.startswith(clean_section):
+            if clean_section in dist or dist.startswith(clean_section) or dist in clean_section:
                 return [code]
 
     # 2. 全縣市郵遞區號清單 (去重保序)
@@ -221,98 +228,3 @@ def resolve_sinyi_zipcodes(
             seen.add(code)
             result.append(code)
     return result
-
-
-def resolve_sinyi_price_payload(
-    min_price_wan: Optional[int] = None,
-    max_price_wan: Optional[int] = None,
-) -> Optional[Dict[str, Any]]:
-    """將總價範圍條件轉換為信義房屋 PriceRequest 物件
-
-    信義格式: {"priceType": 2, "priceRange": ["{min}-{max}"]}
-    """
-    if min_price_wan is None and max_price_wan is None:
-        return None
-
-    min_p = int(min_price_wan) if min_price_wan is not None else "0"
-    max_p = int(max_price_wan) if max_price_wan is not None else "99999"
-
-    return {
-        "priceType": 2,
-        "priceRange": [f"{min_p}-{max_p}"],
-    }
-
-
-def resolve_sinyi_age_payload(
-    min_age_years: Optional[float] = None,
-    max_age_years: Optional[float] = None,
-) -> Optional[List[str]]:
-    """將屋齡範圍條件轉換為信義房屋 houseAge 清單
-
-    信義支援區間: ["min-5", "5-10", "10-20", "20-30", "30-max"]
-    """
-    if min_age_years is None and max_age_years is None:
-        return None
-
-    min_age = min_age_years if min_age_years is not None else 0.0
-    max_age = max_age_years if max_age_years is not None else 999.0
-
-    selected_ranges: List[str] = []
-    # 判斷查詢區間 [min_age, max_age] 與各屋齡區間之實質交集
-    if min_age < 5.0 and max_age > 0.0:
-        selected_ranges.append("min-5")
-    if min_age < 10.0 and max_age > 5.0:
-        selected_ranges.append("5-10")
-    if min_age < 20.0 and max_age > 10.0:
-        selected_ranges.append("10-20")
-    if min_age < 30.0 and max_age > 20.0:
-        selected_ranges.append("20-30")
-    if max_age > 30.0:
-        selected_ranges.append("30-max")
-
-    return selected_ranges if selected_ranges else None
-
-
-def build_filter_object_payload(query: SaleHouseSearchQuery) -> Dict[str, Any]:
-    """將 SaleHouseSearchQuery 轉換為信義房屋 /filterObject.php 之完整明文 Request 酬載"""
-    # 1. 行政區郵遞區號
-    region_name = getattr(query, "region_name", None)
-    section_name = getattr(query, "section_name", None)
-    ret_range = resolve_sinyi_zipcodes(
-        region_id=query.region_id,
-        region_name=region_name,
-        section_name=section_name,
-    )
-
-    # 2. 篩選字典
-    filter_obj: Dict[str, Any] = {
-        "retType": 2,  # 固定為 2 (中古屋買賣)
-        "retRange": ret_range,
-        "floor": None,
-    }
-
-    # 關鍵字
-    if query.keywords:
-        filter_obj["keyword"] = {"keyword": query.keywords.strip()}
-
-    # 屋齡
-    age_ranges = resolve_sinyi_age_payload(query.min_age_years, query.max_age_years)
-    if age_ranges:
-        filter_obj["houseAge"] = age_ranges
-
-    # 價格
-    price_obj = resolve_sinyi_price_payload(query.min_price_wan, query.max_price_wan)
-    if price_obj:
-        filter_obj["price"] = price_obj
-
-    # 3. 排序代碼
-    sort_code = "default"
-    if query.sort_order and query.sort_order in SORT_ORDER_MAP:
-        sort_code = SORT_ORDER_MAP[query.sort_order]
-
-    return {
-        "page": query.page,
-        "pageCnt": query.page_size,
-        "sort": sort_code,
-        "filter": filter_obj,
-    }

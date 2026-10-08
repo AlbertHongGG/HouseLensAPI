@@ -91,3 +91,4 @@ scratch/
 
 封包紀錄/
 *.har
+*.json

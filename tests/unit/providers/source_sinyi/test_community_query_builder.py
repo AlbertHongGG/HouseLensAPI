@@ -4,10 +4,8 @@ import pytest
 
 from src.domain.community import CommunitySearchQuery
 from src.domain.enums import Region
-from src.providers.source_sinyi.community_query_builder import (
-    ALL_TAIWAN_ZIPCODES,
-    SinyiCommunityQueryBuilder,
-)
+from src.providers.source_sinyi.geo import ALL_TAIWAN_ZIPCODES
+from src.providers.source_sinyi.query_builders import SinyiCommunityQueryBuilder
 
 
 def test_build_search_payload_default_all_taiwan():

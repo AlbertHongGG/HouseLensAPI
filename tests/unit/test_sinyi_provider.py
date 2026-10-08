@@ -39,25 +39,27 @@ def test_sinyi_provider_properties():
     assert provider.diagnostics.get_probe("health_ping") is not None
     assert provider.diagnostics.get_probe("sale_list") is not None
     assert provider.diagnostics.get_probe("sale_detail") is not None
+    assert provider.diagnostics.get_probe("community_list") is not None
+    assert provider.diagnostics.get_probe("community_detail") is not None
 
 
 @pytest.mark.asyncio
 async def test_sinyi_provider_health_check_success():
     """測試 health_check 成功情境"""
     mock_client = AsyncMock(spec=SourceSinyiClient)
-    mock_client.post_encrypted.return_value = {"retCode": "000000", "retMsg": "成功"}
+    mock_client.post_mobile_api.return_value = {"retCode": "000000", "retMsg": "成功"}
 
     provider = SourceSinyiProvider(client=mock_client)
     is_healthy = await provider.health_check()
     assert is_healthy is True
-    mock_client.post_encrypted.assert_called_once()
+    mock_client.post_mobile_api.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_sinyi_provider_health_check_failure():
     """測試 health_check 異常回退回傳 False"""
     mock_client = AsyncMock(spec=SourceSinyiClient)
-    mock_client.post_encrypted.side_effect = Exception("Network down")
+    mock_client.post_mobile_api.side_effect = Exception("Network down")
 
     provider = SourceSinyiProvider(client=mock_client)
     is_healthy = await provider.health_check()

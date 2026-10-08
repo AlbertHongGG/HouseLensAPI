@@ -18,12 +18,12 @@ from src.domain.sale_house import (
     SaleHouseSearchQuery,
 )
 from src.providers.source_sinyi.client import SourceSinyiClient
-from src.providers.source_sinyi.query_builder import build_filter_object_payload
-from src.providers.source_sinyi.transformers import (
-    parse_int,
-    transform_sinyi_listing_item,
-    transform_sinyi_property_detail,
+from src.providers.source_sinyi.mappers import (
+    map_sinyi_sale_house_detail,
+    map_sinyi_sale_house_list_item,
 )
+from src.providers.source_sinyi.normalizers import parse_int
+from src.providers.source_sinyi.query_builders import SinyiSaleHouseQueryBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -42,10 +42,10 @@ class SourceSinyiSaleHouseProvider(ISaleHouseProvider):
         將統一查詢物件轉換為信義房屋篩選酬載，發送雙向加密請求並解析為標準刊登清單。
         """
         # 1. 構建信義封包篩選酬載
-        payload = build_filter_object_payload(query)
+        payload = SinyiSaleHouseQueryBuilder.build_search_payload(query)
 
         # 2. 發送雙向加密請求
-        response_json = await self._client.post_encrypted("/filterObject.php", payload)
+        response_json = await self._client.post_mobile_api("/filterObject.php", payload)
 
         # 3. 解析回應資料
         content = response_json.get("content") or {}
@@ -56,7 +56,7 @@ class SourceSinyiSaleHouseProvider(ISaleHouseProvider):
 
         # 4. 100% 透過純函數轉換為標準刊登規格
         items: List[NormalizedSaleListing] = [
-            transform_sinyi_listing_item(obj) for obj in raw_items
+            map_sinyi_sale_house_list_item(obj) for obj in raw_items
         ]
 
         logger.debug(
@@ -92,7 +92,7 @@ class SourceSinyiSaleHouseProvider(ISaleHouseProvider):
         }
 
         # 2. 發送雙向加密請求
-        response_json = await self._client.post_encrypted("/getObjectContent.php", payload)
+        response_json = await self._client.post_mobile_api("/getObjectContent.php", payload)
 
         # 3. 檢驗回應內容
         content = response_json.get("content")
@@ -100,7 +100,7 @@ class SourceSinyiSaleHouseProvider(ISaleHouseProvider):
             raise ResourceNotFoundError("sale_house", clean_house_id)
 
         # 4. 100% 由詳情 API 轉換為標準實體規格模型
-        detail = transform_sinyi_property_detail(content)
+        detail = map_sinyi_sale_house_detail(content)
 
         logger.debug(
             "信義房屋詳情解析成功: 案號 %s, 標題 %s, 總價 %d 萬",

@@ -66,7 +66,7 @@ class SourceSinyiProvider(IHouseSourceProvider):
                     "retType": 2,
                 },
             }
-            res = await self._client.post_encrypted("/filterObject.php", ping_payload)
+            res = await self._client.post_mobile_api("/filterObject.php", ping_payload)
             return res.get("retCode") == "000000"
         except Exception as e:
             logger.warning("信義房屋健康檢查失敗: %s", e)

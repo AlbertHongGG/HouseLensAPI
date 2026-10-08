@@ -34,7 +34,7 @@ async def test_ensure_sid_success_from_gateway():
     mock_http_client.is_closed = False
     mock_http_client.post.return_value = mock_resp
 
-    with patch.object(client, "get_client", return_value=mock_http_client):
+    with patch.object(client, "get_mobile_client", return_value=mock_http_client):
         sid = await client.ensure_sid()
         assert sid == "20261008041801698"
         assert client._cached_sid == "20261008041801698"
@@ -48,7 +48,7 @@ async def test_ensure_sid_fallback_on_network_error():
     mock_http_client.is_closed = False
     mock_http_client.post.side_effect = httpx.NetworkError("Session gateway down")
 
-    with patch.object(client, "get_client", return_value=mock_http_client):
+    with patch.object(client, "get_mobile_client", return_value=mock_http_client):
         sid = await client.ensure_sid()
         assert sid == FALLBACK_SEED_SID
         assert client._cached_sid == FALLBACK_SEED_SID
@@ -56,10 +56,10 @@ async def test_ensure_sid_fallback_on_network_error():
 
 @pytest.mark.asyncio
 class TestSourceSinyiClient:
-    """SourceSinyiClient 核心行為測試"""
+    """SourceSinyiClient 手機端雙向加密網關核心行為測試"""
 
-    async def test_post_encrypted_success_flow(self):
-        """測試加密請求發送與解密接收成功流程 (含 sid 緩存情境)"""
+    async def test_post_mobile_api_success_flow(self):
+        """測試手機端加密請求發送與解密接收成功流程 (含 sid 緩存情境)"""
         crypto = SinyiCryptoService()
         client = SourceSinyiClient(crypto=crypto)
         client._cached_sid = "test_valid_sid_123"
@@ -82,8 +82,8 @@ class TestSourceSinyiClient:
         mock_http_client.is_closed = False
         mock_http_client.post.return_value = mock_resp
 
-        with patch.object(client, "get_client", return_value=mock_http_client):
-            res = await client.post_encrypted("/test_endpoint.php", {"my_query": "taipei"})
+        with patch.object(client, "get_mobile_client", return_value=mock_http_client):
+            res = await client.post_mobile_api("/test_endpoint.php", {"my_query": "taipei"})
 
             assert res["retCode"] == "000000"
             assert res["content"]["items"] == [1, 2, 3]
@@ -95,19 +95,19 @@ class TestSourceSinyiClient:
             assert "json" in kwargs
             assert "param" in kwargs["json"]
 
-    async def test_post_encrypted_connection_timeout(self):
+    async def test_post_mobile_api_connection_timeout(self):
         """測試連線逾時轉換為 ProviderConnectionError"""
         client = SourceSinyiClient()
         mock_http_client = AsyncMock(spec=httpx.AsyncClient)
         mock_http_client.is_closed = False
         mock_http_client.post.side_effect = httpx.ConnectTimeout("Connection timed out")
 
-        with patch.object(client, "get_client", return_value=mock_http_client):
+        with patch.object(client, "get_mobile_client", return_value=mock_http_client):
             with pytest.raises(ProviderConnectionError) as exc_info:
-                await client.post_encrypted("/test.php", {})
+                await client.post_mobile_api("/test.php", {})
             assert "sinyi" in str(exc_info.value)
 
-    async def test_post_encrypted_rate_limit_429(self):
+    async def test_post_mobile_api_rate_limit_429(self):
         """測試 HTTP 429 轉換為 RateLimitExceededError"""
         client = SourceSinyiClient()
         mock_resp = MagicMock(spec=httpx.Response)
@@ -116,11 +116,11 @@ class TestSourceSinyiClient:
         mock_http_client.is_closed = False
         mock_http_client.post.return_value = mock_resp
 
-        with patch.object(client, "get_client", return_value=mock_http_client):
+        with patch.object(client, "get_mobile_client", return_value=mock_http_client):
             with pytest.raises(RateLimitExceededError):
-                await client.post_encrypted("/test.php", {})
+                await client.post_mobile_api("/test.php", {})
 
-    async def test_post_encrypted_business_error_code(self):
+    async def test_post_mobile_api_business_error_code(self):
         """測試伺服器業務狀態碼非 000000 轉換為 ProviderResponseError"""
         crypto = SinyiCryptoService()
         client = SourceSinyiClient(crypto=crypto)
@@ -135,13 +135,13 @@ class TestSourceSinyiClient:
         mock_http_client.is_closed = False
         mock_http_client.post.return_value = mock_resp
 
-        with patch.object(client, "get_client", return_value=mock_http_client):
+        with patch.object(client, "get_mobile_client", return_value=mock_http_client):
             with pytest.raises(ProviderResponseError) as exc_info:
-                await client.post_encrypted("/test.php", {})
+                await client.post_mobile_api("/test.php", {})
             assert "999999" in str(exc_info.value)
             assert "參數檢核失敗" in str(exc_info.value)
 
-    async def test_post_encrypted_retry_on_000991_invalid_sid(self):
+    async def test_post_mobile_api_retry_on_000991_invalid_sid(self):
         """測試遭遇 000991 sid無效 時自動換發新 sid 並重新請求一次成功"""
         crypto = SinyiCryptoService()
         client = SourceSinyiClient(crypto=crypto)
@@ -166,8 +166,8 @@ class TestSourceSinyiClient:
         mock_http_client.is_closed = False
         mock_http_client.post.side_effect = [err_resp, session_resp, ok_resp]
 
-        with patch.object(client, "get_client", return_value=mock_http_client):
-            result = await client.post_encrypted("/test.php", {"k": "v"})
+        with patch.object(client, "get_mobile_client", return_value=mock_http_client):
+            result = await client.post_mobile_api("/test.php", {"k": "v"})
             assert result["retCode"] == "000000"
             assert result["content"]["ok"] is True
             assert client._cached_sid == "fresh_new_sid_888"

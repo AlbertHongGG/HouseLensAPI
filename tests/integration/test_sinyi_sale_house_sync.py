@@ -40,7 +40,7 @@ def mock_sinyi_client():
 @pytest.mark.asyncio
 async def test_sinyi_sale_house_e2e_sync_pipeline(sync_test_db: DatabaseManager, mock_sinyi_client):
     # 1. 設置信義清單 API (/filterObject.php) 與詳情 API (/getObjectContent.php) 模擬回應
-    def fake_post_encrypted(path: str, payload: dict, **kwargs):
+    def fake_post_mobile_api(path: str, payload: dict, **kwargs):
         if path == "/filterObject.php":
             return {
                 "retCode": "000000",
@@ -106,7 +106,7 @@ async def test_sinyi_sale_house_e2e_sync_pipeline(sync_test_db: DatabaseManager,
                 }
         return {"retCode": "000000", "content": {}}
 
-    mock_sinyi_client.post_encrypted.side_effect = fake_post_encrypted
+    mock_sinyi_client.post_mobile_api.side_effect = fake_post_mobile_api
 
     # 2. 建立獨立 Registry 註冊測試 Provider 實例
     from src.core.registry import ProviderRegistry

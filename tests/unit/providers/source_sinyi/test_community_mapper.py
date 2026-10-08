@@ -1,4 +1,4 @@
-"""HouseLensAPI - 信義房屋社區模型轉換器單元測試 (Unit Tests for Sinyi Community Transformers)"""
+"""HouseLensAPI - 信義房屋社區模型映射器單元測試 (Unit Tests for Sinyi Community Mapper)"""
 
 import pytest
 
@@ -7,32 +7,13 @@ from src.domain.community import (
     NormalizedCommunityDetail,
     NormalizedCommunitySummary,
 )
-from src.providers.source_sinyi.community_transformers import (
+from src.providers.source_sinyi.mappers import (
     map_sinyi_community_detail,
-    map_sinyi_community_summary,
-    parse_facilities,
-    parse_public_ratio,
+    map_sinyi_community_list_item,
 )
 
 
-def test_parse_public_ratio():
-    """測試公設比字串解析 (取下限數值)"""
-    assert parse_public_ratio("32.00%~36.00%") == 32.0
-    assert parse_public_ratio("30.5%") == 30.5
-    assert parse_public_ratio("35") == 35.0
-    assert parse_public_ratio(None) is None
-    assert parse_public_ratio("") is None
-
-
-def test_parse_facilities():
-    """測試公共設施字串切分"""
-    raw = "SPA,花園,室內泳池,健身房,KTV、視聽中心"
-    res = parse_facilities(raw)
-    assert res == ["SPA", "花園", "室內泳池", "健身房", "KTV", "視聽中心"]
-    assert parse_facilities(None) == []
-
-
-def test_map_sinyi_community_summary():
+def test_map_sinyi_community_list_item():
     """測試信義房屋清單物件轉換為 NormalizedCommunitySummary"""
     raw_item = {
         "commId": "G0000316",
@@ -45,7 +26,7 @@ def test_map_sinyi_community_summary():
         "longitude": 121.4740942,
     }
 
-    summary = map_sinyi_community_summary(raw_item)
+    summary = map_sinyi_community_list_item(raw_item)
     assert summary.provider_id == "sinyi"
     assert summary.external_community_id == "G0000316"
     assert summary.community_name == "帝國花園"
