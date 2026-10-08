@@ -139,7 +139,7 @@ class RichProgressReporter:
         clean_title = sanitize_terminal_text(title, max_len=20)
         self.console.print(
             f"    [bold magenta][去重合併][/bold magenta] -> [white]{clean_title}[/white] "
-            f"歸戶至既有實體 [dim]{matched_id[:8]}...[/dim]"
+            f"歸戶至既有實體 [dim]{matched_id}[/dim]"
         )
 
     def on_interrupted(self, accumulated_count: int, domain_name: str) -> None:

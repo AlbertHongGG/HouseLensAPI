@@ -470,3 +470,138 @@ async def test_stem_matching_disambiguation_for_case_like_forest_park(resolver_t
         assert updated_prop.community_uuid == saved_comm.id
         assert updated_prop.external_community_id == "104143"  # 關鍵：模式 2 成功補齊外部 ID！
 
+
+@pytest.mark.asyncio
+async def test_local_reconciliation_provider_isolation_and_remote_passthrough(
+    resolver_test_db: DatabaseManager,
+):
+    """測試來源平台隔離：本地存在其他 Provider 之同名或主幹吻合社區時，不干擾目標 Provider 的消歧與探索"""
+    async with resolver_test_db.session() as session:
+        comm_repo = CommunityRepository(session)
+        prop_repo = PropertyRepository(session)
+
+        # 1. 建立 591 與信義房屋的「成德菁選集」於同一行政區
+        comm_sinyi = NormalizedCommunityDetail(
+            provider_id="sinyi",
+            external_community_id="0007498",
+            community_name="成德菁選集",
+            region_name="台北市",
+            section_name="大安區",
+            address="台北市大安區信義路三段１０５號",
+        )
+        await comm_repo.upsert_from_detail(comm_sinyi, provider_id="sinyi")
+
+        comm_591 = NormalizedCommunityDetail(
+            provider_id="591",
+            external_community_id="4059",
+            community_name="成德菁選集",
+            region_name="台北市",
+            section_name="大安區",
+            address="台北市大安區信義路三段105號",
+        )
+        await comm_repo.upsert_from_detail(comm_591, provider_id="591")
+
+        # 2. 建立永慶房屋未關聯之中古屋 (名稱為 '菁選集')
+        prop_yc = await prop_repo.upsert_from_summary(
+            NormalizedSaleListing(
+                provider_id="yungching",
+                external_house_id="YC99001",
+                title="大安菁選集優質美寓",
+                price_wan=3580,
+                total_area_pin=32.5,
+                region_name="台北市",
+                section_name="大安區",
+                external_community_id=None,
+                community_name="菁選集",
+            ),
+            provider_id="yungching",
+        )
+        prop_yc.community_uuid = None
+        await session.flush()
+
+    # 3. 模擬永慶房屋官方社區端點 (回傳永慶專屬社區)
+    cand_yc = NormalizedCommunitySummary(
+        provider_id="yungching",
+        external_community_id="12549",
+        community_name="菁選集",
+        region_name="台北市",
+        section_name="大安區",
+        address="臺北市大安區信義路三段",
+        coordinates=GeoPoint(lat=25.0333, lng=121.5432),
+    )
+
+    mock_comm = MagicMock()
+    mock_comm.search_communities = AsyncMock(
+        return_value=PageResult.create(
+            items=[cand_yc], total_records=1, page=1, page_size=10
+        )
+    )
+    mock_comm.get_community_detail = AsyncMock(
+        return_value=NormalizedCommunityDetail(
+            provider_id="yungching",
+            external_community_id="12549",
+            community_name="菁選集",
+            region_name="台北市",
+            section_name="大安區",
+            address="臺北市大安區信義路三段",
+            coordinates=GeoPoint(lat=25.0333, lng=121.5432),
+        )
+    )
+
+    class DummyYungchingProvider(IHouseSourceProvider):
+        @property
+        def provider_id(self) -> str:
+            return "yungching"
+
+        @property
+        def provider_name(self) -> str:
+            return "永慶房產集團"
+
+        @property
+        def community(self):
+            return mock_comm
+
+        @property
+        def sale_house(self):
+            return None
+
+        @property
+        def new_house(self):
+            return None
+
+        @property
+        def diagnostics(self):
+            return None
+
+        async def health_check(self) -> bool:
+            return True
+
+    reg = ProviderRegistry()
+    reg.register_instance(DummyYungchingProvider())
+
+    service = CommunityResolutionService(provider_registry=reg, database=resolver_test_db)
+    options = CommunityResolutionOptions(provider_id="yungching")
+    report = await service.resolve_unlinked_properties(options)
+
+    # 驗證：永慶物件未被 591/sinyi 的 2 筆成德菁選集誤判為歧義，而是平滑穿透至遠端探索成功對齊
+    assert report.scanned_properties_count == 1
+    assert report.ambiguous_targets_count == 0
+    assert report.remotely_resolved_properties_count == 1
+    assert report.persisted_communities_count == 1
+
+    # 驗證資料庫 Communities 表新增了永慶之社區
+    async with resolver_test_db.session() as session:
+        c_stmt = select(CommunityTable).where(
+            CommunityTable.provider_id == "yungching",
+            CommunityTable.external_community_id == "12549",
+        )
+        c_res = await session.execute(c_stmt)
+        yc_comm = c_res.scalar_one()
+        assert yc_comm.name == "菁選集"
+
+        p_stmt = select(PropertyTable).where(PropertyTable.external_house_id == "YC99001")
+        p_res = await session.execute(p_stmt)
+        updated_prop = p_res.scalar_one()
+        assert updated_prop.community_uuid == yc_comm.id
+        assert updated_prop.external_community_id == "12549"
+

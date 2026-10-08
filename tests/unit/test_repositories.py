@@ -119,6 +119,14 @@ async def test_community_repository_upsert_and_search(test_db: DatabaseManager):
         results_none = await repo.search(min_age_years=10, max_age_years=20)
         assert len(results_none) == 0
 
+        # 4. 來源隔離篩選驗證 (provider_id isolation)
+        results_591 = await repo.search(provider_id="591", keyword="鳴森")
+        assert len(results_591) == 1
+        assert results_591[0].provider_id == "591"
+
+        results_sinyi = await repo.search(provider_id="sinyi", keyword="鳴森")
+        assert len(results_sinyi) == 0
+
 
 @pytest.mark.asyncio
 async def test_property_repository_deduplication_and_listings(test_db: DatabaseManager):

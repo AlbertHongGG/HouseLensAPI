@@ -74,10 +74,11 @@ class ICommunityRepository(ABC):
         keyword: Optional[str] = None,
         min_age_years: Optional[float] = None,
         max_age_years: Optional[float] = None,
+        provider_id: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[CommunityTable]:
-        """多條件檢索庫存社區"""
+        """多條件檢索庫存社區 (支援來源平台篩選)"""
         pass
 
 

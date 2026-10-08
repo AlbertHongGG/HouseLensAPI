@@ -272,11 +272,14 @@ class CommunityRepository(ICommunityRepository):
         keyword: Optional[str] = None,
         min_age_years: Optional[float] = None,
         max_age_years: Optional[float] = None,
+        provider_id: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
     ) -> List[CommunityTable]:
-        """多條件檢索庫存社區 (含屋齡篩選)"""
+        """多條件檢索庫存社區 (含屋齡與來源平台篩選)"""
         stmt = select(CommunityTable)
+        if provider_id:
+            stmt = stmt.where(CommunityTable.provider_id == provider_id)
         if region:
             stmt = stmt.where(CommunityTable.region_name == region)
         if section:

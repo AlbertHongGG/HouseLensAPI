@@ -142,21 +142,8 @@ class SourceSinyiClient:
         Raises:
             ProviderResponseError: 當握手端點回應錯誤或無法解析出 accessCode/sid。
         """
-        handshake_device_payload = {
-            k: DEFAULT_WEB_DEVICE_PAYLOAD.get(k, "")
-            for k in [
-                "domain",
-                "machineNo",
-                "requestor",
-                "sinyiGroup",
-                "utmCampaign",
-                "utmCode",
-                "utmContent",
-                "utmMedium",
-                "utmSource",
-                "utmTerm",
-            ]
-        }
+        # 傳遞完整設備指紋 (包含 19 個必要欄位)，防範信義伺服器檢核參數個數錯誤
+        handshake_device_payload = dict(DEFAULT_WEB_DEVICE_PAYLOAD)
 
         # 第一階段：appSetup.php 取得 accessCode (即日後通訊標頭 sat)
         setup_url = f"{self.web_base_url}/appSetup.php"

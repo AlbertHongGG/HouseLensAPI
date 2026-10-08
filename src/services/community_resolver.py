@@ -200,12 +200,13 @@ class CommunityResolutionService:
                         reason="本地資料庫依外部代碼精準命中",
                     )
 
-            # 2. 依同行政區與名稱查詢本地
+            # 2. 依同行政區與名稱查詢本地 (嚴格限定僅比對同來源 provider 社區)
             if target.community_name:
                 local_candidates = await comm_repo.search(
                     region=target.region_name,
                     section=target.section_name,
                     keyword=target.community_name,
+                    provider_id=target.provider_id,
                     limit=10,
                 )
                 # 優先第一級：全字精確吻合
